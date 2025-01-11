@@ -428,10 +428,8 @@ Windows&reg; ‚ª•Û—L‚·‚éƒf[ƒ^ƒx[ƒX‚É‚È‚¢•¶ŽšƒZƒbƒg‚Å‘‚©‚ê‚Ä‚¢‚éƒ[ƒ‹‚ð”jŠü‚µ‚
 ³‹K‚Ìƒ[ƒ‹‚Íˆê”Ê“I‚É‚»‚ñ‚È‚±‚Æ‚Í‚µ‚È‚¢
 ( ƒ†[ƒU[“o˜^Žž‚É“ü—Í‚µ‚½Ž–¼‚ÅŒê‚è‚©‚¯‚Ä‚­‚é‚©, ‚»‚à‚»‚à•Ê–¼‚È‚ñ‚©•t‚¯‚È‚¢ ) ‚Ì‚Å,
 ‚±‚¤‚¢‚¤ˆÓ–¡‚Ì‚È‚¢•Ê–¼‚ðU‚Á‚Ä‚­‚éƒ[ƒ‹‚ð”jŠü‚µ‚Ü‚·.<br>
-<sub>
 ¦ ‚±‚ê‚Í“–•û‚ÌŒoŒ±‘¥‚É‚æ‚éƒ`ƒFƒbƒN€–Ú‚È‚Ì‚Å,
 ‚à‚µ•›ì—p ( —v‚éƒ[ƒ‹‚Ü‚ÅŠü‚Ä‚ç‚ê‚½ ) ‚ªo‚½‚ç&#x2611;‚ðŠO‚µ‚Ä‚­‚¾‚³‚¢.
-</sub><p>
 
 
 ƒfƒtƒHƒ‹ƒg‚Å 4‚Â‚Æ‚à ON ‚É‚µ‚Ä‚¢‚Ü‚·.
