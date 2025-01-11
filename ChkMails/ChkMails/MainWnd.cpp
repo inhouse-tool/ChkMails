@@ -353,7 +353,7 @@ CMainWnd::OnShowHelp( WPARAM wParam, LPARAM lParam )
 	strURL.MakeLower();
 	strURL.Replace( ' ', '-' );
 
-	CString	strPath = _T("https://github.com/inhouse-tool/ChkMails/README.md");
+	CString	strPath = _T("https://github.com/inhouse-tool/ChkMails/blob/main/README.md");
 	strURL.Insert( 0, _T("#") );
 	strURL.Insert( 0, strPath );
 	ShellExecute( NULL, _T("open"), strURL, NULL, NULL, SW_SHOWNORMAL );
