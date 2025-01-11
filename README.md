@@ -318,13 +318,11 @@ Windows&reg; ‚ª•Û—L‚·‚éƒf[ƒ^ƒx[ƒX‚É‚È‚¢•¶ŽšƒZƒbƒg‚Å‘‚©‚ê‚Ä‚¢‚éƒ[ƒ‹‚ð”jŠü‚µ‚
 ‚±‚Ìƒf[ƒ^ƒx[ƒX‚Í, ˆÈ‰º‚Ì registry ‚Ì”z‰º‚É‚ ‚é‚à‚Ì‚ðˆÓ–¡‚µ‚Ü‚·.<br>
 `HKEY_CLASSES_ROOT\MIME\Database\Charset\`
 <br>
-<sub>
 ( “ú–{‚ÉŒü‚¯‚Ä‚ÌƒXƒpƒ€ƒ[ƒ‹‚ð
 [GB 2312](https://ja.wikipedia.org/wiki/GB_2312) ‚Å‘‚¢‚Ä‚­‚é‚¤‚Á‚©‚è‚³‚ñ‚à‹‚é‚É‚Í‹‚é‚Ì‚Å‚·‚ª,
 ‚±‚¤‚¢‚¤ƒ[ƒ‹‚Í‘¼‚ÌðŒ‚Å‚àƒnƒl‚ç‚ê‚éê‡‚Î‚©‚è‚¾‚Á‚½‚Ì‚Å,
 “Á‚É•¶ŽšƒZƒbƒg‚Åu·•Êv‚·‚é‹@”\‚ÍÝ‚¯‚Ä‚¢‚Ü‚¹‚ñ.
 ‚±‚ÌðŒ‚Éˆø‚Á‚©‚©‚é‚Ì‚Í, ƒzƒ“ƒg‚É‰½‚©‚ÌŠÔˆá‚¢‚Ì‚Æ‚«‚¾‚¯‚Å‚·. )
-</sub>
 
 * ‹^‚í‚µ‚¢§Œä•¶Žš<br>
 [UNICODE ‚Ì§Œä•¶Žš](https://en.wikipedia.org/wiki/Unicode_control_characters)
@@ -332,11 +330,8 @@ Windows&reg; ‚ª•Û—L‚·‚éƒf[ƒ^ƒx[ƒX‚É‚È‚¢•¶ŽšƒZƒbƒg‚Å‘‚©‚ê‚Ä‚¢‚éƒ[ƒ‹‚ð”jŠü‚µ‚
 “Ç‚ÝŽè‚ÉŽÀÛ‚Æ‚ÍˆÙ‚È‚é•¶Žš—ñ‚ð•\Ž¦‚µ‚ÄŒ©‚¹‚½‚è, ƒpƒ^[ƒ“ŒŸõ‚©‚ç“¦‚ê‚é‚½‚ß‚ÉŽg—p‚³‚ê‚½‚è, ‚Æ,
 ‚±‚¤‚¢‚¤•¶ŽšƒR[ƒh‚ª–„‚ßž‚Ü‚ê‚Ä‚¢‚éƒ[ƒ‹‚É‚ÍƒƒN‚È‚à‚Ì‚ª‚ ‚è‚Ü‚¹‚ñ.
 <br>
-<sub>
 ( ‚½‚¾‚µ, ‰E‚©‚ç¶‚É‘‚­Œ¾Œê‚Ìê‡‚Í, ‚²‚­•’Ê‚Éu‰E‚©‚ç¶‚É“Ç‚ñ‚Å‚ËBv‚Æ‚¢‚¤§Œä•¶Žš‚ª“ü‚Á‚Ä‚¢‚é‚±‚Æ‚ª‚ ‚é‚Ì‚Å,
 ‚±‚¤‚¢‚¤Œ¾Œê‚Æ‚¨•t‚«‡‚¢‚Ì‚ ‚é•û‚Í‚±‚Ì&#x2611;‚ðŠO‚µ‚Ä‚­‚¾‚³‚¢. )
-</sub>
-
 
 * ‰ñ”ð“I‚È•¶ŽšƒR[ƒh<br>
 –„‚ßž‚Ü‚ê‚½ƒŠƒ“ƒNæ‚È‚Ç‚É ASCII ƒR[ƒh‚Å‚Í‚È‚­ UNICODE ‚ÌŽ—‚½•¶Žš‚ª–„‚ßž‚Ü‚ê‚½ƒ[ƒ‹‚ð”jŠü‚µ‚Ü‚·.<br>
@@ -345,11 +340,9 @@ Windows&reg; ‚ª•Û—L‚·‚éƒf[ƒ^ƒx[ƒX‚É‚È‚¢•¶ŽšƒZƒbƒg‚Å‘‚©‚ê‚Ä‚¢‚éƒ[ƒ‹‚ð”jŠü‚µ‚
 ‚¾‚Æ‚·‚é‚Æ, ‚±‚¤‚µ‚½•¶ŽšƒR[ƒh‚ð–„‚ßž‚ñ‚¾ƒ[ƒ‹‚Æ‚¢‚¤‚Ì‚Í, ‚»‚Ì‘PˆÓ‚É‚Â‚¯ž‚ñ‚Åƒpƒ^[ƒ“ŒŸõ‚©‚ç“¦‚ê‚é‚½‚ß‚Ì‚à‚Ì‚Å‚µ‚å‚¤.
 ‚±‚¤‚¢‚¤•¶ŽšƒR[ƒh‚ª–„‚ßž‚Ü‚ê‚Ä‚¢‚éƒ[ƒ‹‚É‚ÍƒƒN‚È‚à‚Ì‚ª‚ ‚è‚Ü‚¹‚ñ.
 <br>
-<sub>
 ( ‚Ð‚å‚Á‚Æ‚·‚é‚Æ,
 u•’Ê‚É‘‚­‚æ‚è–Ú—§‚Â‚©‚çv‚Æ‚¢‚¤——R‚Å‚í‚´‚í‚´‚±‚¤‚¢‚¤•¶ŽšƒR[ƒh‚ðŽg‚¤ƒtƒ@ƒ“ƒL[‚È“X•Ü‚à‚ ‚é‚©‚à‚µ‚ê‚Ü‚¹‚ñ.
 ‚»‚¤‚¢‚¤ƒtƒ@ƒ“ƒL[‚È“X•Ü‚Æ‚¨•t‚«‡‚¢‚Ì‚ ‚é•û‚Í‚±‚Ì&#x2611;‚ðŠO‚µ‚Ä‚­‚¾‚³‚¢. )
-</sub>
 
 ƒfƒtƒHƒ‹ƒg‚Å, 3‚Â‘S‚Ä ON ‚É‚µ‚Ä‚¢‚Ü‚·.
 
