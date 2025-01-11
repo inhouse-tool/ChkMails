@@ -49,7 +49,7 @@
 
 メールアカウント設定のための下記のようなダイアログを動かしている class です.
 
-![](../Examples/Accounts3.png)
+![](../pics/Accounts3.png)
 
 どうということはないありふれた独立 dialog ですが,
 [`CListCtrl`](https://learn.microsoft.com/ja-jp/cpp/mfc/reference/clistctrl-class)

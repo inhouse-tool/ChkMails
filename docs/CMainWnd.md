@@ -629,11 +629,11 @@ Windows&reg; 10 では上下左右に動かせるので,
 
 | 呼び出し元 | 状況 | 対応 |
 | --- | --- | --- |
-| [`OnMenuAccounts`](#onmenuaccounts)	| アカウントが全て削除された | アイコン![](../Examples/Icon.White.png)とメッセージでアカウント無効をアピール. |
-| [`ConnectPOP`](#connectpop)		| 接続を開始した | アイコン![](../Examples/Icon.Yellow.png)とメッセージで開始を告げる. |
-| [`ClosePOP`](#closepop)		| 接続が失敗した | アイコン![](../Examples/Icon.Red.png)とメッセージで失敗を訴える. |
-| [`RespondPOP`](#respondpop)		| アカウントのチェックが終わった | アイコン![](../Examples/Icon.Grey.png)![](../Examples/Icon.Green.png)とメッセージで首尾を報告する. |
-| [`FeedDebug`](#feeddebug)		| デバッグ用ファイルを読み切った | アイコン![](../Examples/Icon.Grey.png)![](../Examples/Icon.Green.png)とメッセージで首尾を報告する. |
+| [`OnMenuAccounts`](#onmenuaccounts)	| アカウントが全て削除された | アイコン![](../pics/Icon.White.png)とメッセージでアカウント無効をアピール. |
+| [`ConnectPOP`](#connectpop)		| 接続を開始した | アイコン![](../pics/Icon.Yellow.png)とメッセージで開始を告げる. |
+| [`ClosePOP`](#closepop)		| 接続が失敗した | アイコン![](../pics/Icon.Red.png)とメッセージで失敗を訴える. |
+| [`RespondPOP`](#respondpop)		| アカウントのチェックが終わった | アイコン![](../pics/Icon.Grey.png)![](../pics/Icon.Green.png)とメッセージで首尾を報告する. |
+| [`FeedDebug`](#feeddebug)		| デバッグ用ファイルを読み切った | アイコン![](../pics/Icon.Grey.png)![](../pics/Icon.Green.png)とメッセージで首尾を報告する. |
 
 最後の「首尾を報告する」ですが, この報告を依頼する呼び出しの際には「このメッセージを出せ」との指示がありません.
 引数となっているメッセージが空っぽで呼び出されます.
@@ -641,7 +641,7 @@ Windows&reg; 10 では上下左右に動かせるので,
 空メッセージを受け取った本関数は,
 未読のメール数に従ってメッセージの文言を決め,
 未読のメールの有無に従ってアイコンの種別
-( ![](../Examples/Icon.Grey.png)か![](../Examples/Icon.Green.png) ) を選びます.
+( ![](../pics/Icon.Grey.png)か![](../pics/Icon.Green.png) ) を選びます.
 
 この関数は状況変化があった際に必ず通る切り口になっているので,
 この関数から [`ShowSummary`](#showsummary) や [`ShareSummary`](#sharesummary) も呼び出して,
@@ -689,7 +689,7 @@ Windows&reg; 10 では上下左右に動かせるので,
 [`AfxMessageBox()`](https://learn.microsoft.com/ja-jp/cpp/mfc/reference/cstring-formatting-and-message-box-display#afxmessagebox)
 して下記のように自己紹介します.<br>
 
-![](../Examples/Intro.png)<br>
+![](../pics/Intro.png)<br>
 <sup>
 [`AfxMessageBox()`](https://learn.microsoft.com/ja-jp/cpp/mfc/reference/cstring-formatting-and-message-box-display#afxmessagebox)
 なのに自前のアイコンが添えられているのは, そういうことができるように小細工された

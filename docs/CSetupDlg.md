@@ -44,7 +44,7 @@
 
 その他の設定のための下記のようなダイアログを動かしている class です.
 
-![](../Examples/Setup.png)
+![](../pics/Setup.png)
 
 どうということはないありふれた独立ダイアログですが,
 [`CListCtrl`](https://learn.microsoft.com/ja-jp/cpp/mfc/reference/clistctrl-class)

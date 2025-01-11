@@ -73,12 +73,12 @@ Debug build において,
 その Close ボタン ( 例の赤いアレ ) の内外をマウスでウロウロさせて
 tooltip を出したり引っ込めたりを根気よく繰り返していると……,
 ( 下図参照 )
-<br><img src="../Examples/Tooltip.png">
+<br><img src="../pics/Tooltip.png">
 <sup>( 画面の上端ギリギリに構えて tooltip が出るのを待ち, 出たら tooltip の方に動かすのがコツです. )</sup><br>
 いきなり下記のように assertion に失敗することがあります.
 <sub>( 2025/1月現在 Windows&reg; 11 24H2 にて確認 )</sub>
 
-<img src="../Examples/Assertion.png">
+<img src="../pics/Assertion.png">
 
 せっかくなので `Retry` を押して実況見分してみると,
 
@@ -90,7 +90,7 @@ tooltip を出したり引っ込めたりを根気よく繰り返していると……,
 
 という状況に引っかかったようです. ( 下図参照 )
 
-![](../Examples/AssertionFailure.png)
+![](../pics/AssertionFailure.png)
 
 この再現手順でこの状況に引っかかりそうな `CWnd` は tooltip しかいません. なので犯人は tooltip です.
 

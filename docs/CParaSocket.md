@@ -333,9 +333,9 @@ Socket の状態変化をアプリ層に通知します.
 通信上は, TCP/IP 上の接続が成立してから, いわゆる「Client Hello」を送信するまでを行います.
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="../Examples/TLS1d.png">
-  <source media="(prefers-color-scheme: light)" srcset="../Examples/TLS1l.png">
-  <img src="../Examples/TLS1l.png">
+  <source media="(prefers-color-scheme: dark)" srcset="../pics/TLS1d.png">
+  <source media="(prefers-color-scheme: light)" srcset="../pics/TLS1l.png">
+  <img src="../pics/TLS1l.png">
 </picture>
 <p>
 
@@ -368,9 +368,9 @@ Socket の状態変化をアプリ層に通知します.
 そのまた返信の「Change Cipher Spec」,「Encrypted Handshake Message」を受信するまでを行います.
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="../Examples/TLS2d.png">
-  <source media="(prefers-color-scheme: light)" srcset="../Examples/TLS2l.png">
-  <img src="../Examples/TLS1l.png">
+  <source media="(prefers-color-scheme: dark)" srcset="../pics/TLS2d.png">
+  <source media="(prefers-color-scheme: light)" srcset="../pics/TLS2l.png">
+  <img src="../pics/TLS1l.png">
 </picture>
 <p>
 

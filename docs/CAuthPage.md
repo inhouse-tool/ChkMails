@@ -26,7 +26,7 @@
 [`CFilterSheet`](CFilterSheet.md) が
 束ねている page のうちの 1つです.
 
-![](../Examples/Filter.Authentication.png)
+![](../pics/Filter.Authentication.png)
 
 これまでの運用で, メールサーバーからどの `Authentication-Results:` が来た実績があるのかを,
 [Main Window](CMainWnd.md) から bitmap 値でもらい, その bitmap 値に応じて各 authentication の有無を表現しています.

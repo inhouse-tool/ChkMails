@@ -27,7 +27,7 @@
 ‘©‚Ë‚Ä‚¢‚é page ‚Ì‚¤‚¿‚Ì 1‚Â‚Å‚·.
 <p>
 
-![](../Examples/Filter.Sender.png)
+![](../pics/Filter.Sender.png)
 
 &#x2611;‚Ì ON/OFF ‹ï‡‚ğ,
 bitmap ’l‚Æ‚µ‚Ä [Main Window](CMainWnd.md) ‚Æ‚â‚èæ‚è‚µ‚Ä‚¢‚Ü‚·.

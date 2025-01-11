@@ -46,7 +46,7 @@
 [`MessageBox`](https://learn.microsoft.com/ja-jp/windows/win32/api/winuser/nf-winuser-messagebox)
 を表示する class です.
 
-![](../Examples/Exit.png)
+![](../pics/Exit.png)
 
 なぜそんなものをわざわざ手作りしてあるのかというと,
 `MessageBox`をタスクバー ( 上のアイコン ) に寄った端っこに出したかったから」

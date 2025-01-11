@@ -37,7 +37,7 @@
 
 [サマリー](../README.md#notification) の表示に用いられている通知用ウィンドウの class です.
 
-![](../Examples/Summary.png)
+![](../pics/Summary.png)
 <p>
 
 Windows にはいわゆる

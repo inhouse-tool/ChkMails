@@ -39,7 +39,7 @@
 [`CFilterSheet`](CFilterSheet.md) が
 束ねている page のうちの 1つです.
 
-![](../Examples/Filter.Domain.png)
+![](../pics/Filter.Domain.png)
 
 これまでの運用で, どのドメインからメールが来た実績があるのかを,
 [Main Window](CMainWnd.md) から改行区切りの文字列でもらい, その文字列に応じてドメイン名をリストアップしています.
@@ -223,7 +223,7 @@ List に並べて扱う時は配列の方が扱いやすいので,
 
 その結果, 下記のように並べられることになります.
 
-![](../Examples/Filter.Domain5.png)
+![](../pics/Filter.Domain5.png)
 
 * 同じ `.jp` なら `.co.jp` の方が `.ne.jp` より前
 * 同じ `provider.ne.jp` なら, `cat` の方が `dog` より前

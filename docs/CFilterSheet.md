@@ -163,7 +163,7 @@
 
 * `Help` ボタン付き
 * `Apply` ボタンなし
-* アイコンは ![](../Examples/Icon.White.png)
+* アイコンは ![](../pics/Icon.White.png)
 
 とします.
 

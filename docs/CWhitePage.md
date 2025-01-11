@@ -45,7 +45,7 @@
 [`CFilterSheet`](CFilterSheet.md) が
 束ねている page のうちの 1つです.
 
-![](../Examples/Filter.WhiteList2.png)
+![](../pics/Filter.WhiteList2.png)
 
 手動入力はサポートしていません.
 元ネタとなるメールの `.eml` を　Drag & Drop してもらうか,

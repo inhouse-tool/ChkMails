@@ -26,7 +26,7 @@
 [`CFilterSheet`](CFilterSheet.md) が
 束ねている page のうちの 1つです.
 
-![](../Examples/Filter.Coding.png)
+![](../pics/Filter.Coding.png)
 
 チェックボックスの ON/OFF 具合を,
 bitmap 値として [Main Window](CMainWnd.md) とやり取りしています.

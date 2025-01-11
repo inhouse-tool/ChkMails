@@ -42,7 +42,7 @@
 [`CFilterSheet`](CFilterSheet.md) が
 束ねている page のうちの 1つです.
 
-![](../Examples/Filter.TimeZone.png)
+![](../pics/Filter.TimeZone.png)
 
 [タイムゾーン](https://ja.wikipedia.org/wiki/等時帯)の列挙や時間差を計算するのも面倒な処理なので,
 それらを封じ込めた [`CTimeZones`](CTimeZones.md)
