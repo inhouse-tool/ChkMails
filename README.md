@@ -2,7 +2,7 @@
 
 ƒ[ƒ‹‚ª“Ν‚Ά‚Δ‚Ά‚ι‚©ƒ`ƒFƒbƒN‚·‚ιν’“ƒAƒvƒ‚Ε‚·.
 
-![](Examples/Taskbar.png)
+![](pics/Taskbar.png)
 
 —v‚η‚Θ‚Άƒ[ƒ‹‚©‚Η‚¤‚©‚ΰƒ`ƒFƒbƒN‚µ‚ά‚·.
 —v‚η‚Θ‚Ά‚Ζ”»’θ‚µ‚½ƒ[ƒ‹‚Ν©“®“I‚Ιν‚µ‚ά‚·.
@@ -56,11 +56,11 @@
 
 | ƒCƒ[ƒW | €–Ϊ | —p“r |
 | --- | --- | --- |
-|![](Examples/Menu.png)|[Accounts](#accounts)<br>[Filter](#filter)<br>[Setup](#setup)<br>[Logs](#logs)<br>[Help](#help)<br>[Exit](#exit)| ƒ[ƒ‹ƒAƒJƒEƒ“ƒgέ’θ<br>ƒXƒpƒ€”»’θπέ’θ<br>‚»‚Μ‘Ό‚Μέ’θ<br>ƒƒOm”F<br>ƒwƒ‹ƒv<br>–{ƒAƒvƒ‚πI—Ή|
+|![](pics/Menu.png)|[Accounts](#accounts)<br>[Filter](#filter)<br>[Setup](#setup)<br>[Logs](#logs)<br>[Help](#help)<br>[Exit](#exit)| ƒ[ƒ‹ƒAƒJƒEƒ“ƒgέ’θ<br>ƒXƒpƒ€”»’θπέ’θ<br>‚»‚Μ‘Ό‚Μέ’θ<br>ƒƒOm”F<br>ƒwƒ‹ƒv<br>–{ƒAƒvƒ‚πI—Ή|
 
 ‚µ‚©‚µ, ‰‚ί‚Δ‹N“®‚µ‚½κ‡‚Ν, ‚ά‚Έ‰Ί‚Μ‚ζ‚¤‚Θ‚²‚ ‚Ά‚³‚Β‚Μƒ_ƒCƒAƒƒO‚ª, ‰ζ–Κ‚Μ’[‚Μ•ϋ‚Ι‚±‚¶‚ρ‚ά‚θ‚Ζo‚Δ‚«‚ά‚·.
 
-![](Examples/Intro.png)
+![](pics/Intro.png)
 
 u‚±‚ΜƒAƒvƒ‚πg‚¤‚Ι‚ΝAƒ[ƒ‹‚ΜƒAƒJƒEƒ“ƒg‚πƒZƒbƒg‚µ‚Δ‚­‚Ύ‚³‚ΆBv‚Ζ‚©Ύ‚Α‚Δ‚Ά‚ά‚·.
 ƒAƒ„‚µ‚Ά‚±‚Ζ‚±‚Μγ‚Θ‚­, ƒfƒtƒHƒ‹ƒg‚ªu‚Ν‚Άv‚Θ‚Μ‚ΰ‰‚µ•t‚―‚ª‚ά‚µ‚­΄‚¶‚ά‚·‚ª,
@@ -76,7 +76,7 @@
 
 ‰Ί‹L‚Μ‚ζ‚¤‚Θƒ_ƒCƒAƒƒO‚ª»‚ν‚κ‚ά‚·.
 
-![](Examples/Accounts.png)
+![](pics/Accounts.png)
 
 γ‚Μ•ϋ‚Ι‚ ‚ιƒƒXƒg ( ‹σ‚Α‚Ϋ‚Ύ‚ΖƒƒXƒg‚Ύ‚Ζ”»‚θ‚Γ‚η‚Ά‚Ε‚·‚ª ) ‚ª,
 •΅”‚Μƒ[ƒ‹ƒAƒhƒƒX‚π“o^‚Ε‚«‚ι‚±‚Ζ‚π¦‚µ‚Δ‚Ά‚ά‚·.
@@ -125,11 +125,11 @@
 
 ‚»‚ρ‚Θ‚±‚ρ‚Θ‚Ε‰Ί‚Μ‚ζ‚¤‚Ι‘S‚Δ‚π“ό‚κI‚ν‚Α‚½‚η, `Add` ƒ{ƒ^ƒ“‚π‰‚µ‚ά‚·.
 
-![](Examples/Accounts2.png)
+![](pics/Accounts2.png)
 
 ‚·‚ι‚Ζ, ‰Ί‚Μ‚ζ‚¤‚ΙƒƒXƒg‚Ι“ό—Ν‚µ‚½“ΰ—e ( ‚Μκ•” ) ‚ª”½‰f‚³‚κ‚ά‚·.
 
-![](Examples/Accounts3.png)
+![](pics/Accounts3.png)
 
 ƒƒXƒg‚Ι“ό‚Α‚½‚Μ‚πm”F‚µ‚½‚η, `OK` ƒ{ƒ^ƒ“‚π‰‚·‚Ζ®—Ή‚Ε‚·.
 
@@ -138,7 +138,7 @@
 ƒ^ƒXƒNƒo[‚Μ’Κ’m—Μζ‚Ι‚ ‚ιƒAƒCƒRƒ“‚ªΤ‚­‚Θ‚Α‚½κ‡‚Ν, “o^“ΰ—e‚Μ‚Ά‚Έ‚κ‚©‚ªλ‚Α‚Δ‚Ά‚ά‚·.
 ƒAƒCƒRƒ“‚Ιƒ}ƒEƒXƒJ[ƒ\ƒ‹‚π‚ ‚Δ‚ª‚¤‚Ζ, ‰Ί‹L‚Μ‚ζ‚¤‚ΙΘ’P‚Θΰ–Ύ‚ªo‚ά‚·.
 
-![](Examples/ConnectionError.png)
+![](pics/ConnectionError.png)
 
 ‚Ε, ‚±‚ΜuΘ’P‚Θΰ–Ύv‚ΜƒoƒƒG[ƒVƒ‡ƒ“‚Ε‚·‚ª, ‰Ί‹L‚Μ‚ζ‚¤‚Ι‚Θ‚Α‚Δ‚Ά‚ά‚·.
 
@@ -157,7 +157,7 @@
 ‚»‚µ‚Δ, ‰Ί‹L‚Μ‚ζ‚¤‚Ι‚Θ‚ρ‚Ύ‚©ƒAƒCƒRƒ“‚ª–Ϊ—§‚½‚Θ‚ΆDF‚Ι‚Θ‚Α‚Δ‚µ‚ά‚Α‚½
 ( ‚»‚Μ‘O‚Ι‚Ώ‚ε‚±‚Α‚ΖƒAƒCƒRƒ“‚ª‰©F‚­‚Θ‚Α‚½‚ζ‚¤‚Θ‹C‚ª‚·‚ι ) ‚ ‚Θ‚½.
 
-![](Examples/Empty.png)
+![](pics/Empty.png)
 
 ‚¨‚ί‚Ε‚Ζ‚¤‚²‚΄‚Ά‚ά‚·! ‚ ‚Θ‚½‚Μ“ό—Ν‚Ιλ‚θ‚Ν‚Θ‚©‚Α‚½‚Μ‚Ε‚·.
 ‚»‚ΜDF‚Ν, ‰½‚©‚ª–³ψ‚Ι‚Θ‚Α‚Δ‚Ά‚ι‚±‚Ζ‚π¦‚·‚ΰ‚Μ‚Ε‚Ν‚ ‚θ‚ά‚Ή‚ρ.
@@ -167,11 +167,11 @@
 
 | ƒCƒ[ƒW | Σ–΅ | ‚Ε, ‚Η‚¤‚·‚κ‚Ξ? |
 | :-: | --- | --- |
-| ![](Examples/Icon.White.png)  | ƒAƒJƒEƒ“ƒg–Άέ’θ | ƒ[ƒ‹ƒAƒJƒEƒ“ƒg‚πέ’θ‚µ‚ά‚µ‚ε‚¤. |
-| ![](Examples/Icon.Yellow.png) | ƒT[ƒo[‚Ζ’ΚM’† | –Ω‚Α‚Δ©η‚θ‚ά‚µ‚ε‚¤. |
-| ![](Examples/Icon.Grey.png)   | V’…ƒ[ƒ‹‚Θ‚µ   | ƒ[ƒ‹‚ª—‚ι‚Μ‚πy‚µ‚έ‚Ι‘Ò‚Ώ‚ά‚µ‚ε‚¤. |
-| ![](Examples/Icon.Green.png)  | V’…ƒ[ƒ‹‚ ‚θ   | ƒ[ƒ‰[‚π‹N“®‚µ‚Δƒ[ƒ‹‚π“Η‚έ‚ά‚µ‚ε‚¤. |
-| ![](Examples/Icon.Red.png)    | ’ΚMƒGƒ‰[ | ƒAƒJƒEƒ“ƒg‚βƒlƒbƒgƒ[ƒN‚Μέ’θ‚π©’Ό‚µ‚ά‚µ‚ε‚¤. |
+| ![](pics/Icon.White.png)  | ƒAƒJƒEƒ“ƒg–Άέ’θ | ƒ[ƒ‹ƒAƒJƒEƒ“ƒg‚πέ’θ‚µ‚ά‚µ‚ε‚¤. |
+| ![](pics/Icon.Yellow.png) | ƒT[ƒo[‚Ζ’ΚM’† | –Ω‚Α‚Δ©η‚θ‚ά‚µ‚ε‚¤. |
+| ![](pics/Icon.Grey.png)   | V’…ƒ[ƒ‹‚Θ‚µ   | ƒ[ƒ‹‚ª—‚ι‚Μ‚πy‚µ‚έ‚Ι‘Ò‚Ώ‚ά‚µ‚ε‚¤. |
+| ![](pics/Icon.Green.png)  | V’…ƒ[ƒ‹‚ ‚θ   | ƒ[ƒ‰[‚π‹N“®‚µ‚Δƒ[ƒ‹‚π“Η‚έ‚ά‚µ‚ε‚¤. |
+| ![](pics/Icon.Red.png)    | ’ΚMƒGƒ‰[ | ƒAƒJƒEƒ“ƒg‚βƒlƒbƒgƒ[ƒN‚Μέ’θ‚π©’Ό‚µ‚ά‚µ‚ε‚¤. |
 
  [Accounts](#accounts) ‚Μέ’θ‚ª–³–®—Ή‚µ‚½‚η, ‚Ν
  [Filter](#filter)‚Ιi‚έ‚ά‚·.
@@ -205,7 +205,7 @@
 
 #### Authentication
 
-![](Examples/Filter.Authentication.png)
+![](pics/Filter.Authentication.png)
 
 [”FΨ](https://ja.wikipedia.org/wiki/‘—MƒhƒƒCƒ“”FΨ)
 ( [Authentication](https://en.wikipedia.org/wiki/Email_authentication) )
@@ -261,7 +261,7 @@ Authentication-Results: mx.provider.ne.jp;
 u1‚Β‚Ε‚ΰ‚Π‚Α‚©‚©‚Α‚½‚ηƒ_ƒ‚Ύ‚λ?v
 ‚Ζv‚ν‚κ‚ιό‚«‚ΰ‚ ‚λ‚¤‚©‚Ζ‚Ν‘¶‚¶‚ά‚·‚ª,
 ‹‚ι‚ρ‚Ε‚·‚ζ, ƒ}ƒW‚Ε.
-[1‚Β‚®‚η‚Άψ‚Α‚©‚©‚Α‚Δ‚µ‚ά‚¤‘—MÒ](Examples/README.md#authentication-results-‚ª‘S‚Δ‚Ν-pass-‚µ‚Δ‚Ά‚Θ‚Ά³“–‚Θƒ[ƒ‹‚Μ—α)‚Α‚Δ‚Μ‚ª.<br>
+[1‚Β‚®‚η‚Άψ‚Α‚©‚©‚Α‚Δ‚µ‚ά‚¤‘—MÒ](Examples.md#authentication-results-‚ª‘S‚Δ‚Ν-pass-‚µ‚Δ‚Ά‚Θ‚Ά³“–‚Θƒ[ƒ‹‚Μ—α)‚Α‚Δ‚Μ‚ª.<br>
 <sup>( ƒ[ƒ‹”zM‚π‘γs‹ΖÒ‚Ι—‚ρ‚Ε‚Ά‚ιι‹Ζ‚Ζ‚©‚Ι‘½‚Ά‚ρ‚Ε‚·.
 ‘γs‹ΖÒ‚Μd–‚ª‘e‚Ά‚Μ‚©, ƒNƒ‰ƒCƒAƒ“ƒg‚Μ‹¦—Ν‚ª•s\•ª‚Θ‚Μ‚©‚Ν‘¶‚¶‚ά‚Ή‚ρ‚ª. )</sup>
 
@@ -309,7 +309,7 @@ Authentication-Results: mx.provider.ne.jp;
 
 #### Coding
 
-![](Examples/Filter.Coding.png)
+![](pics/Filter.Coding.png)
 
 “Ν‚Ά‚½ƒ[ƒ‹‚Μ•¶ƒR[ƒh‚Ι‚ζ‚Α‚Δƒ[ƒ‹‚πu‹ζ•Κv‚µ‚ά‚·.
 
@@ -346,7 +346,7 @@ Windows&reg; ‚ª•Ϋ—L‚·‚ιƒf[ƒ^ƒx[ƒX‚Ι‚Θ‚Ά•¶ƒZƒbƒg‚Ε‘‚©‚κ‚Δ‚Ά‚ιƒ[ƒ‹‚π”jό‚µ‚
 
 #### Domain
 
-![](Examples/Filter.Domain.png)
+![](pics/Filter.Domain.png)
 
 “Ν‚Ά‚½ƒ[ƒ‹‚Μ”­M³[ƒhƒƒCƒ“–Ό](https://ja.wikipedia.org/wiki/ƒhƒƒCƒ“–Ό)‚Ι‚ζ‚Α‚Δƒ[ƒ‹‚πu·•Κv‚µ‚ά‚·.
 
@@ -377,12 +377,12 @@ Windows&reg; ‚ª•Ϋ—L‚·‚ιƒf[ƒ^ƒx[ƒX‚Ι‚Θ‚Ά•¶ƒZƒbƒg‚Ε‘‚©‚κ‚Δ‚Ά‚ιƒ[ƒ‹‚π”jό‚µ‚
 uV‹KƒhƒƒCƒ“v‚Ζ‚µ‚Δ“Α’θ‚Μ‘—M³‚Μƒ[ƒ‹ƒAƒhƒƒX‚π‰Α‚¦‚Δ‚¨‚­‚Ζ,
 ‚»‚Μƒ[ƒ‹ƒAƒhƒƒX‚©‚η—‚½ƒ[ƒ‹‚ΰ“―—l‚Ιƒnƒl‚ά‚·.
 
-![](Examples/Filter.Domain2.png)
+![](pics/Filter.Domain2.png)
 
 γ‚Μ—α‚Μ‚ζ‚¤‚Ι, ƒnƒl‚½‚Ά‘θ‚Μƒ[ƒ‹ƒAƒhƒƒX‚π `New Domain:` ‚Ι“ό—Ν‚µ‚Δ‚©‚η `Add` ‚π‰‚·‚Ζ,<br>
 ‰Ί‚Μ}‚Μ‚ζ‚¤‚ΙƒƒXƒg‚Ι“ό‚θ‚ά‚·.
 
-![](Examples/Filter.Domain3.png)
+![](pics/Filter.Domain3.png)
 
 ‚±‚Μ’iK‚Ε‚ΝƒƒXƒg‚Ι“ό‚ι‚Ύ‚―‚Θ‚Μ‚Ε,
 ƒzƒ“ƒg‚Ιƒnƒl‚ικ‡‚Ν&#x2611;‚π“ό‚κ‚ι‚Μ‚π–Y‚κ‚Θ‚Ά‚ζ‚¤‚Ι‚µ‚ά‚µ‚ε‚¤.
@@ -393,7 +393,7 @@ Windows&reg; ‚ª•Ϋ—L‚·‚ιƒf[ƒ^ƒx[ƒX‚Ι‚Θ‚Ά•¶ƒZƒbƒg‚Ε‘‚©‚κ‚Δ‚Ά‚ιƒ[ƒ‹‚π”jό‚µ‚
 
 #### Sender
 
-![](Examples/Filter.Sender.png)
+![](pics/Filter.Sender.png)
 
 ‹^‚ν‚µ‚Ά‘—MÒ‚π’χ‚ίo‚·‚½‚ί‚Μ‚»‚Μ‘Ό‚Μu‹ζ•Κv‚Ε‚·.
 
@@ -410,7 +410,7 @@ Windows&reg; ‚ª•Ϋ—L‚·‚ιƒf[ƒ^ƒx[ƒX‚Ι‚Θ‚Ά•¶ƒZƒbƒg‚Ε‘‚©‚κ‚Δ‚Ά‚ιƒ[ƒ‹‚π”jό‚µ‚
 ‰ζ–Κ‚Ι—α¦‚³‚κ‚Δ‚Ά‚ι’Κ‚θ, ‚Ο‚Α‚Ζ©, ΐέ‚·‚ιι‹Ζ‚Μ³‹K‚ΜƒhƒƒCƒ“‚©‚η‚Μ‚ΰ‚Μ‚Ε‚ ‚ι‚ζ‚¤‚Ι©‚Ή‚©‚―‚Θ‚ª‚η,
 ΐ‚Ν‚Ζ‚ρ‚Ε‚ΰ‚Θ‚Ά‘—MÒ‚©‚η—‚Δ‚Ά‚ι‚ζ‚¤‚Θƒ[ƒ‹‚π”jό‚µ‚ά‚·.<br>
 q‹ιx‚µ‚Μ‚ζ‚¤‚Ε‚·‚ª ( ‚ΖΎ‚Α‚Δ‚Νq‹‚ΙΈ—η‚© )
-[ƒzƒ“ƒg‚Ι‚ ‚ι‚ρ‚Ε‚·‚ζ](Examples/README.md#dkim-signature-‚ª‚ ‚ιƒXƒpƒ€ƒ[ƒ‹‚Μ—α), ‚±‚¤‚Ά‚¤‚Μ.
+[ƒzƒ“ƒg‚Ι‚ ‚ι‚ρ‚Ε‚·‚ζ](Examples.md#dkim-signature-‚ª‚ ‚ιƒXƒpƒ€ƒ[ƒ‹‚Μ—α), ‚±‚¤‚Ά‚¤‚Μ.
 
 * •Κ–Ό ( Alias ) ‚πιx‚Α‚½ƒ[ƒ‹ƒAƒhƒƒX<br>
 •Κ–Ό‚Ζ‚Ν, `From:` ‚Ι‚ ‚ι `<` ‚Ζ `>` ‚ΜΤ‚ΙΝ‚ά‚κ‚½ƒ[ƒ‹ƒAƒhƒƒX‚Μθ‘O‚Ι‚ ‚ι ( ‚Β‚ά‚θ `<` ‚Μθ‘O‚Ι‚ ‚ι )
@@ -437,7 +437,7 @@ Windows&reg; ‚ª•Ϋ—L‚·‚ιƒf[ƒ^ƒx[ƒX‚Ι‚Θ‚Ά•¶ƒZƒbƒg‚Ε‘‚©‚κ‚Δ‚Ά‚ιƒ[ƒ‹‚π”jό‚µ‚
 
 #### Time Zone
 
-![](Examples/Filter.TimeZone.png)
+![](pics/Filter.TimeZone.png)
 
 ƒ[ƒ‹”­M³‚Μ[ƒ^ƒCƒ€ƒ][ƒ“](https://ja.wikipedia.org/wiki/“™‘Ρ)‚Ι‚ζ‚Α‚Δƒ[ƒ‹‚πu·•Κv‚µ‚ά‚·.
 
@@ -455,7 +455,7 @@ Windows&reg; ‚ª•Ϋ—L‚·‚ιƒf[ƒ^ƒx[ƒX‚Ι‚Θ‚Ά•¶ƒZƒbƒg‚Ε‘‚©‚κ‚Δ‚Ά‚ιƒ[ƒ‹‚π”jό‚µ‚
 ‚Ζv‚ΆΨ‚Α‚½‚ ‚Θ‚½, ‚»‚κ‚Ν‘v‚©‚ΰ‚µ‚κ‚ά‚Ή‚ρ.
 ‘εθι‹Ζ‚Ι‚Ν(‚ν‚΄‚ν‚΄)CO‚©‚η‘“ΰ‚Ιό‚―‚½ƒ[ƒ‹‚π”z‘—‚·‚ι‚Ζ‚±‚λ‚ΰ‚ ‚ι‚ρ‚Ε‚·‚ζ.
 ( ‚½‚Ζ‚¦‚Ξ
-[Amazon ‚Ν UTC ‚Μ `+0000` ‚©‚ηA—‚ª‚«‚ά‚·](Examples/README.md#date-‚ª‚Η‚±‚Μ‘‚Ύ‚©”»‚η‚Θ‚Ά³“–‚Θƒ[ƒ‹‚Μ—α). )
+[Amazon ‚Ν UTC ‚Μ `+0000` ‚©‚ηA—‚ª‚«‚ά‚·](Examples.md#date-‚ª‚Η‚±‚Μ‘‚Ύ‚©”»‚η‚Θ‚Ά³“–‚Θƒ[ƒ‹‚Μ—α). )
 —F’B‚Ν‚Ύ‚Ά‚¶‚ε‚¤‚Τ‚Ε‚ΰ, ƒ†[ƒU[“o^‚µ‚½ƒ[ƒJ[‚©‚η‚ΜA—‚ª“rβ‚¦‚ι‚©‚ΰ‚µ‚κ‚ά‚Ή‚ρ.
 v‚ΆΨ‚Α‚½θ‚π‘Ε‚Β‚Μ‚Ν, ‚²©g‚Μƒ[ƒ‹——π‚π‚ζ‚­m”F‚µ‚Δ‚©‚η‚Ι‚µ‚ά‚µ‚ε‚¤.
 
@@ -468,7 +468,7 @@ Windows&reg; ‚ª•Ϋ—L‚·‚ιƒf[ƒ^ƒx[ƒX‚Ι‚Θ‚Ά•¶ƒZƒbƒg‚Ε‘‚©‚κ‚Δ‚Ά‚ιƒ[ƒ‹‚π”jό‚µ‚
 
 #### Whitelist
 
-![](Examples/Filter.WhiteList.png)
+![](pics/Filter.WhiteList.png)
 
 ‚±‚κ‚ά‚Ε‚²Π‰ξ‚µ‚½ƒ[ƒ‹‚πƒnƒl‚ι‚½‚ί‚Μu‹ζ•Κv‚βu·•Κv‚Ζ‚Να‚Ά,
 ‚±‚±‚Ε“o^‚µ‚Δ‚¨‚Ά‚½ƒ[ƒ‹‚Νƒnƒl‚Έ‚Ισ‚―“ό‚κ‚ά‚·.
@@ -487,7 +487,7 @@ Windows&reg; ‚ª•Ϋ—L‚·‚ιƒf[ƒ^ƒx[ƒX‚Ι‚Θ‚Ά•¶ƒZƒbƒg‚Ε‘‚©‚κ‚Δ‚Ά‚ιƒ[ƒ‹‚π”jό‚µ‚
 ‚ά‚Έ, [Authentication](#authentication) ‚Ε,
 upass ‚µ‚»‚±‚Θ‚Α‚½”FΨv‚Μ”‚π `0 Θγ` ‚Ιέ’θ‚·‚ι‚Μ‚Ε‚·. ( ‰Ί}QΖ )
 
-![](Examples/Filter.Authentication0.png)
+![](pics/Filter.Authentication0.png)
 
 ‚±‚¤‚·‚ι‚Ζ, ‘S‚Δ‚Μ”FΨ‚ª pass ‚µ‚Δ‚ΰ, ‚Β‚ά‚θupass ‚µ‚»‚±‚Θ‚Α‚½”FΨv‚Μ”‚ª `0` ‚Ε‚ΰ,
 u`0 Θγ`v‚Ζ‚Ά‚¤π‚Ιψ‚Α‚©‚©‚ι‚Μ‚Ε‘S‚Δ‚Μƒ[ƒ‹‚ª”jό‚³‚κ‚ά‚·.
@@ -510,7 +510,7 @@ Windows&reg; ‚ª•Ϋ—L‚·‚ιƒf[ƒ^ƒx[ƒX‚Ι‚Θ‚Ά•¶ƒZƒbƒg‚Ε‘‚©‚κ‚Δ‚Ά‚ιƒ[ƒ‹‚π”jό‚µ‚
 
 γ‚Μθ’i‚Μ‚Ά‚Έ‚κ‚©‚πΐ{‚·‚ι‚Ζ, ‰Ί‚Μ‚ζ‚¤‚Ι—F’B‚Μƒ[ƒ‹ƒAƒhƒƒX‚ª“o^‚³‚κ‚ά‚·.
 
-![](Examples/Filter.WhiteList2.png)
+![](pics/Filter.WhiteList2.png)
 
 [Domain](#domain)‚Μ‚ζ‚¤‚Ι’ΌΪ“ό—Ν‚π‹–‚µ‚Δ‚Ά‚Θ‚Ά‚Μ‚Ν,
 ‘—MÒ‚Μ³m‚Θ–Ό‹` ( ƒ[ƒ‹ƒwƒbƒ_[‚Μ `From:` ‚Ι‚ ‚ιƒ[ƒ‹ƒAƒhƒƒX ) ‚Ζ,
@@ -536,7 +536,7 @@ Windows&reg; ‚ª•Ϋ—L‚·‚ιƒf[ƒ^ƒx[ƒX‚Ι‚Θ‚Ά•¶ƒZƒbƒg‚Ε‘‚©‚κ‚Δ‚Ά‚ιƒ[ƒ‹‚π”jό‚µ‚
 
 “–ƒAƒvƒ‚Μ“®μ‚π‚ ‚Θ‚½D‚έ‚Ιέ’θ‚µ‚ά‚·.
 
-![](Examples/Setup.png)
+![](pics/Setup.png)
 
 ƒfƒtƒHƒ‹ƒg‚Μ‚ά‚ά‚Ω‚Α‚Ζ‚Ά‚Δ‚ΰ“Α‚Ι“®μ‚Ιxα‚Ν‚ ‚θ‚ά‚Ή‚ρ‚ª,
 ‚ζ‚θD‚έ‚Μ“®μ‚ΙƒJƒXƒ^ƒ}ƒCƒY‚·‚ι‚±‚Ζ‚ª‚Ε‚«‚ά‚·.
@@ -566,7 +566,7 @@ Windows&reg; ‚ª‹N“®‚µ‚½‚Ζ‚« ( ³m‚Ι‚Νƒ†[ƒU[‚ªƒTƒCƒ“ƒCƒ“‚µ‚½‚Ζ‚« ) ‚Ι“–ƒAƒvƒ‚
 ON ‚Ι‚·‚ι‚Ζ, ’…M‚µ‚½ƒ[ƒ‹‚ΜT—v‚π‰Ί‹L‚Μ‚ζ‚¤‚Ι‰ζ–Κ‚Μ‹χ‚Α‚±‚Ι•\¦‚µ‚ά‚·.
 Γ‚Άƒ[ƒ‹‚ª‰Ί‚Μ•ϋ, V‚µ‚Άƒ[ƒ‹‚Ν‚»‚Μγ‚ΙΟ‚έγ‚°‚ι‚ζ‚¤‚Ι•\¦‚³‚κ‚ά‚·.
 <br><br>
-![](Examples/Summary.png)
+![](pics/Summary.png)
 <br><br>
 ‚±‚Μ•\¦‚ΝƒNƒƒbƒN‚·‚ι‚ΖΑ‚¦‚ά‚·.
 ‚µ‚Ξ‚η‚­‚ΝΑ‚¦‚½‚ά‚ά‚Ε‚Ά‚ά‚·‚ª, ‚»‚±‚ΙV‚½‚Θƒ[ƒ‹‚ª“Ν‚­‚Ζ,
@@ -582,7 +582,7 @@ ON ‚Ι‚·‚ι‚Ζ, ’…M‚µ‚½ƒ[ƒ‹‚ΜT—v‚π‰Ί‹L‚Μ‚ζ‚¤‚Ι‰ζ–Κ‚Μ‹χ‚Α‚±‚Ι•\¦‚µ‚ά‚·.
 ‰E‚Μ `>>` ƒ{ƒ^ƒ“‚π‰‚µ‚Δ Explorer ‚Εƒtƒ@ƒCƒ‹‚π©‚Ιs‚­‚Ζ,
 ‰Ί}‚Μ‚ζ‚¤‚Ι File name ‚ª’†“r”Ό’[‚Θσ‘Τ‚Ε•\¦‚³‚κ‚ι‚±‚Ζ‚ª‚ ‚θ‚ά‚·.
 <br><br>
-![](Examples/FileName.png)
+![](pics/FileName.png)
 <br><br>
 ‚±‚κ‚Ν
 [Windows&reg; ‚Μƒ|ƒJ](https://stackoverflow.com/questions/64424601/cmfceditbrowsectrl-is-cropping-the-file-name)
@@ -661,7 +661,7 @@ ON ‚Ι‚·‚ι‚Ζ, ’…M‚µ‚½ƒ[ƒ‹‚ΜT—v‚π‰Ί‹L‚Μ‚ζ‚¤‚Ι‰ζ–Κ‚Μ‹χ‚Α‚±‚Ι•\¦‚µ‚ά‚·.
 
 | ƒCƒ[ƒW | €–Ϊ | —p“r |
 | --- | --- | --- |
-|![](Examples/Menu.Help.png)|[View info on website](#view-info-on-website)<br>[License announcement](#license-announcement)<br>[About ChkMails](#about-chkmails)| Web ‚Εξ•ρ‚π©‚ι<br>ƒ‰ƒCƒZƒ“ƒXιΎ‚π©‚ι<br>–{ƒAƒvƒ‚Ι‚Β‚Ά‚Δ|
+|![](pics/Menu.Help.png)|[View info on website](#view-info-on-website)<br>[License announcement](#license-announcement)<br>[About ChkMails](#about-chkmails)| Web ‚Εξ•ρ‚π©‚ι<br>ƒ‰ƒCƒZƒ“ƒXιΎ‚π©‚ι<br>–{ƒAƒvƒ‚Ι‚Β‚Ά‚Δ|
 
 #### View info on website
 
@@ -697,7 +697,7 @@ Help ƒtƒ@ƒCƒ‹‚Ζ‚©ΐ‘•‚·‚ι‚Μ–Κ“|‚Ύ‚Α‚½‚µcc.
 –{ƒAƒvƒ‚πI—Ή‚µ‚ά‚·.<br>
 ‚ª, ‚»‚Μ‘O‚Ι‰Ί‚Μ‚ζ‚¤‚Θm”Fƒ_ƒCƒAƒƒO‚ª»‚ν‚κ‚ά‚·.
 
-![](Examples/Exit.png)
+![](pics/Exit.png)
 
 ƒfƒtƒHƒ‹ƒg‚ªu‚Ά‚Ά‚¦v‚Θ‚Μ‚ΰ–Ά—ϋ‚ª‚ά‚µ‚­΄‚¶‚ά‚·‚ª,
 uYesv(u‚Ν‚Άv) ‚Μƒ{ƒ^ƒ“‚π‰‚·‚Ζ‚·‚ρ‚Θ‚θI—Ή‚µ‚ά‚·.

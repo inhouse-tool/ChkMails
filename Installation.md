@@ -23,7 +23,7 @@
 `ChkMails.msi` をクリックすると
 `開く` (`Open`) か `名前を付けて保存` (`Save as`) か `保存` ( `Save` ) かの三択を迫られます.
 
-![](Examples/Downloads.png)
+![](pics/Downloads.png)
 
 #### `開く` (`Open`) を選ぶと:
 
@@ -62,7 +62,7 @@
 自動でウイルスチェックでもしているのか, つまづくような時間が空いた後,
 ようやく下図のようにインストーラーが動き出します.
 
-![](Examples/Installer.png)
+![](pics/Installer.png)
 
 
 #### `保存` (`Save`) を選ぶと:
@@ -128,7 +128,7 @@ Explorer がフォルダー表示を抽象化するので, よく解らないことになっていますが, <su
 下記のように `2025年 1月 11日 16:43:19` 付けのデジタル署名が付いています
 ( インストール後の `ChkMails.exe` は `2025年 1月 11日 16:43:17` ).
 
-![](Examples/MSI.png) ![](Examples/Signature.png)
+![](pics/MSI.png) ![](pics/Signature.png)
 
 まあ, これはいわゆる「自己署名」(「私がやりました。」) というもので,
 ちゃんとした認証局が発行した署名 (「あの人がやりました。」) と比べて全然説得力がないのですが,
@@ -176,13 +176,13 @@ Explorer がフォルダー表示を抽象化するので, よく解らないことになっていますが, <su
 
 | 日本語 | English |
 | --- | --- |
-| ![](Examples/DefenderJ.png) | ![](Examples/Defender.png) |
+| ![](pics/DefenderJ.png) | ![](pics/Defender.png) |
 
 よく見ると, `詳細情報` (`More info`) という文字列が出ているのでそれをつついてみると,
 `実行` (`Run anyway`) というボタンが現われるので,
 それを押すとようやく下図のようにインストーラーが動き出します.
 
-![](Examples/Installer10.png)
+![](pics/Installer10.png)
 
 
 ## Microsoft Edge 以外のブラウザーの場合
@@ -199,12 +199,12 @@ Explorer がフォルダー表示を抽象化するので, よく解らないことになっていますが, <su
 
 まず, 最初に出てくるのが下図の状態です.
 
-![](Examples/Installer.png)
+![](pics/Installer.png)
 
 特にどうもしようがないので, すなおに `Next >` を押しましょう.
 すると下図のようになります.
 
-![](Examples/Installer2.png)
+![](pics/Installer2.png)
 
 当アプリをインストールする先のフォルダーを指定する段階です.
 
@@ -215,7 +215,7 @@ Explorer がフォルダー表示を抽象化するので, よく解らないことになっていますが, <su
 そして, `Next >` を押します.
 すると下図のようになります.
 
-![](Examples/Installer3.png)
+![](pics/Installer3.png)
 
 「インストールを始めるには `"Next"` を押してください。」的なことを言っているので,
  `Next >` を押します.
@@ -227,7 +227,7 @@ Explorer がフォルダー表示を抽象化するので, よく解らないことになっていますが, <su
 すると再びインストーラーが動き出しますが,
 すぐに終わって下記のような表示に落ち着きます.
 
-![](Examples/Installer5.png)
+![](pics/Installer5.png)
 
 いろいろとお手数をおかけしました.
 これで `Close` ボタンを押せば, インストールは完了です.
@@ -235,7 +235,7 @@ Explorer がフォルダー表示を抽象化するので, よく解らないことになっていますが, <su
 スタートメニューの **頭文字C** のところを見ると,
 下記のように `ChkMails` が紛れ込んでいるはずです.
 
-![](Examples/StartMenu.png)
+![](pics/StartMenu.png)
 
 
 ## 起動してみたら「mfc140u.dll が見つからない」とか言われた場合
@@ -244,7 +244,7 @@ Explorer がフォルダー表示を抽象化するので, よく解らないことになっていますが, <su
 人によっては ( 正確には PC によっては ), 下図のようなダイアログが現われて,
 何か深刻な問題が起きたようなことを告げてきます.
 
-![](Examples/MissingRuntime.png)
+![](pics/MissingRuntime.png)
 <br>
 <sub>
 (「システムエラー」ですもんね.
@@ -279,7 +279,7 @@ Explorer がフォルダー表示を抽象化するので, よく解らないことになっていますが, <su
 すると下図のようになんだかボタンの位置がズレたダイアログが出てきて「だいじょうぶか、こいつ?」と思わせなくもないですが,
 だいじょうぶなんです.
 
-![](Examples/Redistributable.png)
+![](pics/Redistributable.png)
 
 中に書いてある「ライセンス条項」とやらに一応目を通してみましょうか.
 <br>
@@ -305,7 +305,7 @@ Explorer がフォルダー表示を抽象化するので, よく解らないことになっていますが, <su
 なんかいきなり下図のようなダイアログが, 画面の端っこの方に出てきて驚かされますが,
 それが正常動作なんです.
 
-![](Examples/Intro.png)
+![](pics/Intro.png)
 
 その後どうすればいいのかに関しては, [本編の説明](README.md)をご参照ください.
 
