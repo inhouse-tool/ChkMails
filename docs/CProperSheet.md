@@ -185,7 +185,7 @@ Window Message [`WM_GETMINMAXINFO`](https://learn.microsoft.com/ja-jp/windows/wi
 
 ## `OnSize`
 
-Window Message [`WM_GETMINMAXINFO`](https://learn.microsoft.com/ja-jp/windows/win32/winmsg/wm-size)
+Window Message [`WM_SIZE`](https://learn.microsoft.com/ja-jp/windows/win32/winmsg/wm-size)
 に対するハンドラーです.
 
 「初期化済み」つまり [`OnInitDialog`](#oninitdialog) 済みの場合は以下の処理を行います.
