@@ -420,7 +420,7 @@ Windows&reg; ‚ª•Û—L‚·‚éƒf[ƒ^ƒx[ƒX‚É‚È‚¢•¶ŽšƒZƒbƒg‚Å‘‚©‚ê‚Ä‚¢‚éƒ[ƒ‹‚ð”jŠü‚µ‚
 ‚Ì‚æ‚¤‚É, ‚±‚Ì•Ê–¼‚ÉŽÀÛ‚Ì‘—MŽÒ‚Æ‚Í‘S‚­•Ê‚ÌŠé‹Æ–¼‚ªéx‚ç‚ê‚é‚±‚Æ‚ª‚ ‚è‚Ü‚·.
 ‚±‚¤‚µ‚½éx‚è‚ª–¾‚ç‚©‚Èƒ[ƒ‹‚ð”jŠü‚µ‚Ü‚·.
 
-* –³‘Ê‚È•Ê–¼ ( Alias ) ‚ÅŒÄ‚Ñ‚©‚¯‚Ä‚­‚éƒ[ƒ‹<br>
+* –³‘Ê‚È•Ê–¼ ( Alias ) ‚ÅŒÄ‚Ñ‚©‚¯‚Ä‚­‚éƒ[ƒ‹<sup>¦</sup><br>
 ã‚Æ‚Í‹t‚É, `To:` ‚É‚ ‚éŽóMŽÒ‚Ì•Ê–¼‚ÉŠÖ‚·‚éƒ`ƒFƒbƒN‚Å‚·.<br>
 ƒXƒpƒ€ƒ[ƒ‹‚à•Ê–¼‚ÅŒÄ‚Ñ‚©‚¯‚Ä‚­‚é‚±‚Æ‚ª‚ ‚è‚Ü‚·‚ª,
 ƒXƒpƒ€ƒ[ƒ‹‘—MŽÒ‚Íˆ¶æ‚Ìƒ[ƒ‹ƒAƒhƒŒƒX‚µ‚©’m‚ç‚È‚¢‚Ì‚Å,
