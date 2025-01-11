@@ -316,8 +316,7 @@ Authentication-Results: mx.provider.ne.jp;
 * 読めない文字セット<br>
 Windows&reg; が保有するデータベースにない文字セットで書かれているメールを破棄します.<br>
 このデータベースは, 以下の registry の配下にあるものを意味します.<br>
-`HKEY_CLASSES_ROOT\MIME\Database\Charset\`
-<br>
+`HKEY_CLASSES_ROOT\MIME\Database\Charset\`<br>
 ( 日本に向けてのスパムメールを
 [GB 2312](https://ja.wikipedia.org/wiki/GB_2312) で書いてくるうっかりさんも居るには居るのですが,
 こういうメールは他の条件でもハネられる場合ばかりだったので,
