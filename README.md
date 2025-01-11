@@ -328,8 +328,8 @@ Windows&reg; ‚ª•Û—L‚·‚éƒf[ƒ^ƒx[ƒX‚É‚È‚¢•¶ŽšƒZƒbƒg‚Å‘‚©‚ê‚Ä‚¢‚éƒ[ƒ‹‚ð”jŠü‚µ‚
 ‚ª–„‚ßž‚Ü‚ê‚Ä‚¢‚éƒ[ƒ‹‚ð”jŠü‚µ‚Ü‚·.<br>
 “Ç‚ÝŽè‚ÉŽÀÛ‚Æ‚ÍˆÙ‚È‚é•¶Žš—ñ‚ð•\Ž¦‚µ‚ÄŒ©‚¹‚½‚è, ƒpƒ^[ƒ“ŒŸõ‚©‚ç“¦‚ê‚é‚½‚ß‚ÉŽg—p‚³‚ê‚½‚è, ‚Æ,
 ‚±‚¤‚¢‚¤•¶ŽšƒR[ƒh‚ª–„‚ßž‚Ü‚ê‚Ä‚¢‚éƒ[ƒ‹‚É‚ÍƒƒN‚È‚à‚Ì‚ª‚ ‚è‚Ü‚¹‚ñ.<br>
-( ‚½‚¾‚µ, ‰E‚©‚ç¶‚É‘‚­Œ¾Œê‚Ìê‡‚Í, ‚²‚­•’Ê‚Éu‰E‚©‚ç¶‚É“Ç‚ñ‚Å‚ËBv‚Æ‚¢‚¤§Œä•¶Žš‚ª“ü‚Á‚Ä‚¢‚é‚±‚Æ‚ª‚ ‚é‚Ì‚Å,
-‚±‚¤‚¢‚¤Œ¾Œê‚Æ‚¨•t‚«‡‚¢‚Ì‚ ‚é•û‚Í‚±‚Ì&#x2611;‚ðŠO‚µ‚Ä‚­‚¾‚³‚¢. )
+<sub>( ‚½‚¾‚µ, ‰E‚©‚ç¶‚É‘‚­Œ¾Œê‚Ìê‡‚Í, ‚²‚­•’Ê‚Éu‰E‚©‚ç¶‚É“Ç‚ñ‚Å‚ËBv‚Æ‚¢‚¤§Œä•¶Žš‚ª“ü‚Á‚Ä‚¢‚é‚±‚Æ‚ª‚ ‚é‚Ì‚Å,
+‚±‚¤‚¢‚¤Œ¾Œê‚Æ‚¨•t‚«‡‚¢‚Ì‚ ‚é•û‚Í‚±‚Ì&#x2611;‚ðŠO‚µ‚Ä‚­‚¾‚³‚¢. )</sub>
 
 * ‰ñ”ð“I‚È•¶ŽšƒR[ƒh<br>
 –„‚ßž‚Ü‚ê‚½ƒŠƒ“ƒNæ‚È‚Ç‚É ASCII ƒR[ƒh‚Å‚Í‚È‚­ UNICODE ‚ÌŽ—‚½•¶Žš‚ª–„‚ßž‚Ü‚ê‚½ƒ[ƒ‹‚ð”jŠü‚µ‚Ü‚·.<br>
@@ -337,9 +337,9 @@ Windows&reg; ‚ª•Û—L‚·‚éƒf[ƒ^ƒx[ƒX‚É‚È‚¢•¶ŽšƒZƒbƒg‚Å‘‚©‚ê‚Ä‚¢‚éƒ[ƒ‹‚ð”jŠü‚µ‚
 g.&#x24B8;&#x24C4;&#x24C2;h ‚ð g.comh ‚Æ‘PˆÓ‚É‰ðŽß‚µ‚Ä‚­‚ê‚éƒ[ƒ‰[‚Å‚à‚ ‚é‚Ì‚Å‚·‚©‚Ë?
 ‚¾‚Æ‚·‚é‚Æ, ‚±‚¤‚µ‚½•¶ŽšƒR[ƒh‚ð–„‚ßž‚ñ‚¾ƒ[ƒ‹‚Æ‚¢‚¤‚Ì‚Í, ‚»‚Ì‘PˆÓ‚É‚Â‚¯ž‚ñ‚Åƒpƒ^[ƒ“ŒŸõ‚©‚ç“¦‚ê‚é‚½‚ß‚Ì‚à‚Ì‚Å‚µ‚å‚¤.
 ‚±‚¤‚¢‚¤•¶ŽšƒR[ƒh‚ª–„‚ßž‚Ü‚ê‚Ä‚¢‚éƒ[ƒ‹‚É‚ÍƒƒN‚È‚à‚Ì‚ª‚ ‚è‚Ü‚¹‚ñ.<br>
-( ‚Ð‚å‚Á‚Æ‚·‚é‚Æ,
+<sub>( ‚Ð‚å‚Á‚Æ‚·‚é‚Æ,
 u•’Ê‚É‘‚­‚æ‚è–Ú—§‚Â‚©‚çv‚Æ‚¢‚¤——R‚Å‚í‚´‚í‚´‚±‚¤‚¢‚¤•¶ŽšƒR[ƒh‚ðŽg‚¤ƒtƒ@ƒ“ƒL[‚È“X•Ü‚à‚ ‚é‚©‚à‚µ‚ê‚Ü‚¹‚ñ.
-‚»‚¤‚¢‚¤ƒtƒ@ƒ“ƒL[‚È“X•Ü‚Æ‚¨•t‚«‡‚¢‚Ì‚ ‚é•û‚Í‚±‚Ì&#x2611;‚ðŠO‚µ‚Ä‚­‚¾‚³‚¢. )
+‚»‚¤‚¢‚¤ƒtƒ@ƒ“ƒL[‚È“X•Ü‚Æ‚¨•t‚«‡‚¢‚Ì‚ ‚é•û‚Í‚±‚Ì&#x2611;‚ðŠO‚µ‚Ä‚­‚¾‚³‚¢. )</sub>
 
 ƒfƒtƒHƒ‹ƒg‚Å, 3‚Â‘S‚Ä ON ‚É‚µ‚Ä‚¢‚Ü‚·.
 
