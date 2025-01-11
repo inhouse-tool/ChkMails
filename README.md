@@ -317,11 +317,11 @@ Authentication-Results: mx.provider.ne.jp;
 Windows&reg; が保有するデータベースにない文字セットで書かれているメールを破棄します.<br>
 このデータベースは, 以下の registry の配下にあるものを意味します.<br>
 `HKEY_CLASSES_ROOT\MIME\Database\Charset\`<br>
-( 日本に向けてのスパムメールを
+<sub>( 日本に向けてのスパムメールを
 [GB 2312](https://ja.wikipedia.org/wiki/GB_2312) で書いてくるうっかりさんも居るには居るのですが,
 こういうメールは他の条件でもハネられる場合ばかりだったので,
 特に文字セットで「差別」する機能は設けていません.
-この条件に引っかかるのは, ホントに何かの間違いのときだけです. )
+この条件に引っかかるのは, ホントに何かの間違いのときだけです. )<sub>
 
 * 疑わしい制御文字<br>
 [UNICODE の制御文字](https://en.wikipedia.org/wiki/Unicode_control_characters)
