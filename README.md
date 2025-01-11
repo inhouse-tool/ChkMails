@@ -582,7 +582,7 @@ ON にすると, 着信したメールの概要を下記のように画面の隅っこに表示します.
 右の `>>` ボタンを押して Explorer でファイルを見に行くと,
 下図のように File name が中途半端な状態で表示されることがあります.
 <br><br>
-![](Examples/Filename.png)
+![](Examples/FileName.png)
 <br><br>
 これは
 [Windows&reg; のポカ](https://stackoverflow.com/questions/64424601/cmfceditbrowsectrl-is-cropping-the-file-name)
