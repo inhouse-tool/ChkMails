@@ -20,14 +20,14 @@ Embedded-Link: sagawa-hdwcqxj.com∕neclsr∕gvyihzwqm∕bhaob@bryidls.𝕝𝕠�
 Return-Path: <Amazon-fwgesqjthhrpuwlbcsnonzgaj@azeb.net>
 Received: from azeb.net([114.232.44.117]) by ifmta666-pr.im.network.ne.jp
     with ESMTP
-    id <20241208211552269.IBOR.72595.azeb.net@imta666.provider.ne.jp>
-    for <tama.the.dog@provider.ne.jp>; Mon, 9 Dec 2024 06:15:52 +0900
-Message-ID: <7d0ee334d6d6771a7c7b285627b923a0@azeb.net>
+    id <20241208214142235.IBOR.72595.azeb.net@imta666.provider.ne.jp>
+    for <tama.the.dog@provider.ne.jp>; Mon, 9 Dec 2024 07:15:52 +0900
+Message-ID: <350e7134c3d6441a3f7b885631b942a0@azeb.net>
 Sender: <Amazon-fwgesqjthhrpuwlbcsnonzgaj@azeb.net>
 From: 佐川急便株式会社 <Amazon-fwgesqjthhrpuwlbcsnonzgaj@azeb.net>
 To: <tama.the.dog@provider.ne.jp>
 Subject: 【重要】お荷物の配達について重要なお知らせ
-Date: Mon, 09 Dec 2024 05:15:51 +0800
+Date: Mon, 09 Dec 2024 06:15:51 +0800
 MIME-Version: 1.0
 Content-Type: text/html;
     charset="utf-8"
@@ -117,7 +117,7 @@ Embedded-Link: viewsnet.jp
 Embedded-Link: viewsnet-mercard.juxinpay.cc
 Return-Path: <viewcard.infl-viewsnet.dogkin-property.tenuory-fensial@service.xys25.cc>
 Received: from htbltd (166.108.193.150) by service.xys25.cc id haof8c0001gp
- for <tama.the.dog@provider.ne.jp>; Sun, 8 Dec 2024 17:13:22 -0500
+ for <tama.the.dog@provider.ne.jp>; Sun, 8 Dec 2024 16:13:22 -0500
  (envelope-from <viewcard.infl-viewsnet.dogkin-property.tenuory-fensial@service.xys25.cc>)
 DKIM-Signature: v=1; a=rsa-sha1; c=relaxed/relaxed; s=mykey; d=service.xys25.cc;
  h=Message-ID:From:To:Subject:Date:MIME-Version:Content-Type;
@@ -125,14 +125,14 @@ DKIM-Signature: v=1; a=rsa-sha1; c=relaxed/relaxed; s=mykey; d=service.xys25.cc;
  b=hg3Y/rnltpu4Sng2JRrZ3t2NAPSNF3s+gm4xNWwhF+11wm7c0BERZwaFAGPP/ilXgEI+8ZV0ner1
    AbT0fi+LzNtw4wTDn/5SCB7j8QOPO8fyuTFW1rtsUSe2u1Ani3owV5l8+2o3XCHrFM64EUHj7/9b
    lHdNIsXSorBK31eS7K0=
-Message-ID: <20241209061322585823@service.xys25.cc>
+Message-ID: <2024120905141421356@service.xys25.cc>
 From: 株式会社ビューカード <viewcard.infl-viewsnet.dogkin-property.tenuory-fensial@service.xys25.cc>
 To: <tama.the.dog@provider.ne.jp>
 Subject: ご利用明細更新のお知らせ
-Date: Mon, 9 Dec 2024 06:13:10 +0800
+Date: Mon, 9 Dec 2024 05:13:10 +0800
 MIME-Version: 1.0
 Content-Type: multipart/alternative;
-    boundary="----=_NextPart_000_0727_01839F1A.19A11190"
+    boundary="----=_NextPart_000_0727_01839C3C.19B21170"
 Authentication-Results: mx.provider.ne.jp; spf=pass
     smtp.mailfrom=viewcard.infl-viewsnet.dogkin-property.tenuory-fensial@service.xys25.cc;
     sender-id=pass
@@ -221,8 +221,8 @@ Embedded-Link: www.yodobashi.com
 Return-Path: <yodobashi.com@golfetcpearland.com>
 Received: from golfetcpearland.com([165.154.231.111])
     by ifmta666-pr.im.network.ne.jp with ESMTP
-    id <20241231172511933.VFDD.51930.golfetcpearland.com@imta666.provider.ne.jp>
-    for <tama.the.dog@provider.ne.jp>; Wed, 1 Jan 2025 02:25:11 +0900
+    id <20241231182511314.VFDD.51930.golfetcpearland.com@imta666.provider.ne.jp>
+    for <tama.the.dog@provider.ne.jp>; Wed, 1 Jan 2025 03:25:11 +0900
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; s=mail; d=golfetcpearland.com;
  h=Message-ID:From:To:Subject:Date:MIME-Version:Content-Type;
  i=yodobashi.com@golfetcpearland.com;
@@ -230,14 +230,14 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; s=mail; d=golfetcpearland.
  b=TRLWc6LsPUtGV1gH5bUnCWbb/JSDV4keDnXaVTemvjSPjmj+gJEk/ifF93ku9evUx7o3gkfx42dv
    TbwF/PNEghoIUgfUuw54ZYR/VmprL35qFDwXR6bsAIBxbqtmT2MBVAyE5U+ccyWSmpi3r1z2Ab9X
    w03e3D6cFDfgEOrMBoA=
-Message-ID: <8F75C6E9723620EC5F69B303BAD435A4@cEy.exndwgiji>
+Message-ID: <3E757CE93F3651EC89697303DED471A4@cEy.exndwgiji>
 From: "yodabashi" <yodobashi.com@golfetcpearland.com>
 To: <tama.the.dog@provider.ne.jp>
 Subject: ヨドバシ・ドット・コム：「お客様情報」変更依頼受付のご連絡
-Date: Wed, 1 Jan 2025 01:24:55 +0800
+Date: Wed, 1 Jan 2025 02:24:55 +0800
 MIME-Version: 1.0
 Content-Type: multipart/alternative;
-    boundary="----=_NextPart_000_02CE_011B2363.1CF27670"
+    boundary="----=_NextPart_010_02FE_011B23C2.1C5F7320"
 Authentication-Results: mx.provider.ne.jp; spf=pass
     smtp.mailfrom=yodobashi.com@golfetcpearland.com; sender-id=pass
     header.From=yodobashi.com@golfetcpearland.com
@@ -390,7 +390,7 @@ Subject: Amazonを装った不審なメール等にご注意ください
 MIME-Version: 1.0
 Content-Type: multipart/alternative; 
     boundary="----=_Part_8104580_445183779.1733449866650"
-Authentication-Results: mx.jcom.zaq.ne.jp; spf=pass
+Authentication-Results: mx.provider.ne.jp; spf=pass
     smtp.mailfrom=202412060151061f9c3eef447347cdb925ff7a9220p0fe-C5CGKT47C4OV7@bounces.amazon.co.jp;
     sender-id=pass header.From=store-news@amazon.co.jp
 ```
@@ -519,3 +519,4 @@ Content-Transfer-Encoding: 7bit
 <div style="text-align: right;">
 In-house Tool / 家中 徹
 </div>
+ 
