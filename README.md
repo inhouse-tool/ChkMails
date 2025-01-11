@@ -588,10 +588,7 @@ ON にすると, 着信したメールの概要を下記のように画面の隅っこに表示します.
 [Windows&reg; のポカ](https://stackoverflow.com/questions/64424601/cmfceditbrowsectrl-is-cropping-the-file-name)
 です.
 だいぶ前から指摘されているのに, いまだに直っていません.
-<br>
-<sup>
-( 2025年1月に Windows&reg; 11 24H2 で確認 )
-</sup>
+<br><sup>( 2025年1月に Windows&reg; 11 24H2 で確認 )</sup>
 
 
 #### Log
