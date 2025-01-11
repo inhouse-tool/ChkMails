@@ -170,12 +170,12 @@ web 上の誰もこんなこと言ってなかったし.
 ( 最悪, なかなか実際の開放が行われず, マジでリークしているようにしか見えない場合すらあります. )
 </sub>
 
-技術的には, 「LHF が発動する前に ( 昔ながらの ) Look-aside List 方式を指定する」
+技術的には, 「LFH が発動する前に ( 昔ながらの ) Look-aside List 方式を指定する」
 というやり方もあるそうですが,
 [Look-aside List 方式には攻撃に対する脆弱性がある](https://atmarkit.itmedia.co.jp/ait/articles/1408/28/news010_2.html)ので,
-実用的には LHF に「甘んじる」しかなさそうです.
+実用的には LFH に「甘んじる」しかなさそうです.
 
-LHF の影響を受けて「リークしているように見える」のは,
+LFH の影響を受けて「リークしているように見える」のは,
 Performance Monitor の測定項目のうち
 
 * Page File Bytes
@@ -186,7 +186,7 @@ Performance Monitor の測定項目のうち
 * Virtual Bytes
 * Working Set
 
-は LHF の影響が直撃しないようなので,
+は LFH の影響が直撃しないようなので,
 これら 2つの推移を眺めて
 
 「ああ、リークはしてなさそうだな……(たぶん)。」
