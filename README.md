@@ -1,4 +1,4 @@
-# ChkMails<br><sup><sup>Version 1.0.0.111</sup></sup>
+# ChkMails<br><sup><sup>Version 1.0.1.112</sup></sup>
 
 メールが届いているかチェックする常駐アプリです.
 
