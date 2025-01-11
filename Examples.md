@@ -519,4 +519,3 @@ Content-Transfer-Encoding: 7bit
 <div style="text-align: right;">
 In-house Tool / 家中 徹
 </div>
- 
