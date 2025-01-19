@@ -1,13 +1,14 @@
 # インストール手順
 
-[`Releases`](releases)
+[`Releases`](https://github.com/inhouse-tool/ChkMails/releases)
 の下にある最新版をマウスでクリックすると,
 その最新版を構成するファイルのページが開きます.
 
 その中から `ChkMails.msi` をクリックして, インストールファイルのダウンロードを開始します.
 
 > [!IMPORTANT]
-必ず当サイトの [`Releases`](releases) からご自身で直接ダウンロードした
+必ず当サイトの [`Releases`](https://github.com/inhouse-tool/ChkMails/releases)
+からご自身で直接ダウンロードした
 `ChkMails.msi` をお使いください.
 人から USB メモリーや SD カードなどに入ったファイルで渡されたものだと,
 それが正規品であるとは保証できません.
@@ -154,7 +155,7 @@
 でも, 一旦 `保存` (`Save`) した方が,
 ファイルが由緒正しいものかどうかの確認ができますね.
 
-正規品の `ChkMails.msi` は, プロパティ―を見ると,
+正規品最新版の `ChkMails.msi` は, プロパティ―を見ると,
 下記のように `2025年 1月 19日 11:20:28` 付けのデジタル署名が付いています
 ( インストール後の `ChkMails.exe` は `2025年 1月 19日 11:20:01` ).
 
