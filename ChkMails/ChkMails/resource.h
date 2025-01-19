@@ -40,9 +40,10 @@
 #define IDS_RF_FAKE_DOMAIN              206
 #define IDS_RF_FAKE_ALIAS               207
 #define IDS_RF_CALL_BY_ADDR             208
-#define IDS_RF_TIMEZONE                 209
+#define IDS_RF_LINK_FAKED               209
 #define IDS_RF_LINK_DOMAIN              210
 #define IDS_RF_LINK_EVASIVE             211
+#define IDS_RF_TIMEZONE                 212
 #define IDS_RE_DATE                     220
 #define IDS_RE_ABBR                     221
 #define IDS_RE_ENCODING                 222
@@ -89,9 +90,10 @@
 #define IDC_BUTTON_DOMAIN_ADD           1042
 #define IDC_BUTTON_DOMAIN_DEL           1043
 #define IDC_CHECK_SENDER_MESSAGEID      1050
-#define IDC_CHECK_SENDER_FAKEUSER       1051
-#define IDC_CHECK_SENDER_FAKEALIAS      1052
-#define IDC_CHECK_SENDER_FAKEALIAS2     1053
+#define IDC_CHECK_SENDER_CALLALIAS      1051
+#define IDC_CHECK_SENDER_FAKEUSER       1052
+#define IDC_CHECK_SENDER_FAKEALIAS      1053
+#define IDC_CHECK_SENDER_FAKELINK       1054
 #define IDC_LIST_TIMEZONE               1060
 #define IDC_STATIC_DST                  1061
 #define IDC_STATIC_LOCALTIME            1062

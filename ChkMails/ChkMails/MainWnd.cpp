@@ -364,7 +364,7 @@ CMainWnd::OnShowHelp( WPARAM wParam, LPARAM lParam )
 void
 CMainWnd::OnMenuWeb( void )
 {
-	CString	strPath = _T("https://github.com/inhouse-tool/ChkMails/README.md");
+	CString	strPath = _T("https://github.com/inhouse-tool/ChkMails/blob/main/README.md");
 	ShellExecute( NULL, _T("open"), strPath, NULL, NULL, SW_SHOWNORMAL );
 }
 
@@ -801,13 +801,13 @@ CMainWnd::LoadFilters( void )
 {
 	CChkMailsApp*	pApp = (CChkMailsApp*)AfxGetApp();
 
-	m_nAuth      = pApp->GetProfileInt(    _T("Filters"), _T("AuthFail"), 2 );
-	m_dwAuthCache     = pApp->GetProfileInt(    _T("Filters"), _T("AuthBits"), 0x00 );
-	m_dwCode     = pApp->GetProfileInt(    _T("Filters"), _T("Code"),     0x07 );
-	m_strDomains = pApp->GetProfileString( _T("Filters"), _T("Drop"),     _T("") );
-	m_dwSender   = pApp->GetProfileInt(    _T("Filters"), _T("Sender"),   0x0f );
-	m_strTimes   = pApp->GetProfileString( _T("Filters"), _T("TimeZone"), _T("") );
-	m_strWhites  = pApp->GetProfileString( _T("Filters"), _T("White"),    _T("") );
+	m_nAuth       = pApp->GetProfileInt(    _T("Filters"), _T("AuthFail"), 2 );
+	m_dwAuthCache = pApp->GetProfileInt(    _T("Filters"), _T("AuthBits"), 0x0000 );
+	m_dwCode      = pApp->GetProfileInt(    _T("Filters"), _T("Code"),     0xffff );
+	m_strDomains  = pApp->GetProfileString( _T("Filters"), _T("Drop"),     _T("") );
+	m_dwSender    = pApp->GetProfileInt(    _T("Filters"), _T("Sender"),   0xffff );
+	m_strTimes    = pApp->GetProfileString( _T("Filters"), _T("TimeZone"), _T("") );
+	m_strWhites   = pApp->GetProfileString( _T("Filters"), _T("White"),    _T("") );
 }
 
 void
@@ -1780,8 +1780,29 @@ CMainWnd::CheckLink( CString& strLines, TCHAR* pchScheme, CAttr& attr )
 		if	( xLink >= 0 )
 			strLink = strLink.Left( xLink );
 		xLink = strLink.Find( '/' );
-		if	( xLink >= 0 )
+
+		// Take a path following the URL.
+
+		CString	strPath;
+		if	( xLink >= 0 ){
+			strPath = strLink.Mid(  xLink+1 );
 			strLink = strLink.Left( xLink );
+		}
+		do{
+			if	( strPath.IsEmpty() )
+				break;
+			xLink = strPath.ReverseFind( '.' );
+			if	( xLink < 0 )
+				break;
+			CString	strTLD = strPath.Mid( xLink );
+			int	xDelim = strTLD.Find( '/' );
+			if	( xDelim >= 0 )
+				strTLD = strTLD.Left( xDelim );
+			if	( m_strTLDCache.Find( strTLD ) < 0 )
+				break;
+			strLink += _T("/") + strPath;
+			FilterError( IDS_RF_LINK_FAKED, attr );
+		}while	( 0 );
 
 		HexToASCII( strLink );
 
@@ -1944,7 +1965,7 @@ CMainWnd::FilterError( UINT uIdError, CAttr& attr )
 	}
 	else if	( uIdError == IDS_RF_DOMAIN ){
 	}
-	else if	( uIdError >= IDS_RF_MESSAGEID && uIdError <= IDS_RF_FAKE_ALIAS ){
+	else if	( uIdError >= IDS_RF_MESSAGEID && uIdError <= IDS_RF_LINK_FAKED ){
 		int	i = uIdError-IDS_RF_MESSAGEID;
 		if	( !( m_dwSender & (1<<i) ) )
 			uIdError = 0;
@@ -1954,6 +1975,8 @@ CMainWnd::FilterError( UINT uIdError, CAttr& attr )
 	else if	( uIdError == IDS_RF_LINK_EVASIVE ){
 		if	( !( m_dwCode & (1<<(IDS_RF_EVASIVECODE-IDS_RF_CHARSET)) ) )
 			uIdError = 0;
+	}
+	else if	( uIdError == IDS_RF_TIMEZONE ){
 	}
 
 	if	( uIdError ){
