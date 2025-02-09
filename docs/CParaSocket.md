@@ -162,7 +162,7 @@ POP3 でも POP3S でもやることは同じです.
 
 「TLS段階」が `0` でなければ,
 
-* [`CloseTLS`](#closetls) で TLS として閉じる.
+* [先方から切断された](#onclose)のでなければ [`CloseTLS`](#closetls) で TLS として閉じる.
 * 「TLS段階」を `0` に初期化.
 * 「暗号バッファ」を開放し, 暗号化関連の変数もクリア.
 
@@ -486,7 +486,10 @@ Socket の状態変化をアプリ層に通知します.
 
 [TLS](https://ja.wikipedia.org/wiki/Transport_Layer_Security) 接続を終了します.
 
-[`Close`](#close) から呼ばれ, TLS 接続を終了させます.
+[`Close`](#close) から呼ばれ, TLS 接続を終了させます.<br>
+ただし, [先方から切断された](#onclose)場合は, この関数は呼ばれません.
+先方から切断された場合は, すでに TCP 階層で切断されており,
+この関数が担当している「TLS 接続を終了させる」という仕事そのものが不要だからです.
 
 1. 「セキュリティートークンのやり取り」というお題でシャットダウンメッセージを
 [`InitializeSecurityContext`](https://learn.microsoft.com/ja-jp/windows/win32/secauthn/initializesecuritycontext--schannel).
@@ -569,3 +572,175 @@ FIFO のキュー形式となっています.
 
 取り出した分, キューに保持されているデータは減り, 残っているデータは先頭に向けて移動します.
 
+
+## 動作例
+
+下記は TLS1.2 の POP サーバーとの通信を [Wireshark](https://www.wireshark.org) でキャプチャーした例です.
+タイムスタンプ表示は, 最初のパケットからの経過時間 [s] を [&micro;s] 単位まで表記したものです.
+Frame No. が途中飛び飛びになっているのは, TCP の `[ACK]` を省略したためです.
+( 出だしとおしまいの TCP ACK は略さず表示しています. )
+
+```
+1	0.000000	CLIENT	SERVER	TCP	66	50707 → 995 [SYN]
+2	0.025680	SERVER	CLIENT	TCP	66	995 → 50707 [SYN, ACK]
+3	0.025744	CLIENT	SERVER	TCP	54	50707 → 995 [ACK]
+4	0.028947	CLIENT	SERVER	TLSv1.2	500	Client Hello (SNI=pop.provider.ne.jp)
+5	0.063717	SERVER	CLIENT	TLSv1.2	1514	Server Hello
+6	0.063909	SERVER	CLIENT	TLSv1.2	1499	Certificate,
+							Server Hello Done
+8	0.067916	CLIENT	SERVER	TLSv1.2	412	Client Key Exchange,
+							Change Cipher Spec,
+							Encrypted Handshake Message
+10	0.097212	SERVER	CLIENT	TLSv1.2	145	Change Cipher Spec,
+							Encrypted Handshake Message
+12	0.175987	SERVER	CLIENT	TLSv1.2	155	Application Data
+13	0.176757	CLIENT	SERVER	TLSv1.2	139	Application Data
+15	0.201460	SERVER	CLIENT	TLSv1.2	139	Application Data
+16	0.201988	CLIENT	SERVER	TLSv1.2	139	Application Data
+18	0.313435	SERVER	CLIENT	TLSv1.2	139	Application Data
+19	0.313792	CLIENT	SERVER	TLSv1.2	123	Application Data
+21	0.347685	SERVER	CLIENT	TLSv1.2	123	Application Data
+22	0.348111	CLIENT	SERVER	TLSv1.2	123	Application Data
+24	0.371177	SERVER	CLIENT	TLSv1.2	155	Application Data
+25	0.371249	SERVER	CLIENT	TCP	60	995 → 50707 [FIN, ACK]
+26	0.371274	CLIENT	SERVER	TCP	54	50707 → 995 [ACK]
+27	0.371764	CLIENT	SERVER	TCP	54	50707 → 995 [FIN, ACK]
+28	0.398535	SERVER	CLIENT	TCP	60	995 → 50707 [ACK]
+```
+
+Frame No.1 は [`Connect`](#connect) で出したものです.<br>
+Frame No.2 は Frame No.1 に対するサーバー側の応答で,<br>
+Frame No.3 を返していわゆる
+[Three-way Handshake](https://ja.wikipedia.org/wiki/3ウェイ・ハンドシェイク)
+が成立しています.
+
+Frame No.4 は [`OnConnectTLS1`](#onconnecttls1) で出したものです.<br>
+つまり,
+[`AcquireCredentialsHandle`](https://learn.microsoft.com/ja-jp/windows/win32/secauthn/acquirecredentialshandle--schannel)
+した後に
+[`InitializeSecurityContext`](https://learn.microsoft.com/ja-jp/windows/win32/secauthn/initializesecuritycontext--schannel)
+すると, 出力バッファーに `Client Hello` が形成されるので, それを送信しているわけです.
+
+この `Client Hello` を受けて, サーバーからは `Server Hello` が返ってきます.<br>
+Frame No.5 がそれです. そして立て続けに ( 上記通信例によると 192[&micro;s] 後 )<br>
+Frame No.6 の `Certificate` と `Server Hello Done` が両方入ったパケットが飛んできます.
+
+これらに対応するのが [`OnConnectTLS2`](#onconnecttls2) です.
+
+192[&micro;s] しか間が空いていないので, こちらがもたもたしていると ( デバッグ用のメッセージ出力を挟んだりしていると ),
+Frame No.5 と No.6 がくっついたイメージを受信したりします.
+いずれのケースでも
+[`InitializeSecurityContext`](https://learn.microsoft.com/ja-jp/windows/win32/secauthn/initializesecuritycontext--schannel)
+から帰ってくる答えは `SEC_I_CONTINUE_NEEDED` で変わりませんが,
+Frame No.5 と No.6 を個別に受信するほど反応が速かった場合は,
+Frame No.5 の受信時には, 出力バッファーが空で帰ってきて返信するものがない状態で終わり,
+Frame No.6 の受信時に出力バッファーに応答が形成されます.
+Frame No.5 と No.6 をまとめて受信するほど反応が鈍かった場合は,
+すぐに出力バッファーに応答が形成されます.
+
+Frame No.8 がこの形成された応答です.<br>
+1つのパケットの中に `Client Key Exchange`, `Change Cipher Spec`, `Encrypted Handshake Message` が入っています.
+
+Frame No.10 がその応答です<br>
+1つのパケットの中に `Change Cipher Spec` と `Encrypted Handshake Message` が入っています.
+
+このパケットを受信するまでが [`OnConnectTLS2`](#onconnecttls2) の仕事で,
+このパケットを渡された
+[`InitializeSecurityContext`](https://learn.microsoft.com/ja-jp/windows/win32/secauthn/initializesecuritycontext--schannel)
+が, `SEC_E_OK` を返してきたところで, TLS が開通したものとみなし,
+次回の受信からは [`OnReceiveTLS`](#onreceivetls) で受けるフェーズに進みます.
+
+ところで, Frame No.10 で TLS が開通したら, Frame No.12 で早速なにか `Application Data` をサーバーが送ってきています.
+その時間差はわずか 78.775[ms] ( = 0.175987[s] - 0.097212[s] ).
+これに追いつけないほどこちらの動きが鈍かった場合どうなるかを,
+100[ms] の `Sleep` を挟んで確認してみました.<br>
+すると, 
+[`InitializeSecurityContext`](https://learn.microsoft.com/ja-jp/windows/win32/secauthn/initializesecuritycontext--schannel)
+が返してきた入力バッファーに `SECBUFFER_EXTRA` が検出されていて,
+それを
+[`DecryptMessage`](https://learn.microsoft.com/ja-jp/windows/win32/secauthn/decryptmessage--schannel)
+すると, 巻き込まれた Frame No. 12 の `Application Data` が POP3 のサーバーからの応答であることが確認できました.
+
+つまり, こちら側の動きが速かろうと遅かろうと,
+通信としては噛み合うということです.
+
+
+## TLS1.3 について
+
+結論から言えば, 本品は TLS1.2 でフィックスしており, TLS1.3 はまだサポートしておりません.
+
+2025年 2月現在の
+[Microsoft&reg; の公開情報](https://learn.microsoft.com/ja-jp/windows/win32/secauthn/protocols-in-tls-ssl--schannel-ssp-)によると,
+Windows&reg;10 (22H2) では TLS1.3 は「サポート対象外」で, TLS1.2 が「有効」だそうです.
+
+[同公開情報](https://learn.microsoft.com/ja-jp/windows/win32/secauthn/protocols-in-tls-ssl--schannel-ssp-)によると,
+Windows&reg;11 では最初っから TLS1.3 が「有効」だそうなので,
+
+* Windows&reg;11 機で TLS1.3 対応の[POP3S](https://ja.wikipedia.org/wiki/Post_Office_Protocol#暗号化)サーバー
+
+という条件で実験してみました.
+
+その結果, 通信に失敗しました.
+
+この状況に鑑みて,
+
+* Windows&reg; では TLS1.3 はまだ早い
+
+と結論付け,
+本品では「TLS1.2固定」に設定しております.
+( Version 1.0.3.209 )
+
+
+### 実験の詳細
+
+TLS1.2 / 1.3 の切り分けは,
+実装上では,
+[`AcquireCredentialsHandle`](https://learn.microsoft.com/ja-jp/windows/win32/secauthn/acquirecredentialshandle--schannel)
+の引数 `PVOID pAuthData` に
+[`SCHANNEL_CRED`](https://learn.microsoft.com/ja-jp/windows/win32/api/schannel/ns-schannel-schannel_cred)
+を与えるか,
+[`SCH_CREDENTIALS`](https://learn.microsoft.com/ja-jp/windows/win32/api/schannel/ns-schannel-sch_credentials)
+を与えるかで決まるようです.
+<sub>
+解りにくっ!
+</sub>
+
+[`SCHANNEL_CRED`](https://learn.microsoft.com/ja-jp/windows/win32/api/schannel/ns-schannel-schannel_cred)
+のページには「代わりに[`SCH_CREDENTIALS`](https://learn.microsoft.com/ja-jp/windows/win32/api/schannel/ns-schannel-sch_credentials)を使え」
+的なことが書いてあるので,
+この辺の情報を信じて実装を進めると, 自然に TLS1.3 に対応することになります.
+
+ところが, これを実際に動かしてみると,
+[`OnConnectTLS2`](#onconnecttls2)
+で進行が止まってしまいました.
+
+[`OnConnectTLS2`](#onconnecttls2)
+において, 最後に
+[`InitializeSecurityContext`](https://learn.microsoft.com/ja-jp/windows/win32/secauthn/initializesecuritycontext--schannel)
+から返ってくる戻り値は `SEC_E_OK` で, 一見正常終了しているように見えます.
+が, そのとき既に受信バッファ―に溜まっているはずの POP3 メッセージに対して,
+`SECBUFFER_EXTRA` を検出しません.
+単に正常終了するだけです.
+
+結果,
+POP3 としては手順が進まず, こちらが何も送信しないまま時間切れでサーバーから切断されて終わります.
+
+というわけで
+例の[公開情報](https://learn.microsoft.com/ja-jp/windows/win32/secauthn/protocols-in-tls-ssl--schannel-ssp-)
+はアテにならず, 現時点 ( 2025年2月現在 ) では Windows&reg;11 でも TLS1.3 のサポートは
+( 少なくとも[POP3S](https://ja.wikipedia.org/wiki/Post_Office_Protocol#暗号化)においては )
+まだなんだろう, との判断を下し, 本品では TLS1.2 に留めてあります.
+<br>
+<sub>
+( 別に TLS1.2 でも困らないので, それほど TLS1.3 にはこだわっていません. 上記の経緯が気に入りませんが. )
+</sub>
+
+この実験時点での暗号化ライブラリーの版数は:
+
+```
+C:Windows\System32\bcrypt.dll             10.0.26100.2033 (WinBuild.160101.0800)
+C:Windows\System32\bcryptprimitives.dll   10.0.26100.2894 (WinBuild.160101.0800)
+```
+
+となっており,
+この辺が改版されたら再確認してみる所存です.

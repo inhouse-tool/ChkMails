@@ -1,4 +1,4 @@
-# ChkMails<br><sup><sup>Version 1.0.2.119</sup></sup>
+# ChkMails<br><sup><sup>Version 1.0.3.209</sup></sup>
 
 ƒ[ƒ‹‚ª“Ν‚Ά‚Δ‚Ά‚ι‚©ƒ`ƒFƒbƒN‚·‚ιν’“ƒAƒvƒ‚Ε‚·.
 
@@ -420,6 +420,7 @@ Windows&reg; ‚ª•Ϋ—L‚·‚ιƒf[ƒ^ƒx[ƒX‚Ι‚Θ‚Ά•¶ƒZƒbƒg‚Ε‘‚©‚κ‚Δ‚Ά‚ιƒ[ƒ‹‚π”jό‚µ‚
 * ƒhƒƒCƒ“‚π‘•‚Α‚½ƒ[ƒ‹ƒAƒhƒƒX<br>
 `From: amazon.com@phishing.com` ‚Μ‚ζ‚¤‚Ι, ‚Ο‚Α‚Ζ©, ΐέ‚·‚ιι‹Ζ‚Μ³‹K‚ΜƒhƒƒCƒ“‚©‚η‚Μ‚ΰ‚Μ‚Ε‚ ‚ι‚ζ‚¤‚Ι©‚Ή‚©‚―‚Θ‚ª‚η,
 ΐ‚Ν‚Ζ‚ρ‚Ε‚ΰ‚Θ‚Ά‘—MÒ‚©‚η—‚Δ‚Ά‚ι‚ζ‚¤‚Θƒ[ƒ‹‚π”jό‚µ‚ά‚·.<br>
+‘—M³ƒAƒhƒƒX‚Μ–`“ª‚πκ•Λ‚µ‚Δ‘—MÒ‚π”»’f‚·‚ι•Θ‚Μ‚ ‚ιl‚πΧ‚κ‚ι‚β‚θϋ‚Ε‚·.<br>
 q‹ιx‚µ‚Μ‚ζ‚¤‚Ε‚·‚ª ( ‚ΖΎ‚Α‚Δ‚Νq‹‚ΙΈ—η‚© )
 [ƒzƒ“ƒg‚Ι‚ ‚ι‚ρ‚Ε‚·‚ζ](Examples.md#dkim-signature-‚ª‚ ‚ιƒXƒpƒ€ƒ[ƒ‹‚Μ—α), ‚±‚¤‚Ά‚¤‚Μ.
 
@@ -436,7 +437,7 @@ Windows&reg; ‚ª•Ϋ—L‚·‚ιƒf[ƒ^ƒx[ƒX‚Ι‚Θ‚Ά•¶ƒZƒbƒg‚Ε‘‚©‚κ‚Δ‚Ά‚ιƒ[ƒ‹‚π”jό‚µ‚
 ƒ[ƒ‹‚Ι–„‚ί‚ά‚κ‚½ƒƒ“ƒN‚πιx‚Α‚½‚ΰ‚Μ‚Ε‚·.<br>
 `https://phishing.com/amazon.com` ‚Μ‚ζ‚¤‚Ι, ‚Ο‚Α‚Ζ©, ΐέ‚·‚ιι‹Ζ‚Μ³‹K‚ΜƒhƒƒCƒ“‚Μ‚ΰ‚Μ‚Ε‚ ‚ι‚ζ‚¤‚Ι©‚Ή‚©‚―‚Θ‚ª‚η,
 ΐ‚Ν‚Ζ‚ρ‚Ε‚ΰ‚Θ‚ΆƒEƒFƒuƒTƒCƒg‚πw‚µ‚Δ‚Ά‚ιƒƒ“ƒN‚ª–„‚ί‚ά‚κ‚½ƒ[ƒ‹‚π”jό‚µ‚ά‚·.<br>
-––”φ‚Μ•ϋ‚πκ•Λ‚µ‚Δ URL ‚π”»’f‚·‚ι•Θ‚Μ‚ ‚ιl‚πΧ‚κ‚ι‚β‚θϋ‚Ε‚·.
+ƒƒ“ƒN‚Μ––”φ‚πκ•Λ‚µ‚Δ URL ‚π”»’f‚·‚ι•Θ‚Μ‚ ‚ιl‚πΧ‚κ‚ι‚β‚θϋ‚Ε‚·.
 
 ƒfƒtƒHƒ‹ƒg‚Ε 5‚Β‚Ζ‚ΰ ON ‚Ι‚µ‚Δ‚Ά‚ά‚·.
 
@@ -647,9 +648,10 @@ ON ‚Ι‚·‚ι‚Ζ, ’…M‚µ‚½ƒ[ƒ‹‚ΜT—v‚π‰Ί‹L‚Μ‚ζ‚¤‚Ι‰ζ–Κ‚Μ‹χ‚Α‚±‚Ι•\¦‚µ‚ά‚·.
 | `Coded with Evasive Encoding`		| [Coding](#coding) ‚Μu‰ρ”π“I‚Θ•¶ƒR[ƒhv‚πo		|
 | `Domain Unreliable`			| [Domain](#domain) ‚Ε‚Μ”r‘ΞΫ					|
 | `Sender Using Aberrant Message-ID`	| [Sender](#sender) ‚ΜuMessage-ID ‚ª•W€‚Ι€‹’‚µ‚Δ‚Ά‚Θ‚Άƒ[ƒ‹v‚ΙY“–	|
+| `Sender Calling Unnecessary Alias`	| [Sender](#sender) ‚Μu–³‘Κ‚Θ•Κ–Ό‚ΕΔ‚Ρ‚©‚―‚Δ‚­‚ιƒ[ƒ‹v‚πo	|
 | `Sender Faking a Domain`		| [Sender](#sender) ‚ΜuƒhƒƒCƒ“‚π‘•‚Α‚½ƒ[ƒ‹ƒAƒhƒƒXv‚πo	|
 | `Sender Faking Alias`			| [Sender](#sender) ‚Μu•Κ–Ό‚πιx‚Α‚½ƒ[ƒ‹ƒAƒhƒƒXv‚πo		|
-| `Sender Calling Unnecessary Alias`	| [Sender](#sender) ‚Μu–³‘Κ‚Θ•Κ–Ό‚ΕΔ‚Ρ‚©‚―‚Δ‚­‚ιƒ[ƒ‹v‚πo	|
+| `Sender Faking Links`			| [Sender](#sender) ‚ΜuƒhƒƒCƒ“‚π‘•‚Α‚½ƒƒ“ƒNv‚πo		|
 | `Time Zone Unreliable`		| [Time Zone](#time-zone) ‚Ε‚Μ”r‘ΞΫ				|
 | `Link to Unreliable Domain`		| ƒƒ“ƒNζ‚ª [Domain](#domain) ‚Ε‚Μ”r‘ΞΫ			|
 | `Evasive Link Path`			| ƒƒ“ƒNζ‚Ι [Coding](#coding) ‚Μu‰ρ”π“I‚Θ•¶ƒR[ƒhv‚πo	|

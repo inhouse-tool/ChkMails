@@ -17,6 +17,7 @@
 #define	TID_READY	2
 #define	TID_START	3
 #define	TID_POLL	4
+#define	TID_CLOSE	5
 
 ///////////////////////////////////////////////////////////////////////////////////////
 // Constructor & Destructor
@@ -163,6 +164,10 @@ CMainWnd::OnTimer( UINT_PTR nIDEvent )
 	else if	( nIDEvent == TID_POLL ){
 		PollMails();
 	}
+	else if	( nIDEvent == TID_CLOSE ){
+		KillTimer( nIDEvent );
+		RespondPOP( NULL );
+	}
 	else
 		CWnd::OnTimer( nIDEvent );
 }
@@ -180,9 +185,9 @@ CMainWnd::OnSocketNotify( WPARAM wParam, LPARAM lParam )
 	int		nState = HIWORD( wParam );
 	int		nCode  = LOWORD( wParam );
 
-	if	( nState == SOCK_STATE_FAILED ){
-		DWORD	dwError = m_pSocket->GetLastError();
-		ClosePOP( dwError );
+	if	( nState == SOCK_STATE_FAILED ||
+		  nState == SOCK_STATE_IDLE ){
+		SetTimer( TID_CLOSE, 0, NULL );
 	}
 	else if	( nState == SOCK_STATE_RECEIVED ){
 		UINT	nMessage = 0;
@@ -1775,6 +1780,13 @@ CMainWnd::CheckLink( CString& strLines, TCHAR* pchScheme, CAttr& attr )
 		if	( xLink < 0 )
 			continue;
 		xLines += xLink;
+
+		CString	strLeft = strLines.Mid( xLines );
+		strLeft.MakeLower();
+		x = strLeft.Find( _T("</a>") );
+		if	( x >= 0 )
+			xLines += x;
+
 		strLink = strLink.Left( xLink );
 		xLink = strLink.Find( '"' );
 		if	( xLink >= 0 )
@@ -2956,11 +2968,14 @@ CMainWnd::ConnectPOP( void )
 #undef	atoi
 #endif//UNICODE
 
-#undef	DBGOUTPUT
+//#define	DBGOUTPUT
 
 void
 CMainWnd::RespondPOP( CStringA strMessage )
 {
+	if	( !m_iPhase )
+		return;
+
 	CStringA strCommand;
 	CStringA str;
 
@@ -2973,10 +2988,15 @@ CMainWnd::RespondPOP( CStringA strMessage )
 
 	switch	( m_iPhase ){
 		case	1:	// Connected: to send USER
-			str = m_aAccount[m_iUser].m_strUser;
-			strCommand.Format( "USER %s\r\n", str.GetBuffer() );
-			m_strMail.Empty();
-			m_iPhase++;
+			if	( strMessage.IsEmpty() ){
+				ClosePOP( -1 );
+			}
+			else{
+				str = m_aAccount[m_iUser].m_strUser;
+				strCommand.Format( "USER %s\r\n", str.GetBuffer() );
+				m_strMail.Empty();
+				m_iPhase++;
+			}
 			break;
 		case	2:	// Sent USER: to send PASS
 			if	( strMessage.Left( 3 ) == "+OK" ){
@@ -2986,7 +3006,7 @@ CMainWnd::RespondPOP( CStringA strMessage )
 			}
 			else{
 				strCommand = "QUIT\r\n";
-				m_iPhase = 9;
+				m_iPhase = 10;
 			}
 			break;
 		case	3:	// Sent PASS: to send STAT
@@ -2996,7 +3016,7 @@ CMainWnd::RespondPOP( CStringA strMessage )
 			}
 			else{
 				strCommand = "QUIT\r\n";
-				m_iPhase = 9;
+				m_iPhase = 10;
 			}
 			break;
 		case	4:	// Sent STAT: to receice STAT
@@ -3015,7 +3035,7 @@ CMainWnd::RespondPOP( CStringA strMessage )
 			}
 			else{
 				strCommand = "QUIT\r\n";
-				m_iPhase = 9;
+				m_iPhase = 10;
 				break;
 			}
 		case	5:	// Received STAT: to send RETR
@@ -3057,15 +3077,27 @@ CMainWnd::RespondPOP( CStringA strMessage )
 			break;
 		case	8:	// Sent QUIT: to close and to connect the next user
 			ClosePOP( 0 );
-			if	( ++m_iUser < m_aAccount.GetCount() )
-				ConnectPOP();
-			else{
+			SetTimer( TID_CLOSE, 0, NULL );
+			m_iPhase++;
+			break;
+		case	9:
+			// All users done: Show the result.
+
+			if	( ++m_iUser >= m_aAccount.GetCount() ){
 				m_iUser = 0;
 				ModNI( 0, NULL );
 			}
+
+			// There's the next: Connect in the name of the user.
+
+			else{
+				m_iPhase = 0;
+				ConnectPOP();
+			}
 			break;
-		case	9:
+		case	10:
 			ClosePOP( -1 );
+			break;
 	}
 
 	if	( !m_pSocket )
@@ -3085,6 +3117,9 @@ void
 CMainWnd::ClosePOP( int nError )
 {
 	CString	strError;
+	if	( m_iPhase >= 1 && m_iPhase <= 3 )
+		nError = -1;
+
 	if	( nError == -1 )
 		(void)strError.LoadString( IDS_NI_FAIL_POP );
 	else
@@ -3100,7 +3135,6 @@ CMainWnd::ClosePOP( int nError )
 		m_pSocket->Close();
 		delete	m_pSocket;
 		m_pSocket = NULL;
-		m_iPhase = 0;
 	}
 }
 

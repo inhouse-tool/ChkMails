@@ -87,9 +87,9 @@ void
 CParaSocket::Close( void )
 {
 	if	( m_iTLS ){
-		CloseTLS();
+		if	( m_nState != SOCK_STATE_IDLE )
+			CloseTLS();
 
-		m_iTLS = 0;
 		delete[] m_pbEncrypted;
 		m_cbPacketMax = 0;
 		m_pbEncrypted = NULL;
@@ -207,8 +207,8 @@ CParaSocket::OnConnectTLS1( void )
 
 	// Acquire a handle to preexisting credentials.
 
-	SCH_CREDENTIALS	cred = { 0 };
-	cred.dwVersion = SCH_CREDENTIALS_VERSION;
+	SCHANNEL_CRED	cred = { 0 };
+	cred.dwVersion = SCHANNEL_CRED_VERSION;
 	cred.dwFlags = SCH_USE_STRONG_CRYPTO | SCH_CRED_AUTO_CRED_VALIDATION | SCH_CRED_NO_DEFAULT_CREDS;
 
 	SECURITY_STATUS	status =
@@ -325,15 +325,18 @@ CParaSocket::OnConnectTLS2( void )
 			MoveMemory( m_pbEncrypted, m_pbEncrypted + (m_cbEncrypted -cbExtra), cbExtra );
 			m_cbEncrypted = cbExtra;
 		}
-		else
+		else if	( status == SEC_E_INCOMPLETE_MESSAGE )
+			;
+		else{
 			m_cbEncrypted = 0;
+		}
+		// 0x9a
 
 		// Completed: Get the size of each block of the stream,
 		//		then go ahead to the next stage to wait the app do something.
 
 		if	( status == SEC_E_OK ){
 			QueryContextAttributes( &m_hContext, SECPKG_ATTR_STREAM_SIZES, &m_cbsContext );
-
 			m_iTLS = 3;
 			m_nState = SOCK_STATE_CONNECTED;
 			NotifyState();
@@ -343,8 +346,9 @@ CParaSocket::OnConnectTLS2( void )
 
 		// Incomplete: Continue.
 
-		else if	( status == SEC_E_INCOMPLETE_MESSAGE )
+		else if	( status == SEC_E_INCOMPLETE_MESSAGE ){
 			break;
+		}
 
 		// Completed, but must do it again: Send the response.
 
@@ -373,7 +377,7 @@ CParaSocket::OnConnectTLS2( void )
 
 		else{
 			bDone = false;
-			TRACE( "OnConnectTLS2 failed in error %08x\n", status );
+			TRACE( "CParaSocket::OnConnectTLS2: Failed in error 0x%08x\n", status );
 			break;
 		}
 	}while	( 0 );
@@ -416,6 +420,7 @@ CParaSocket::OnConnectTLS2( void )
 
 				m_nState = SOCK_STATE_RECEIVED;
 				NotifyState();
+
 				if	( m_bReceiving ){
 					m_bReceiving = false;
 					SetEvent( m_hReceived );
@@ -545,51 +550,53 @@ CParaSocket::SendTLS( BYTE* pbData, DWORD cbData )
 	while	( cbData > 0 ){
 		int	cbToPut = min( cbData, m_cbsContext.cbMaximumMessage );
 
-		char*	pbSend = new char[m_cbPacketMax];
+		if	( m_cbPacketMax ){
+			char*	pbSend = new char[m_cbPacketMax];
 
-		// Prepare the buffers for encrypting the message.
+			// Prepare the buffers for encrypting the message.
 
-		SecBuffer asbOut[3];
-		asbOut[0].BufferType = SECBUFFER_STREAM_HEADER;
-		asbOut[0].pvBuffer   = pbSend;
-		asbOut[0].cbBuffer   = m_cbsContext.cbHeader;
-		asbOut[1].BufferType = SECBUFFER_DATA;
-		asbOut[1].pvBuffer   = pbSend +m_cbsContext.cbHeader;
-		asbOut[1].cbBuffer   = cbToPut;
-		asbOut[2].BufferType = SECBUFFER_STREAM_TRAILER;
-		asbOut[2].pvBuffer   = pbSend +m_cbsContext.cbHeader +cbToPut;
-		asbOut[2].cbBuffer   = m_cbsContext.cbTrailer;
-		SecBufferDesc	descOut = { SECBUFFER_VERSION, _countof( asbOut ), asbOut };
+			SecBuffer asbOut[3];
+			asbOut[0].BufferType = SECBUFFER_STREAM_HEADER;
+			asbOut[0].pvBuffer   = pbSend;
+			asbOut[0].cbBuffer   = m_cbsContext.cbHeader;
+			asbOut[1].BufferType = SECBUFFER_DATA;
+			asbOut[1].pvBuffer   = pbSend +m_cbsContext.cbHeader;
+			asbOut[1].cbBuffer   = cbToPut;
+			asbOut[2].BufferType = SECBUFFER_STREAM_TRAILER;
+			asbOut[2].pvBuffer   = pbSend +m_cbsContext.cbHeader +cbToPut;
+			asbOut[2].cbBuffer   = m_cbsContext.cbTrailer;
+			SecBufferDesc	descOut = { SECBUFFER_VERSION, _countof( asbOut ), asbOut };
 
-		// Encrypt the message.
+			// Encrypt the message.
 
-		CopyMemory( asbOut[1].pvBuffer, pbData, cbToPut );
-		SECURITY_STATUS	status = EncryptMessage( &m_hContext, 0, &descOut, 0 );
+			CopyMemory( asbOut[1].pvBuffer, pbData, cbToPut );
+			SECURITY_STATUS	status = EncryptMessage( &m_hContext, 0, &descOut, 0 );
 
-		// Send the encrypted message.
+			// Send the encrypted message.
 
-		if	( status == SEC_E_OK ){
-			int	cbTotal = asbOut[0].cbBuffer + asbOut[1].cbBuffer + asbOut[2].cbBuffer;
-			int	cbDone = 0;
-			int	cbSent = -1;
-			while	( cbDone != cbTotal ){
-				cbSent = CAsyncSocket::Send( pbSend+cbDone, cbTotal-cbDone, 0 );
-				if	( cbSent == SOCKET_ERROR )
-					break;
-				else
-					cbDone += cbSent;
+			if	( status == SEC_E_OK ){
+				int	cbTotal = asbOut[0].cbBuffer + asbOut[1].cbBuffer + asbOut[2].cbBuffer;
+				int	cbDone = 0;
+				int	cbSent = -1;
+				while	( cbDone != cbTotal ){
+					cbSent = CAsyncSocket::Send( pbSend+cbDone, cbTotal-cbDone, 0 );
+					if	( cbSent == SOCKET_ERROR )
+						break;
+					else
+						cbDone += cbSent;
+				}
+				if	( cbSent != -1 ){
+					pbData += cbToPut;
+					cbData -= cbToPut;
+				}
 			}
-			if	( cbSent != -1 ){
-				pbData += cbToPut;
-				cbData -= cbToPut;
+
+			delete[] pbSend;
+
+			if	( status != SEC_E_OK ){
+				FinishTLS( status );
+				return	SOCKET_ERROR;
 			}
-		}
-
-		delete[] pbSend;
-
-		if	( status != SEC_E_OK ){
-			FinishTLS( status );
-			return	SOCKET_ERROR;
 		}
 	}
 
@@ -640,8 +647,7 @@ CParaSocket::CloseTLS( void )
 			pbBuffer += cbSent;
 			cbBuffer -= cbSent;
 
-			// Insert a time to receive a TCP ACK. ( just for a clean capture log :-)
-			Sleep( 50 );
+			Sleep( 50 );	// Insert a time to receive a TCP ACK. ( just for a clean capture log :-)
 		}
 		FreeContextBuffer( asbOut[0].pvBuffer );
 	}

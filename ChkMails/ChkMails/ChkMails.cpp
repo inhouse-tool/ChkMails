@@ -159,7 +159,7 @@ CChkMailsApp::InitInstance( void )
 		HWND	hWnd = FindWindow( strClass, strTitle );
 		if	( hWnd ){
 			PostMessage( hWnd, WM_CLOSE, 0, 0 );
-			Sleep( 100 );
+			Sleep( 100 );	// Wait the preceding process to close.
 		}
 		else
 			break;
