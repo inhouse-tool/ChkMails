@@ -276,6 +276,7 @@ Window Message [`WM_TIMER`](https://learn.microsoft.com/ja-jp/windows/win32/winm
 | `TID_READY` | u€”õ’†v | [`AddNI`](#addni) ‚É‚Äƒ^ƒXƒNƒo[‚Ì’Ê’m—Ìˆæ‚ÉƒAƒCƒRƒ““o˜^. “o˜^Š®—¹‚Ü‚ÅŒJ‚è•Ô‚µ. |
 | `TID_START` | u’Êí‰c‹ÆŠJŽnv | [`PollNow`](#pollnow) ‚É‚ÄÅ‰‚Ìƒ`ƒFƒbƒN‚ÆˆÈ~‚Ì‚½‚ß‚É `TID_POLL` ‚ðƒZƒbƒg. |
 | `TID_POLL` | u’Êí‰c‹Æ’†v | [`PollMails`](#pollmails) ‚É‚Äƒ[ƒ‹‚Ìƒ`ƒFƒbƒN. |
+| `TID_CLOSE` | u•Â“X’†v | [`RespondPOP`](#respondpop) ‚É‹ó•¶Žš—ñ‚ð“n‚µ‚Ä’ÊM‚ðI—¹. |
 
 
 ## `OnGetFont`
@@ -323,10 +324,10 @@ Window Message `WM_SOCKET_NOTIFY`
 
 | ó‘Ô | ˆÓ–¡ | “– class ‚Ì‘Î‰ž |
 | --- | --- | --- |
-| `SOCK_STATE_FAILED` | u‚È‚ñ‚©Ž¸”s‚µ‚½v | [`ClosePOP`](#closepop) ‚ðŒÄ‚ñ‚Å’ÊM‚ðØ’f. |
+| `SOCK_STATE_FAILED`<br>`SOCK_STATE_IDLE` | u‚È‚ñ‚©Ž¸”s‚µ‚½v<br>uØ‚ê‚½v | `TID_CLOSE` ‚ð‚µ‚©‚¯‚Ä’ÊM‚ðI—¹. |
 | `SOCK_STATE_RECEIVED` | u‚È‚ñ‚©ŽóM‚µ‚½v | [`RespondPOP`](#respondpop) ‚ðŒÄ‚ñ‚ÅŽóM‚µ‚½‚à‚Ì‚ðŽó‚¯Žæ‚é. |
 
-‚Ì 2Ží—Þ‚Ì‚Ýˆµ‚Á‚Ä‚¢‚Ü‚·.
+‚Ì 3Ží—Þ‚Ì‚Ýˆµ‚Á‚Ä‚¢‚Ü‚·.
 
 `SOCK_STATE_RECEIVED` ‚ª’Ê’m‚³‚ê‚½ê‡‚Í,
 ŽóM‚µ‚½ƒoƒCƒg”‚¾‚¯“Ç‚ÝŽæ‚Á‚Ä `CStringA` ‚ÉŽd—§‚Ä‚Ä‚©‚ç,
@@ -1003,6 +1004,7 @@ Windows&reg; 10 ‚Å‚Íã‰º¶‰E‚É“®‚©‚¹‚é‚Ì‚Å,
 <sup>
 Q: ‚¦? `from: ` ‚È‚ñ‚Ä‘‚¢‚Ä‚­‚é‚â‚Â‚ª‹‚é‚ñ‚Å‚·‚©? A: ‹‚é‚ñ‚Å‚·‚æ. ‚Æ‚ ‚é“Á’è‚Ì‹ÆŽÒ‚¾‚¯‚Å‚·‚ª.
 </sup>
+
 1. Alias (•Ê–¼) ‚Ì‘¼‚É `<` ‚Æ `>` ‚ÅˆÍ‚Ü‚ê‚½ƒAƒhƒŒƒX‚ª‚ ‚ê‚Î‚»‚ê‚ð `attr.m_strFrom` ‚Æ‚µ‚Ä”[•i.
 
 1. Alias (•Ê–¼) ‚ª‚È‚©‚Á‚½‚ç, `From: ` ‚É“Y‚¦‚Ä‚ ‚éƒAƒhƒŒƒX‚ð `attr.m_strFrom` ‚Æ‚µ‚Ä”[•i.
@@ -1312,7 +1314,7 @@ UNICODE ( [UTF-16LE](https://ja.wikipedia.org/wiki/UTF-16) ) •¶Žš—ñ‚ðƒ`ƒFƒbƒN‚µ‚
 [`AddSuffix`](#addsuffix) ‚Ì•‚¯‚ðŽØ‚è‚Ä, ƒJƒu‚ç‚È‚¢‚æ‚¤‚É‚µ‚Ä‚¢‚Ü‚·.
 
 ‚¹‚Á‚©‚­ 7. ‚Æ 12. ‚Åƒtƒ@ƒCƒ‹‚Ìƒ^ƒCƒ€ƒXƒ^ƒ“ƒv‚ðƒ[ƒ‹‚Ì‘—M“úŽž‚É‡‚í‚¹‚Ä‚¨‚¢‚½‚Ì‚É,
-Windows&reg; ‚ª‘ä‚È‚µ‚É‚µ‚Ä‚µ‚Ü‚¤‚±‚Æ‚Í[–`“ª‚Ì˜A—Ž–€](#‚²Ž©g‚Å-build-‚µ‚Ä-debug-‚³‚ê‚é•û‚Ö‚Ì˜A—Ž–€)‚Å‚¨“`‚¦‚µ‚½’Ê‚è‚Å‚·.
+Windows&reg; ‚ª‘ä‚È‚µ‚É‚µ‚Ä‚µ‚Ü‚¤‚±‚Æ‚Í[–`“ª‚Ì˜A—Ž–€](/README.md#‚²Ž©g‚Å-build-‚µ‚Ä-debug-‚³‚ê‚é•û‚Ö‚Ì˜A—Ž–€)‚Å‚¨“`‚¦‚µ‚½’Ê‚è‚Å‚·.
 
 [`ParseMail`](#parsemail) ‚©‚çŒÄ‚Î‚ê‚Ä‚¢‚Ü‚·.
 
@@ -1843,13 +1845,29 @@ Return-Path: <’†—ª>
 ’†g‚ªo‚»‚ë‚Á‚Ä‚¢‚½‚ç [`ParseMail`](#paasemail) ‚Å’†g‚ðƒ`ƒFƒbƒN. ”jŠü‚·‚×‚«ƒ[ƒ‹‚È‚ç `DELE` ‚·‚é.<br>
 ’†g‚ªo‚»‚ë‚Á‚Ä‚¢‚È‚©‚Á‚½‚ç, ŽŸ‚ÌŽóM‚ð‘Ò‚Â.
 1. ‘S‚Ä‚Ìƒ[ƒ‹‚ð“Ç‚ÝI‚í‚Á‚½‚È‚ç `QUIT`, ‚Ü‚¾‚È‚çŽŸ‚Ìƒ[ƒ‹‚ð `RETR` ‚·‚é.
-1. `‚¨•Ê‚ê‚Ìˆ¥ŽA` ‚ª•Ô‚Á‚Ä‚«‚½‚Ì‚Å [`ClosePOP`](#closepop) ‚µ,<br>
-ŽŸ‚ÌƒAƒJƒEƒ“ƒg‚ª‚ ‚é‚È‚ç [`ConnectPOP`](#connectpop) ‚µ, ÅŒã‚ÌƒAƒJƒEƒ“ƒg‚È‚çŒ‹‰Ê‚ð [`ModNI`](#modni) ‚·‚é.
-1. `+OK` ‚ÆŒ¾‚í‚ê‚È‚©‚Á‚½ê‡‚Í, [`ClosePOP`](#closepop) ‚·‚é.
+1. `‚¨•Ê‚ê‚Ìˆ¥ŽA` ‚ª•Ô‚Á‚Ä‚«‚½‚Ì‚Å’ÊM‚ðI—¹‚·‚é.
+1. ŽŸ‚ÌƒAƒJƒEƒ“ƒg‚ª‚ ‚é‚È‚ç [`ConnectPOP`](#connectpop) ‚µ, ÅŒã‚ÌƒAƒJƒEƒ“ƒg‚È‚çŒ‹‰Ê‚ð [`ModNI`](#modni) ‚·‚é.
+1. ’ÊM‚ª¬Œ÷‚µ‚È‚©‚Á‚½‚ç, [`ClosePOP`](#closepop) ‚·‚é.
 
 ‚±‚Ì’iŽæ‚è‚ð `switch ( m_iPhase )` ‚ÉŠî‚Ã‚¢‚Ä `case` ‚Å“®‚©‚µ‚Ä‚¢‚Ü‚·‚ª,
 ˆê•”‚Ì `case` ‚Å‚Í `break` ‚¹‚¸‚ÉŽŸ‚Ì `case` ‚É—Ž‚Æ‚µ‚Ä‚¢‚éê‡‚ª‚ ‚é‚Ì‚Å‚¨Œ©“¦‚µ‚È‚«‚æ‚¤.<br>
 ( –¢“Çƒ[ƒ‹‚ª‚ ‚Á‚½ê‡‚Ì `4` ¨ `5` ‚Æ, 1’Ê•ª“Ç‚ÝØ‚Á‚½‚ ‚Æ”jŠü‚µ‚È‚©‚Á‚½ê‡‚Ì `6` ¨ `7` )
+
+`m_iPhase` ‚²‚Æ‚Ìˆ—“à—e‚Å‚Ü‚Æ‚ß‚é‚Æ:
+
+
+| `m_iPhase` | ’iŠK | ˆ—“à—e |
+| :-: | --- | --- |
+| `1` | Ú‘±’¼Œã | `USER` ‚ð‘—‚é. |
+| `2` | `USER` ‘—MŒã | `PASS` ‚ð‘—M. ( `+OK` ŽóMŽž )<br>`QUIT` ‚ð‘—M. ( ‚»‚Ì‘¼ŽóMŽž ) |
+| `3` | `PASS` ‘—MŒã | `STAT` ‚ð‘—M. ( `+OK` ŽóMŽž )<br>`QUIT` ‚ð‘—M. ( ‚»‚Ì‘¼ŽóMŽž ) |
+| `4` | `STAT` ‘—MŒã | `QUIT` ‚ð‘—M. ( `+OK` ŽóMŽž‚Å–¢“Çƒ[ƒ‹‚ª‚È‚©‚Á‚½ê‡ )<br>`m_iPhase` `5` ‚Ö. ( `+OK` ŽóMŽž‚Å–¢“Çƒ[ƒ‹‚ª‚ ‚Á‚½ê‡ )<br> `QUIT` ‚ð‘—M. ( ‚»‚Ì‘¼ŽóMŽž ) |
+| `5` | `STAT` ‘—MŒã<br>(–¢“Çƒ[ƒ‹‚ ‚è‚Ìê‡) | `RETR` ‚ð‘—M. |
+| `6` | `RETR` ‚Ì‰ž“šŽóMŒã | ƒ[ƒ‹–{•¶–`“ª‚Ìê‡‚Í, –{•¶‚Ì‘O‚É‚ ‚é `+OK` ‚ðíœ.<br>ŽóMƒƒbƒZ[ƒW‚ð–{•¶‚É’Ç‰Á.<br>–{•¶––”ö‚ª `"/r/n./r/n"` ‚È‚ç–{•¶ŽóMŠ®—¹‚È‚Ì‚Å, [`ParseMail`](#parsemail) ‚ðŒÄ‚Ô.<br>–ß‚è’l‚ªu”jŠüv‚È‚ç `DELE` ‚ð‘—M.u•ÛŽv‚È‚ç `m_iPhase` `7` ‚Ö. |
+| `7` | `RETR` ‚Ì‰ž“šŽóMŒã<br>(ƒ[ƒ‹•ÛŽ‚Ìê‡)<br>`DELE` ‚Ì‰ž“šŽóMŒã | `QUIT` ‚ð‘—‚é. ( ‘S–¢“Çƒ[ƒ‹Šm”FŠ®—¹Žž )<br>ŽŸ‚Ìƒ[ƒ‹‚Ì `RETR` ‚ð‘—M. ( –¢Šm”F‚Ìƒ[ƒ‹‚ªŽc‚Á‚Ä‚¢‚éê‡ ) |
+| `8` | `QUIT` ‘—MŒã | [`ClosePOP`](#closepop) ‚ðŒÄ‚ñ‚Å POP3 ‚ðI—¹.<br>`TID_CLOSE` ‚ð‚µ‚©‚¯‚é. |
+| `9` | `TID_CLOSE` –ž—¹Œã | ‘SƒAƒJƒEƒ“ƒgŠ®—¹‚È‚ç [`ModNI`](#modni)‚ðŒÄ‚ñ‚ÅŒ‹‰Ê•\Ž¦.<br>ŽŸ‚ÌƒAƒJƒEƒ“ƒg‚ª‚ ‚ê‚Î, [`ConnectPOP`](#connectpop) ‚©‚çÄŠJ. |
+| `10` | ƒTƒCƒ“ƒCƒ“Ž¸”sŒã | [`ClosePOP`](#closepop) ‚ðˆø” `-1` ‚ÅŒÄ‚ñ‚Å, ƒTƒCƒ“ƒCƒ“Ž¸”s‚ðŒã•Ð•t‚¯. |
 
 ### Debug build ‚Å‚±‚Ì‚â‚èŽæ‚è‚ð’­‚ß‚Ä‚¢‚é•û‚Ö‚Ì˜A—Ž–€
 
