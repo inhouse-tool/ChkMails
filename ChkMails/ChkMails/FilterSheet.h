@@ -7,6 +7,7 @@
 #include "AuthPage.h"
 #include "CodePage.h"
 #include "DomainPage.h"
+#include "NamePage.h"
 #include "SenderPage.h"
 #include "ZonePage.h"
 #include "WhitePage.h"
@@ -21,6 +22,7 @@ public:
 	CAuthPage	m_pageAuth;
 	CCodePage	m_pageCode;
 	CDomainPage	m_pageDomain;
+	CNamePage	m_pageName;
 	CSenderPage	m_pageSender;
 	CZonePage	m_pageZone;
 	CWhitePage	m_pageWhite;

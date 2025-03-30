@@ -242,13 +242,26 @@ void
 CWhitePage::OnEditPaste( void )
 {
 	if	( OpenClipboard() ){
-		HGLOBAL	hMem = GetClipboardData( CF_TEXT );
+		HGLOBAL	hMem = GetClipboardData( CF_UNICODETEXT );
 		if	( hMem ){
 			void*	pMem = GlobalLock( hMem );
-			CStringA strPasted( (char*)pMem );
+			CString strIn( (TCHAR*)pMem );
 			GlobalUnlock( hMem );
 
-			if	( !TakeSender( strPasted ) ){
+			int	n = strIn.GetLength();
+			for	( int i = 0; i < n; i++ )
+				if	( strIn[i] >= 0x80 )
+					strIn.SetAt( i, ' ' );
+
+			WCHAR*	pchIn = strIn.GetBuffer();
+			int	cchOut =
+			::WideCharToMultiByte( CP_ACP, 0, pchIn, -1, NULL,        0, NULL, NULL );
+			CHAR*	pchOut = new CHAR[cchOut];
+			::WideCharToMultiByte( CP_ACP, 0, pchIn, -1, pchOut, cchOut, NULL, NULL );
+			CStringA	strOut = pchOut;
+			delete []pchOut;
+
+			if	( !TakeSender( strOut ) ){
 				CString	strError;
 				(void)strError.LoadString( IDS_RE_UNRELIABLE );
 				CString	str;

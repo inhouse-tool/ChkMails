@@ -180,7 +180,7 @@ Window Message [`WM_GETMINMAXINFO`](https://learn.microsoft.com/ja-jp/windows/wi
 「最小サイズ」として返します.
 これにより, シートの端を drag しても元のサイズより小さくはできなくなります.
 小さくしても意味はないので入れておきました.
-大きくする分には意味があるので不介入です.
+大きくする分には意味がある ( 場合もある ) ので不介入です.
 
 
 ## `OnSize`

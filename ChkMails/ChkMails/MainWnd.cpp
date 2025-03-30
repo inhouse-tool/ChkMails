@@ -330,7 +330,7 @@ CMainWnd::OnGetSender( WPARAM wParam, LPARAM lParam )
 	CStringA strMail( (char*)lParam );
 
 	CAttr	attr = GetAttr( strMail );
-	if	( !attr.m_strReason.IsEmpty() )
+	if	( attr.m_dwReason )
 		return	(LRESULT)0;
 
 	if	( attr.m_strSender.IsEmpty() )
@@ -473,6 +473,7 @@ CMainWnd::OnMenuFilter( void )
 	sheet.m_pageCode  .m_dwFlags     = m_dwCode;
 	sheet.m_pageDomain.m_strDomains  = m_strDomains;
 	sheet.m_pageDomain.m_strTLDCache = m_strTLDCache;
+	sheet.m_pageName  .m_strNames    = m_strNames;
 	sheet.m_pageSender.m_dwFlags     = m_dwSender;
 	sheet.m_pageZone  .m_strTimes    = m_strTimes;
 	sheet.m_pageWhite .m_strWhites   = m_strWhites;
@@ -500,6 +501,10 @@ CMainWnd::OnMenuFilter( void )
 		m_strTLDCache  = sheet.m_pageDomain  .m_strTLDCache;
 		SaveTLDs();
 	}
+	if	( sheet.m_pageName  .m_strNames    != m_strNames ){
+		m_strNames  = sheet.m_pageName       .m_strNames;
+		bUpdate = true;
+	}
 	if	( sheet.m_pageSender.m_dwFlags     != m_dwSender ){
 		m_dwSender = sheet.m_pageSender      .m_dwFlags;
 		bUpdate = true;
@@ -513,8 +518,11 @@ CMainWnd::OnMenuFilter( void )
 		bUpdate = true;
 	}
 
-	if	( bUpdate )
+	if	( bUpdate ){
 		SaveFilters();
+		if	( AfxMessageBox( IDS_MB_REEVAL, MB_YESNO | MB_ICONQUESTION ) == IDYES )
+			ReadFromEML( m_strLogPath );
+	}
 }
 
 void
@@ -810,6 +818,7 @@ CMainWnd::LoadFilters( void )
 	m_dwAuthCache = pApp->GetProfileInt(    _T("Filters"), _T("AuthBits"), 0x0000 );
 	m_dwCode      = pApp->GetProfileInt(    _T("Filters"), _T("Code"),     0xffff );
 	m_strDomains  = pApp->GetProfileString( _T("Filters"), _T("Drop"),     _T("") );
+	m_strNames    = pApp->GetProfileString( _T("Filters"), _T("Name"),     _T("") );
 	m_dwSender    = pApp->GetProfileInt(    _T("Filters"), _T("Sender"),   0xffff );
 	m_strTimes    = pApp->GetProfileString( _T("Filters"), _T("TimeZone"), _T("") );
 	m_strWhites   = pApp->GetProfileString( _T("Filters"), _T("White"),    _T("") );
@@ -824,6 +833,7 @@ CMainWnd::SaveFilters( void )
 	pApp->WriteProfileInt(    _T("Filters"), _T("AuthBits"), m_dwAuthCache );
 	pApp->WriteProfileInt(    _T("Filters"), _T("Code"),     m_dwCode );
 	pApp->WriteProfileString( _T("Filters"), _T("Drop"),     m_strDomains );
+	pApp->WriteProfileString( _T("Filters"), _T("Name"),     m_strNames );
 	pApp->WriteProfileInt(    _T("Filters"), _T("Sender"),   m_dwSender );
 	pApp->WriteProfileString( _T("Filters"), _T("TimeZone"), m_strTimes );
 	pApp->WriteProfileString( _T("Filters"), _T("White"),    m_strWhites );
@@ -1003,7 +1013,7 @@ CMainWnd::PollMails( void )
 }
 
 bool
-CMainWnd::ParseMail( CStringA strMail, bool bForceLog )
+CMainWnd::ParseMail( CStringA strMail, LPCTSTR pchFile )
 {
 	bool	bKeep = true;
 	CAttr	attr;
@@ -1011,6 +1021,11 @@ CMainWnd::ParseMail( CStringA strMail, bool bForceLog )
 	// Get `attributes` of the mail.
 
 	attr = GetAttr( strMail );
+
+	// Set the file name if given.
+
+	if	( pchFile )
+		attr.m_strFile = pchFile;
 
 	// Make a log of the mail.
 
@@ -1022,15 +1037,15 @@ CMainWnd::ParseMail( CStringA strMail, bool bForceLog )
 
 	// Add summary if the mail has kept.
 
-	if	( attr.m_strReason.IsEmpty() )
-		m_strSummary.Insert( 0, MakeSummary( strLog, attr ) );
-	else
+	if	( attr.m_dwReason )
 		bKeep = false;
+	else
+		m_strSummary.Insert( 0, MakeSummary( strLog, attr ) );
 
 	// Leave a log of the mail to be discarded.
 
 	if	( m_bLogAll || !bKeep )
-		SaveLog( strMail, strLog, attr, bForceLog );
+		SaveLog( strMail, strLog, attr );
 
 	return	bKeep;
 }
@@ -1046,7 +1061,8 @@ CMainWnd::GetAttr( CStringA strMail )
 	GetType(   strMail, attr );
 	GetEncode( strMail, attr );
 	GetTime(   strMail, attr );
-	CheckMID(  strMail, attr );
+	CheckMID(      strMail, attr );
+	CheckReceived( strMail, attr );
 
 	return	attr;
 }
@@ -1130,9 +1146,16 @@ CMainWnd::GetFrom( CStringA strMail, CAttr& attr )
 
 		// Extract sender address.
 
+		CStringA strFrom;
 		xIn  = x + 6;
-		xOut = strMail.Find( ':', xIn+1 );
-		CStringA strFrom = strMail.Mid( xIn, xOut-xIn );
+		x = xIn;
+		while	( true ){
+			xOut = strMail.Find( ':', x );
+			strFrom = strMail.Mid( xIn, xOut-xIn );
+			if	( strFrom.Find( '\r' ) >= 0 )
+				break;
+			x = xOut+1;
+		}
 
 		xIn  = strFrom.Find( '<', 0 );
 		xOut = strFrom.Find( '>', xIn+1 );
@@ -1278,13 +1301,18 @@ CMainWnd::GetType( CStringA strMail, CAttr& attr )
 			break;
 		x = strMail.Find( "content-type: " );
 	}while	( 0 );
+
 	if	( x >= 0 ){
 		xIn  = strMail.Find( ": ", x );
 		xOut = strMail.Find( ": ", xIn+2 );
 		if	( xOut < 0 )
 			xOut = strMail.GetLength();
 		CStringA str = strMail.Mid( xIn+2, xOut-(xIn+2) );
+		x = str.ReverseFind( '\r' );
+		if	( x >= 0 )
+			str = str.Left( x );
 		str.Trim();
+
 		if	( str.Left( 4 ) == "text" ){
 			attr.m_iType = CAttr::Text;
 			CStringA strSubType = str.Mid( 5 );
@@ -1298,35 +1326,39 @@ CMainWnd::GetType( CStringA strMail, CAttr& attr )
 
 		x = str.Find( "charset=" );
 		if	( x >= 0 ){
+			CStringA strCharset = str;
 			x += 8;
-			str.Delete( 0, x );
-			if	( str[0] == '"' ){
-				str.Delete( 0, 1 );
-				x = str.Find( '"' );
-				str = str.Left( x );
+			strCharset.Delete( 0, x );
+			if	( strCharset[0] == '"' ){
+				strCharset.Delete( 0, 1 );
+				x = strCharset.Find( '"' );
+				strCharset = strCharset.Left( x );
 			}
 			else{
-				x = str.Find( "\r\n" );
+				x = strCharset.Find( "\r\n" );
 				if	( x > 0 )
-					str = str.Left( x );
+					strCharset = strCharset.Left( x );
 			}
 
-			attr.m_iCharset = GetCodePage( str );
+			attr.m_iCharset = GetCodePage( strCharset );
 			if	( !attr.m_iCharset )
 				FilterError( IDS_RF_CHARSET, attr );
 		}
+
 		if	( attr.m_iType == CAttr::Multipart ){
 			x = str.Find( "boundary=" );
 			if	( x > 0 ){
-				str.Delete( 0, x+9 );
-				if	( str[0] == '"' ){
-					str.Delete( 0, 1 );
-					x = str.Find( '"', 0 );
+				CStringA strBoundary = str;
+				strBoundary.Delete( 0, x+9 );
+				if	( strBoundary[0] == '"' ){
+					strBoundary.Delete( 0, 1 );
+					x = strBoundary.Find( '"', 0 );
 				}
 				else
-					x = str.Find( "\r\n" );
-				str = str.Left( x );
-				attr.m_strBoundary = str;
+					x = strBoundary.Find( "\r\n" );
+				if	( x >= 0 )
+					strBoundary = strBoundary.Left( x );
+				attr.m_strBoundary = strBoundary;
 			}
 		}
 	}
@@ -1502,6 +1534,7 @@ CMainWnd::GetTime( CStringA strMail, CAttr& attr )
 
 #define	CP_SHIFT_JIS	  932
 #define	CP_ISO_2022_JP	50220	// JIS X 0201-1989
+#define	CP_GB18030	54936	// GB18030
 //efine	CP_UTF8		65001	// defined in <WinNls.h>
 
 int
@@ -1531,8 +1564,13 @@ CMainWnd::GetCodePage( CStringA strMail )
 
 		RegCloseKey( hKey );
 	}
-	if	( !iCodePage )
-		TRACE( "code page '%s' is unknown.\n", strMail );
+	if	( !iCodePage ){
+		// MS says that they start supporting GB18030 in KB5028171 which fails in installation for Japanese locale.
+		if	( !strMail.CompareNoCase( "GB18030" ) )
+			iCodePage = CP_GB18030;
+		else
+			TRACE( "code page '%s' is unknown.\n", strMail );
+	}
 
 	return	iCodePage;
 }
@@ -1570,130 +1608,88 @@ CMainWnd::CheckMID( CStringA strMail, CAttr& attr )
 }
 
 void
-CMainWnd::CheckAlias( CString strLog, CAttr& attr )
+CMainWnd::CheckReceived( CStringA strMail, CAttr& attr )
 {
+	// Get the last ( the first ) 'Received: '.
+
 	int	x, xIn, xOut;
 
-	// Get nominal sender.
-
-	x = strLog.Find( _T("From: ") );
-	if	( x < 0 )
-		x = strLog.Find( _T("from: ") );
+	xIn = -1;
+	x = 0;
 	do{
+		x = strMail.Find( "\r\nReceived: ", x );
 		if	( x < 0 )
 			break;
+		x += 2+10;
+		xIn = x;
+	}while	( true );
+	if	( xIn < 0 )
+		return;
 
-		// Extract sender's alias.
-
-		xIn  = x + 6;
-		xOut = strLog.Find( ':', xIn );
-		CString strAlias = strLog.Mid( xIn, xOut-xIn );
-
-		xOut = strAlias.ReverseFind( '<' );
-		if	( xOut < 0 )
+	x = xIn;
+	do{
+		x = strMail.Find( "\r\n", x );
+		x += 2;
+		if	( strMail[x] > ' ' ){
+			xOut = x;
 			break;
+		}
+	}while	( true );
+	
+	CStringA strReceived = strMail.Mid( xIn, xOut-xIn );
 
-		strAlias = strAlias.Left( xOut );
-		strAlias.Trim();
+	// Get the time zone in the 'Received: '.
 
-		int	n = strAlias.GetLength();
-		xIn = n;
-		for	( x = 0; x < n; x++ ){
-			TCHAR	ch = strAlias[x];
-			if	( ( ch == '.' ) ||
-				  ( ch >= 'A' && ch <= 'Z' ) ||
-				  ( ch >= 'a' && ch <= 'z' ) ){
-				xIn = x;
+	CStringA strZone;
+	x = 0;
+	while	( strZone.IsEmpty() ){
+		x = strReceived.Find( '+', x );
+		if	( x < 0 )
+			break;
+		else if	( isdigit( strReceived[x+1] ) &&
+			  isdigit( strReceived[x+2] ) &&
+			  isdigit( strReceived[x+3] ) &&
+			  isdigit( strReceived[x+4] ) &&
+			 !isdigit( strReceived[x+5] )    ){
+			strZone = strReceived.Mid( x, 5 );
+			int	nHour = atoi( strZone.GetBuffer()+1 );
+			if	( nHour < 2400 )
+				break;
+		}
+		x++;
+	}
+	x = 0;
+	while	( strZone.IsEmpty() ){
+		x = strReceived.Find( '-', x );
+		if	( x < 0 )
+			break;
+		else if	( isdigit( strReceived[x+1] ) &&
+			  isdigit( strReceived[x+2] ) &&
+			  isdigit( strReceived[x+3] ) &&
+			  isdigit( strReceived[x+4] ) &&
+			 !isdigit( strReceived[x+5] )    ){
+			strZone = strReceived.Mid( x, 5 );
+			int	nHour = atoi( strZone.GetBuffer()+1 );
+			if	( nHour < 2400 )
+				break;
+		}
+		x++;
+	}
+
+	// Check if the time zone is unreliale.
+
+	if	( !strZone.IsEmpty() ){
+		x = 0;
+		for	( ;; ){
+			CString	strTime = m_strTimes.Tokenize( _T("\n"), x );
+			if	( strTime.IsEmpty() )
+				break;
+			if	( strTime == (CString)strZone ){
+				FilterError( IDS_RF_TIMEZONE, attr );
 				break;
 			}
 		}
-		xOut = xIn;
-		while	( x < n ){
-			TCHAR	ch = strAlias[x];
-			if	( ( ch == '.' ) ||
-				  ( ch >= 'A' && ch <= 'z' ) ||
-				  ( ch >= 'a' && ch <= 'z' ) ||
-				  ( ch == ' ' ) )
-				xOut = ++x;
-			else
-				break;
-		}
-		strAlias = strAlias.Mid( xIn, xOut-xIn );
-		if	( strAlias.IsEmpty() )
-			break;
-
-		strAlias.MakeLower();
-		if	( strAlias.Find( _T("my ") ) == 0 ||
-			  strAlias.Find( _T("my.") ) == 0 )
-			strAlias.Delete( 0, 3 );
-
-		if	( strAlias.Find( ' ' ) >= 0 )
-			break;
-
-		// Extract sender's domain.
-
-		CString	strDomain = (CString)attr.m_strFrom;
-		x = strDomain.Find( '@' );
-		if	( x < 0 )
-			break;
-
-		strDomain = strDomain.Mid( x+1 );
-
-		// Check if the alias is included in the domain.
-
-		if	( strDomain.Find( strAlias ) < 0 )
-			FilterError( IDS_RF_FAKE_ALIAS, attr );
-	}while	( 0 );
-
-	// Get the sendee.
-
-	x = strLog.Find( _T("To: ") );
-	if	( x < 0 )
-		x = strLog.Find( _T("to: ") );
-	do{
-		if	( x < 0 )
-			break;
-
-		// Extract sendee's alias.
-
-		xIn  = x + 4;
-		xOut = strLog.Find( ':', xIn );
-		CString strAlias = strLog.Mid( xIn, xOut-xIn );
-
-		xOut = strAlias.Find( '<', 0 );
-		if	( xOut < 0 )
-			break;
-
-		CString	strTo = strAlias.Mid( xOut+1 );
-		strAlias = strAlias.Left( xOut );
-		strAlias.Trim();
-
-		if	( strAlias[0] == '"' ){
-			strAlias.Delete( 0, 1 );
-			strAlias.Delete( strAlias.GetLength()-1, 1 );
-		}
-
-		if	( strAlias.IsEmpty() )
-			break;
-
-		xOut = strTo.Find( '>' );
-		strTo = strTo.Left( xOut );
-
-		x = strTo.Find( '@' );
-		CString	strUser = strTo.Left( x );
-
-		// Check if the alias is included in the address.
-
-		if	( strAlias == strUser )
-			;
-		else if	( strAlias == strTo )
-			;
-		else
-			break;
-
-		FilterError( IDS_RF_CALL_BY_ADDR, attr );
-
-	}while	( 0 );
+	}
 }
 
 void
@@ -1717,298 +1713,6 @@ CMainWnd::CheckBlackList( CStringA strSender, CAttr& attr )
 		FilterError( IDS_RF_DOMAIN, attr );
 }
 
-void
-CMainWnd::CheckWhiteList( CString strLog, CAttr& attr )
-{
-	if	( attr.m_strReason.IsEmpty() )
-		return;
-
-	for	( int xToken = 0; xToken >= 0; ){
-		CString	strItem = m_strWhites.Tokenize( _T("\n"), xToken );
-		if	( strItem.IsEmpty() )
-			break;
-
-		int	x = strItem.Find( '\t' );
-		CString	strFrom   = strItem.Left( x );
-		CString	strDomain = strItem.Mid( x+1 );
-
-		if	( strFrom == (CString)attr.m_strFrom ){
-			CString	strSender = (CString)attr.m_strSender;
-			if	( strSender.IsEmpty() )
-				strSender = (CString)attr.m_strFrom;
-			strSender = strSender.Right( strDomain.GetLength() );
-			if	( strSender == strDomain ){
-				attr.m_strReason.Empty();
-				break;
-			}
-		}
-	}
-}
-
-void
-CMainWnd::CheckLink( CString& strLines, TCHAR* pchScheme, CAttr& attr )
-{
-#ifdef	UNICODE
-	int	xLines;
-
-	xLines = 0;
-	for	( ;; ){
-		int	x;
-
-		// Seek the given scheme tag.
-
-		xLines = strLines.Find( pchScheme, xLines );
-		if	( xLines < 0 )
-			break;
-
-		for	( x = xLines; x >= 0; x-- )
-			if	( strLines[x] == '<' )
-				break;
-		CString	strTag = strLines.Mid( x, xLines-x );
-		x = strTag.Find( _T(" ") );
-		if	( x >= 0 )
-			strTag = strTag.Left( x );
-		strTag.MakeLower();
-		xLines += (int)wcslen( pchScheme );
-		if	( strTag != _T("<a") )
-			continue;
-
-		// Take a URL.
-
-		CString	strLink = strLines.Mid( xLines );
-		int	xLink = strLink.Find( _T(">") );
-		if	( xLink < 0 )
-			continue;
-		xLines += xLink;
-
-		CString	strLeft = strLines.Mid( xLines );
-		strLeft.MakeLower();
-		x = strLeft.Find( _T("</a>") );
-		if	( x >= 0 )
-			xLines += x;
-
-		strLink = strLink.Left( xLink );
-		xLink = strLink.Find( '"' );
-		if	( xLink >= 0 )
-			strLink = strLink.Left( xLink );
-		xLink = strLink.Find( '/' );
-
-		// Take a path following the URL.
-
-		CString	strPath;
-		if	( xLink >= 0 ){
-			strPath = strLink.Mid(  xLink+1 );
-			strLink = strLink.Left( xLink );
-		}
-		do{
-			if	( strPath.IsEmpty() )
-				break;
-			xLink = strPath.ReverseFind( '.' );
-			if	( xLink < 0 )
-				break;
-			CString	strTLD = strPath.Mid( xLink );
-			int	xDelim = strTLD.Find( '/' );
-			if	( xDelim >= 0 )
-				strTLD = strTLD.Left( xDelim );
-			if	( m_strTLDCache.Find( strTLD ) < 0 )
-				break;
-			strLink += _T("/") + strPath;
-			FilterError( IDS_RF_LINK_FAKED, attr );
-		}while	( 0 );
-
-		HexToASCII( strLink );
-
-		// Cut off arguments.
-
-		xLink = strLink.ReverseFind( '?' );
-		if	( xLink >= 0 ){
-			strLink = strLink.Left( xLink );
-			xLink = strLink.ReverseFind( '/' );
-			if	( xLink >= 0 )
-				strLink = strLink.Left( xLink );
-		}
-		xLink = strLink.ReverseFind( '=' );
-		if	( xLink >= 0 ){
-			strLink = strLink.Left( xLink );
-			xLink = strLink.ReverseFind( '/' );
-			if	( xLink >= 0 )
-				strLink = strLink.Left( xLink );
-		}
-		xLink = strLink.ReverseFind( '<' );
-		if	( xLink >= 0 ){
-			strLink = strLink.Left( xLink );
-			xLink = strLink.ReverseFind( '/' );
-			if	( xLink >= 0 )
-				strLink = strLink.Left( xLink );
-		}
-
-		// Add the link to show later.
-
-		if	( attr.m_strLinks.Find( strLink ) < 0 )
-			attr.m_strLinks += strLink + _T("\n");
-
-		// Check the link.
-
-		bool	bEvasive = false;
-		int	nch = strLink.GetLength();
-		for	( x = 0; x < nch; x++ )
-			if	( strLink[x] > 0x7f ){
-				FilterError( IDS_RF_LINK_EVASIVE, attr );
-				bEvasive = true;
-				break;
-			}
-
-		// Take the top level domain.
-
-		xLink = strLink.ReverseFind( '.' );
-		if	( xLink < 0 )
-			continue;
-		CString	strTLD = strLink.Mid( xLink );
-		x = strTLD.Find( '/' );
-		if	( x >= 0 )
-			strTLD = strTLD.Left( x );
-
-		// Evasive domain? It's not worth remembering.
-		
-		nch = strTLD.GetLength();
-		for	( x = 0; x < nch; x++ )
-			if	( (WORD)strTLD[x] > 0x7f )
-				break;
-		
-		if	( x >= nch ){
-
-			// Check the domain.
-
-			for	( x = 0; x >= 0; ){
-				CString	strDrop = m_strDomains.Tokenize( _T("\n"), x );
-				if	( strDrop.IsEmpty() )
-					break;
-				if	( strDrop == strTLD ){
-					FilterError( IDS_RF_LINK_DOMAIN, attr );
-					if	( attr.m_strLinks.Find( strLink ) < 0 )
-						attr.m_strLinks += strLink + _T("\n");
-					break;
-				}
-			}
-
-			// Cache the top level domain.
-
-			strTLD += _T("\n");
-			if	( !bEvasive ){
-				if	( m_strTLDCache.Find( strTLD ) < 0 ){
-					m_strTLDCache += strTLD;
-					SaveTLDs();
-				}
-			}
-		}
-	}
-#endif//UNICODE
-}
-
-void
-CMainWnd::CheckUnicode( WCHAR* pch, int nch, CAttr &attr )
-{
-	// Check bidirectional characters.
-
-	WORD	awBidirectional[] = {
-			0x200e,	// U+200E: Left-to-Right Mark
-			0x200f,	// U+200F: Right-to-Left Mark
-			0x202a,	// U+202A: Left-to-Right Embedding
-			0x202b,	// U+202B: Right-to-Left Embedding
-			0x202c,	// U+202C: Pop Directional Formatting
-			0x202d,	// U+202D: Left-to-Right Override
-			0x202e,	// U+202E: Right-to-Left Override
-			0x2066,	// U+2066: Left-to-Right Isolate
-			0x2067,	// U+2067: Right-to-Left Isolate
-			0x2068,	// U+2068: First Strong Isolate
-			0x2069	// U+2069: Pop Directional Isolate
-	};
-
-	DWORD	dwUnicode = 0;
-	WORD*	pw = (WORD*)pch;
-	for	( int i = 0; i < nch; i++ ){
-
-		// Do not accept bidirectional codes.
-
-		bool	bBidirectional = false;
-		for	( int x = 0; x < _countof( awBidirectional ); x++ ){
-			if	( !memcmp( pw+i, awBidirectional+x, sizeof( WORD ) ) ){
-				bBidirectional = true;
-				break;
-			}
-		}
-		if	( bBidirectional )
-			FilterError( IDS_RF_CONTROLCODE, attr );
-
-		// Do not accept illegal sequence.
-
-		else if	( pw[i] == 0xfffd )
-			FilterError( IDS_RF_CHARSET, attr );
-
-		// Do not accept evasive code area.
-
-		else if	( pw[i] >= 0x24b6 && pw[i] <= 0x24cf )
-			FilterError( IDS_RF_EVASIVECODE, attr );
-		else if	( pw[i] >= 0x24d0 && pw[i] <= 0x24e9 )
-			FilterError( IDS_RF_EVASIVECODE, attr );
-//		else if	( pw[i] >= 0xff01 && pw[i] <= 0xff5e )
-//			FilterError( IDS_RF_EVASIVECODE, attr );
-
-		// Do not accept surrogate pairs.
-
-//		else if	( pw[i] >= 0xd800 && pw[i] <= 0xdbff )
-//			FilterError( IDS_RF_EVASIVECODE, attr );
-//		else if	( pw[i] >= 0xdc00 && pw[i] <= 0xdfff )
-//			FilterError( IDS_RF_EVASIVECODE, attr );
-	}
-}
-
-void
-CMainWnd::FilterError( UINT uIdError, CAttr& attr )
-{
-	if	( uIdError == IDS_RF_AUTH ){
-		if	( attr.m_nAuth < m_nAuth )
-			uIdError = 0;
-	}
-	else if	( uIdError >= IDS_RF_CHARSET && uIdError <= IDS_RF_EVASIVECODE ){
-		int	i = uIdError-IDS_RF_CHARSET;
-		if	( !( m_dwCode & (1<<i) ) )
-			uIdError = 0;
-	}
-	else if	( uIdError == IDS_RF_DOMAIN ){
-	}
-	else if	( uIdError >= IDS_RF_MESSAGEID && uIdError <= IDS_RF_LINK_FAKED ){
-		int	i = uIdError-IDS_RF_MESSAGEID;
-		if	( !( m_dwSender & (1<<i) ) )
-			uIdError = 0;
-	}
-	else if	( uIdError == IDS_RF_LINK_DOMAIN ){
-	}
-	else if	( uIdError == IDS_RF_LINK_EVASIVE ){
-		if	( !( m_dwCode & (1<<(IDS_RF_EVASIVECODE-IDS_RF_CHARSET)) ) )
-			uIdError = 0;
-	}
-	else if	( uIdError == IDS_RF_TIMEZONE ){
-	}
-
-	if	( uIdError ){
-		CString	strReason;
-		(void)strReason.LoadString( uIdError );
-		if	( attr.m_strReason.IsEmpty() )
-			attr.m_strReason = strReason;
-		else{
-			int	x = attr.m_strReason.ReverseFind( ',' );
-			CString	strLast = attr.m_strReason.Mid( x );
-			if	( strLast.Left( 2 ) == _T(", ") )
-				strLast.Delete( 0, 2 );
-			if	( strLast != strReason ){
-				attr.m_strReason += _T(", ");
-				attr.m_strReason += strReason;
-			}
-		}
-	}
-}
-
 CString
 CMainWnd::MakeLog( CStringA strMail, CAttr& attr )
 {
@@ -2022,6 +1726,7 @@ CMainWnd::MakeLog( CStringA strMail, CAttr& attr )
 		FilterError( IDS_RE_MAIL_HEADER, attr );
 		return	_T("");
 	}
+
 	CStringA strHeader = strMail.Left( x+4 );
 	CStringA strBody   = strMail.Mid( x+4 );
 
@@ -2079,6 +1784,7 @@ CMainWnd::MakeLog( CStringA strMail, CAttr& attr )
 			// Get 'attribute' of the part body ( w/o Authentication check ).
 
 			CAttr	attrPart = GetAttr( strPart );
+			attrPart.m_strFrom = attr.m_strFrom;
 
 			// Add the boundary header of the part to the log.
 
@@ -2111,36 +1817,49 @@ CMainWnd::MakeLog( CStringA strMail, CAttr& attr )
 			// Merge the links and the reasons.
 
 			if	( !attrPart.m_strLinks.IsEmpty() ){
-				if	( attr.m_strLinks.Find( attrPart.m_strLinks ) < 0 ){
-					if	( !attr.m_strLinks.IsEmpty() )
-						attr.m_strLinks += _T("\n");
-					attr.m_strLinks += attrPart.m_strLinks;
-				}
+				x = 0;
+				do{
+					CString	strLink = attrPart.m_strLinks.Tokenize( _T("\n"), x );
+					if	( strLink.IsEmpty() )
+						break;
+					else if	( attr.m_strLinks.Find( strLink ) < 0 )
+						attr.m_strLinks += strLink + _T("\n");
+				}while	( 1 );
 			}
-			if	( !attrPart.m_strReason.IsEmpty() ){
-				if	( attr.m_strReason.Find( attrPart.m_strReason ) < 0 ){
-					if	( !attr.m_strReason.IsEmpty() )
-						attr.m_strReason += _T(", ");
-					attr.m_strReason += attrPart.m_strReason;
-				}
-			}
+			if	( attrPart.m_dwReason )
+				attr.m_dwReason |= attrPart.m_dwReason;
 		}while	( 1 );
 	}
 
 	// Insert the links and the reasons in the log.
 
-	if	( !attr.m_strReason.IsEmpty() ){
+	if	( attr.m_dwReason ){
 		if	( !attr.m_strLinks.IsEmpty() ){
 			x = 0;
+			CString	strLinks;
 			for	( ;; ){
 				CString	strLink = attr.m_strLinks.Tokenize( _T("\n"), x );
 				if	( strLink.IsEmpty() )
 					break;
-				strLog.Insert( 0, strLink + _T("\r\n") );
-				strLog.Insert( 0, _T("Embedded-Link: ") );
+				strLinks += _T("Embedded-Link: ");
+				strLinks += strLink + _T("\r\n");
+			}
+			strLog.Insert( 0, strLinks );
+		}
+		CString	strReason;
+		DWORD	dwReason = attr.m_dwReason;
+		for	( UINT uID = IDS_RF_AUTH; uID <= IDS_RF_TIMEZONE; uID++ ){
+			UINT	uBit = 1<<(uID-IDS_RF_AUTH);
+			if	( dwReason & uBit ){
+				CString	strError;
+				(void)strError.LoadString( uID );
+				strReason += strError;
+				dwReason &= ~uBit;
+				if	( dwReason )
+					strReason += _T(", ");
 			}
 		}
-		strLog.Insert( 0, attr.m_strReason + _T("\r\n") );
+		strLog.Insert( 0, strReason + _T("\r\n") );
 		strLog.Insert( 0, _T("Discard-Reason: ") );
 	}
 
@@ -2148,7 +1867,7 @@ CMainWnd::MakeLog( CStringA strMail, CAttr& attr )
 }
 
 void
-CMainWnd::SaveLog( CStringA strMail, CString strLog, CAttr& attr, bool bForceLog )
+CMainWnd::SaveLog( CStringA strMail, CString strLog, CAttr& attr )
 {
 	// Check the folder to save logs.
 
@@ -2166,25 +1885,33 @@ CMainWnd::SaveLog( CStringA strMail, CString strLog, CAttr& attr, bool bForceLog
 		time -= spanBias;
 	}
 
+	// Delete old files before re-evaluation.
+
+	if	( !attr.m_strFile.IsEmpty() ){
+		DeleteFile( m_strLogPath + attr.m_strFile + _T(".eml") );
+		DeleteFile( m_strLogPath + attr.m_strFile + _T(".txt") );
+		DeleteFile( m_strLogPath + _T("!") + attr.m_strFile + _T(".eml") );
+		DeleteFile( m_strLogPath + _T("!") + attr.m_strFile + _T(".txt") );
+	}
+
 	// Save the original image as a '.eml' file.
 
-	bool	bSave;
 	CString	strFile;
+	bool	bSave;
 
 	bSave = true;
-	strFile = (CString)attr.m_strFrom;
-	if	( !attr.m_strReason.IsEmpty() )
+	strFile = attr.m_strFile.IsEmpty()? (CString)attr.m_strFrom: attr.m_strFile;
+	if	( attr.m_dwReason )
 		strFile.Insert( 0, _T("!") );
 	strFile.Insert( 0, m_strLogPath );
 	strFile += _T(".eml");
 
-	if	( bForceLog )
-		bSave = true;
-	else if	( IsDuplicated( strFile, time ) )
-		bSave = false;
+	if	( attr.m_strFile.IsEmpty() )
+		if	( IsDuplicated( strFile, time ) )
+			bSave = false;
 
 	if	( bSave ){
-		if	( !bForceLog )
+		if	( attr.m_strFile.IsEmpty() )
 			strFile = AddSuffix( strFile );
 		{
 			CFile	f;
@@ -2204,19 +1931,18 @@ CMainWnd::SaveLog( CStringA strMail, CString strLog, CAttr& attr, bool bForceLog
 	// Save decoded text files.
 
 	bSave = true;
-	strFile = (CString)attr.m_strFrom;
-	if	( !attr.m_strReason.IsEmpty() )
+	strFile = attr.m_strFile.IsEmpty()? (CString)attr.m_strFrom: attr.m_strFile;
+	if	( attr.m_dwReason )
 		strFile.Insert( 0, _T("!") );
 	strFile.Insert( 0, m_strLogPath );
 	strFile += _T(".txt");
 
-	if	( bForceLog )
-		bSave = true;
-	else if	( IsDuplicated( strFile, time ) )
-		bSave = false;
+	if	( attr.m_strFile.IsEmpty() )
+		if	( IsDuplicated( strFile, time ) )
+			bSave = false;
 
 	if	( bSave ){
-		if	( !bForceLog )
+		if	( attr.m_strFile.IsEmpty() )
 			strFile = AddSuffix( strFile );
 		{
 			CFile	f;
@@ -2595,11 +2321,9 @@ CMainWnd::StringFromBody( CStringA strIn, CAttr& attr )
 	strOut = StringFromCodePage( strDecoded, attr );
 
 	LFtoCRLF( strOut );
-	if	( attr.m_iSubType == CAttr::HTML ){
-		HexToUnicode( strOut );
-		CheckLink( strOut, _T("https://"), attr );
-		CheckLink( strOut, _T("http://"),  attr );
-	}
+	HexToUnicode( strOut );
+	CheckUnicode( strOut, attr );
+	CheckLink( strOut, attr );
 
 	return	strOut;
 }
@@ -2713,8 +2437,6 @@ CMainWnd::StringFromCodePage( CStringA strIn, CAttr& attr )
 	DWORD	dwError = GetLastError();
 	if	( dwError == ERROR_NO_UNICODE_TRANSLATION )
 		FilterError( IDS_RF_CHARSET, attr );
-
-	CheckUnicode( pchOut, cchOut, attr );
 
 	CString	strOut = pchOut;
 	delete []pchOut;
@@ -2853,35 +2575,6 @@ CMainWnd::LFtoCRLF( CString& strLines )
 }
 
 void
-CMainWnd::HexToASCII( CString& strLines )
-{
-	int	n;
-
-	for	( int x = 0;; ){
-		n = strLines.GetLength();
-		if	( x > n-3 )
-			break;
-		x = strLines.Find( _T("%"), x );
-		if	( x < 0 )
-			break;
-		TCHAR*	pch = strLines.GetBuffer();
-		pch += x+1;
-		if	( isspace( pch[0] ) || isspace( pch[1] ) ){
-			x += 2;
-			continue;
-		}
-		TCHAR*	pchNew = NULL;
-		WCHAR	wch = (WORD)wcstol( pch, &pchNew, 16 );
-		if	( pchNew != pch+2 ){
-			x++;
-			continue;
-		}
-		strLines.Delete( x, 2 );
-		strLines.SetAt( x, wch );
-	}
-}
-
-void
 CMainWnd::HexToUnicode( CString& strLines )
 {
 #ifdef	UNICODE
@@ -2923,9 +2616,723 @@ CMainWnd::HexToUnicode( CString& strLines )
 }
 
 void
+CMainWnd::CheckUnicode( CString& strLog, CAttr &attr )
+{
+	// Check bidirectional characters.
+
+	WORD	awBidirectional[] = {
+			0x200e,	// U+200E: Left-to-Right Mark
+			0x200f,	// U+200F: Right-to-Left Mark
+			0x202a,	// U+202A: Left-to-Right Embedding
+			0x202b,	// U+202B: Right-to-Left Embedding
+			0x202c,	// U+202C: Pop Directional Formatting
+			0x202d,	// U+202D: Left-to-Right Override
+			0x202e,	// U+202E: Right-to-Left Override
+			0x2066,	// U+2066: Left-to-Right Isolate
+			0x2067,	// U+2067: Right-to-Left Isolate
+			0x2068,	// U+2068: First Strong Isolate
+			0x2069	// U+2069: Pop Directional Isolate
+	};
+
+	int	nch = strLog.GetLength();
+	DWORD	dwUnicode = 0;
+	for	( int i = 0; i < nch; i++ ){
+
+		// Do not accept bidirectional codes.
+
+		bool	bBidirectional = false;
+		for	( int x = 0; x < _countof( awBidirectional ); x++ ){
+			if	( strLog[i] == awBidirectional[x] ){
+				strLog.Delete( i, 1 );
+				nch -= 1;
+				CString	strHex;
+				strHex.Format( _T("&#x%04x;"), awBidirectional[x] );
+				strLog.Insert( i, strHex );
+				nch += 8;
+				bBidirectional = true;
+			}
+		}
+		if	( bBidirectional )
+			FilterError( IDS_RF_CONTROLCODE, attr );
+
+		// Do not accept illegal sequence.
+
+		else if	( strLog[i] == 0xfffd )
+			FilterError( IDS_RF_CHARSET, attr );
+	}
+}
+
+void
+CMainWnd::CheckAlias( CString strLog, CAttr& attr )
+{
+	int	x, xIn, xOut;
+
+	// Get nominal sender.
+
+	x = strLog.Find( _T("From: ") );
+	if	( x < 0 )
+		x = strLog.Find( _T("from: ") );
+	do{
+		if	( x < 0 )
+			break;
+
+		// Extract sender's alias.
+
+		xIn  = x + 6;
+		xOut = strLog.Find( ':', xIn );
+		CString strAlias = strLog.Mid( xIn, xOut-xIn );
+
+		xOut = strAlias.ReverseFind( '<' );
+		if	( xOut < 0 )
+			break;
+		strAlias = strAlias.Left( xOut );
+		NormalizeAlias( strAlias );
+
+		// Extract sender's domain.
+
+		CString	strDomain = (CString)attr.m_strFrom;
+		x = strLog.Find( _T("Sender: ") );
+		if	( x >= 0 ){
+			strDomain = strLog.Mid( x );
+			x = strDomain.Find( '\r' );
+			strDomain = strDomain.Left( x );
+		}
+		x = strDomain.Find( '@' );
+		if	( x < 0 )
+			break;
+
+		strDomain = strDomain.Mid( x+1 );
+
+		// Check the combination of alias and domain.
+
+		bool	bHit = false;
+		bool	bMet = false;
+
+		int	iName = 0;
+		for	( ;; ){
+
+			// Check if the the registered word in alias.
+
+			CString	strName = m_strNames.Tokenize( _T("\n"), iName );
+			if	( iName < 0 )
+				break;
+			x = strName.Find( '\t' );
+			CString	strWord = strName.Left( x );
+			NormalizeAlias( strWord );
+			int	iWord = strAlias.Find( strWord );
+			if	( iWord < 0 ){
+				if	( strWord.GetLength() > 3 ){
+					CString	strAliasL = strAlias;
+					strAliasL.MakeLower();
+					strWord.MakeLower();
+					iWord = strAliasL.Find( strWord );
+					if	( iWord < 0 )
+						continue;
+				}
+				else
+					continue;
+			}
+			bHit = true;
+
+			// Check if the the registered word in domain.
+
+			strWord = strName.Mid( x+1 );
+			if	( strWord.FindOneOf( _T("*?") ) >= 0 ){
+				if	( !CompareWild( strWord, strDomain ) ){
+					bMet = true;
+					break;
+				}
+			}
+			else if	( strWord.Find( '.' ) >= 0 ){
+				int	cch = strWord.GetLength();
+				if	( strDomain.Right( cch ) == strWord ){
+					bMet = true;
+					break;
+				}
+			}
+			else{
+				if	( strDomain.Find( strWord ) >= 0 ){
+					bMet = true;
+					break;
+				}
+			}
+		}
+
+		if	( bHit && !bMet )
+			FilterError( IDS_RF_FAKE_ALIAS, attr );			
+	}while	( 0 );
+
+	// Get the sendee.
+
+	x = strLog.Find( _T("To: ") );
+	if	( x < 0 )
+		x = strLog.Find( _T("to: ") );
+	do{
+		if	( x < 0 )
+			break;
+
+		// Extract sendee's alias.
+
+		xIn  = x + 4;
+		xOut = strLog.Find( ':', xIn );
+		CString strAlias = strLog.Mid( xIn, xOut-xIn );
+
+		xOut = strAlias.Find( '<', 0 );
+		if	( xOut < 0 )
+			break;
+
+		CString	strTo = strAlias.Mid( xOut+1 );
+		strAlias = strAlias.Left( xOut );
+		strAlias.Trim();
+
+		if	( strAlias[0] == '"' ){
+			strAlias.Delete( 0, 1 );
+			strAlias.Delete( strAlias.GetLength()-1, 1 );
+		}
+
+		if	( strAlias.IsEmpty() )
+			break;
+
+		xOut = strTo.Find( '>' );
+		strTo = strTo.Left( xOut );
+
+		x = strTo.Find( '@' );
+		CString	strUser = strTo.Left( x );
+
+		// Check if the alias is included in the address.
+
+		if	( strAlias == strUser )
+			;
+		else if	( strAlias == strTo )
+			;
+		else
+			break;
+
+		FilterError( IDS_RF_CALL_BY_ADDR, attr );
+
+	}while	( 0 );
+}
+
+int
+CMainWnd::CompareWild( CString strWild, CString strName )
+{
+	for	( ;; ){
+		int	x;
+
+		x = strWild.FindOneOf( _T("*?") );
+
+		// No wildcards left, do normal comparison.
+
+		if	( x < 0 )
+			return	strWild.Compare( strName );
+
+		// Take a part to compare.
+
+		CString	strWildPart = strWild.Left( x );
+		CString	strNamePart = strName.Left( x );
+		int	iPart = strWildPart.Compare( strNamePart );
+
+		// Parts differ, return result.
+
+		if	( iPart )
+			return	-1;
+
+		// Parts match, delete the parts.
+
+		TCHAR	ch = strWild[x];
+		if	( ch == '?' ){
+			strWild.Delete( 0, x+1 );
+			strName.Delete( 0, x+1 );
+		}
+		else if	( ch == '*' ){
+			strWild.Delete( 0, x+1 );
+			strName.Delete( 0, x+0 );
+		}
+
+		// No more string, return 'matched'.
+
+		if	( strWild.IsEmpty() )
+			return	0;
+
+		// Seek the next word to compare.
+
+		if	( ch == '*' ){
+			CString	strWildNext = strWild;
+			int	xNext = strWildNext.FindOneOf( _T("*?") );
+			if	( xNext >= 0 )
+				strWildNext = strWildNext.Left( xNext );
+			xNext = strName.Find( strWildNext );
+			if	( xNext >= 0 )
+				strName.Delete( 0, xNext );
+			else
+				strName.Delete( 0, x );
+		}
+	}
+}
+
+void
+CMainWnd::NormalizeAlias( CString& strAlias )
+{
+	// Remove symbols.
+
+	strAlias.Replace( _T("\""), _T(" ") );
+	strAlias.Replace( _T("'"),  _T(" ") );
+	strAlias.Replace( _T("ÅE"),  _T("") );
+	strAlias.Replace( _T("_"),  _T(" ") );
+	strAlias.Trim();
+
+	// Remove padding spaces.
+#if	0
+	bool	bSpaced = true;
+	int	nch = strAlias.GetLength();
+	for	( int x = 1; x < nch; x += 2 ){
+		if	( strAlias[x] != ' ' ){
+			bSpaced = false;
+			break;
+		}
+	}
+	if	( bSpaced ){
+		strAlias.Replace( _T(" "), _T("") );
+		n = strAlias.GetLength();
+	}
+#else
+	strAlias.Replace( _T(" "),  _T("") );
+	strAlias.Trim();
+#endif
+
+	// Large codes to ASCII code.
+
+	int	n = strAlias.GetLength();
+	for	( int x = 0; x < n; x++ ){
+		TCHAR	ch = strAlias[x];
+
+		if	( ch >= 0x0300 && ch <= 0x036f ){	// Combining Diacritical Marks
+			strAlias.Delete( x, 1 );
+			n--;
+		}
+		else if	( ch >= 0x2460 && ch <= 0x2468 )	// Circled numbers 1 to 9
+			strAlias.SetAt( x, '1'+(ch-0x2460) );
+		else if	( ch >= 0x24b6 && ch <= 0x24e9 )	// Circled letters A to Z
+			strAlias.SetAt( x, 'A'+(ch-0x24b6) );
+		else if	( ch == 0x24ea )			// Circled numbers 0
+			strAlias.SetAt( x, '0' );
+		else if	( ch >= 0x24f5 && ch <= 0x24fd )	// DoubleCircled numbers 1 to 9
+			strAlias.SetAt( x, '1'+(ch-0x24f5) );
+		else if	( ch >= 0x2776 && ch <= 0x277e )	// Black circled numbers 1 to 9
+			strAlias.SetAt( x, '1'+(ch-0x277e) );
+		else if	( ch >= 0x2780 && ch <= 0x2788 )	// White circled numbers 1 to 9
+			strAlias.SetAt( x, '1'+(ch-0x2780) );
+		else if	( ch >= 0x278a && ch <= 0x2792 )	// Black circled numbers 1 to 9
+			strAlias.SetAt( x, '1'+(ch-0x278a) );
+		else if	( ch >= 0xff01 &&
+			  ch <= 0xff5e )
+			strAlias.SetAt( x, '!'+(ch-0xff01) );
+		else if	( ch >= 0xd800 && ch <= 0xdbff ){	// Letters in a surrogate pair
+			UINT	uch = ( ch & 0x3ff ) << 10;
+			ch = strAlias[x+1];
+			if	( ch >= 0xdc00 && ch <= 0xdfff ){
+				uch |= ( ch & 0x3ff );
+				uch += 0x10000;
+				bool	bHit = true;
+				if	( uch >= 0x1d400 && uch <= 0x1d6a3 )	// Decorated letters A to Z
+					strAlias.SetAt( x, 'A'+((uch-0x1d400)%26) );
+				else if	( uch >= 0x1d7ce && uch <= 0x1d7ff )	// Decorated numbers 0 to 9
+					strAlias.SetAt( x, '0'+((uch-0x1d7ce)%10) );
+				else
+					bHit = false;
+				if	( bHit ){
+					strAlias.Delete( x+1, 1 );
+					n--;
+				}
+			}
+
+		}
+	}
+}
+
+void
+CMainWnd::CheckWhiteList( CString strLog, CAttr& attr )
+{
+	if	( !attr.m_dwReason )
+		return;
+
+	for	( int xToken = 0; xToken >= 0; ){
+		CString	strItem = m_strWhites.Tokenize( _T("\n"), xToken );
+		if	( strItem.IsEmpty() )
+			break;
+
+		int	x = strItem.Find( '\t' );
+		CString	strFrom   = strItem.Left( x );
+		CString	strDomain = strItem.Mid( x+1 );
+
+		if	( strFrom == (CString)attr.m_strFrom ){
+			CString	strSender = (CString)attr.m_strSender;
+			if	( strSender.IsEmpty() )
+				strSender = (CString)attr.m_strFrom;
+			strSender = strSender.Right( strDomain.GetLength() );
+			if	( strSender == strDomain ){
+				attr.m_dwReason = 0;
+				break;
+			}
+		}
+	}
+}
+
+void
+CMainWnd::CheckLink( CString& strLog, CAttr& attr )
+{
+#ifdef	UNICODE
+	int	xLines;
+	TCHAR*	apchScheme[2] = { _T("http://"), _T("https://") };
+
+	for	( int iScheme = 0; iScheme < 2; iScheme++ ){
+		TCHAR*	pchScheme = apchScheme[iScheme];
+		xLines = 0;
+		for	( ;; ){
+			// Seek the given scheme tag.
+
+			xLines = strLog.Find( pchScheme, xLines );
+			if	( xLines < 0 )
+				break;
+
+			CString	strLink;
+			CString	strDisplay;
+			int	xLink = -1;
+
+			if	( attr.m_iSubType == CAttr::HTML ){
+				if	( !GetLinkInHTML( strLog, xLines, strLink, strDisplay ) )
+					continue;
+			}
+			else if	( attr.m_iSubType == CAttr::Plain ){
+				GetLinkInText( strLog, xLines, strLink );
+			}
+			SetLinkVisible( strLink, attr );
+
+			// Seek the first '/' just after the domain.
+
+			xLink = strLink.Find( '/' );
+
+			// Take a path following the URL.
+
+			CString	strURL, strPath;
+			if	( xLink >= 0 ){
+				strPath = strLink.Mid(  xLink+1 );
+				strURL  = strLink.Left( xLink );
+			}
+
+			// Check if the path is faking a domain.
+
+			do{
+				if	( strPath.IsEmpty() )
+					break;
+				int	x = strPath.FindOneOf( _T("?#<") );
+				if	( x < 0 )
+					strPath = strPath.Left( x );
+				x = strPath.ReverseFind( '.' );
+				if	( x < 0 )
+					break;
+				CString	strTLD = strPath.Mid( x );
+				strTLD.MakeLower();
+				if	( m_strTLDCache.Find( strTLD ) < 0 )
+					break;
+				strTLD += _T("\n");
+				if	( m_strTLDCache.Find( strTLD ) >= 0 )
+					FilterError( IDS_RF_LINK_FAKED, attr );
+			}while	( 0 );
+
+			// Cut off arguments.
+
+			xLink = strLink.ReverseFind( '?' );
+			if	( xLink >= 0 )
+				strLink = strLink.Left( xLink );
+			xLink = strLink.ReverseFind( '#' );
+			if	( xLink >= 0 )
+				strLink = strLink.Left( xLink );
+			xLink = strLink.ReverseFind( '<' );
+			if	( xLink >= 0 )
+				strLink = strLink.Left( xLink );
+
+			// Add the link to show later.
+
+			if	( attr.m_strLinks.Find( strLink ) < 0 )
+				attr.m_strLinks += strLink + _T("\n");
+
+			// Check if the link is described in evasive codes.
+
+			bool	bEvasive = false;
+			int	nch = strLink.GetLength();
+			for	( int i = 0; i < nch; i++ )
+				if	( strLink[i] >= 0x80 )
+					if	( IsEvasiveCode( strLink, i ) ){
+						FilterError( IDS_RF_LINK_EVASIVE, attr );
+						bEvasive = true;
+						break;
+					}
+
+			// Take the top level domain.
+
+			xLink = strURL.ReverseFind( '.' );
+			if	( xLink < 0 )
+				continue;
+
+			CString	strTLD = strURL.Mid( xLink );
+			int	x = strTLD.FindOneOf( _T("?#=") );
+			if	( x >= 0 )
+				strTLD = strTLD.Left( x );
+
+			// Evasive domain? It's not worth remembering.
+		
+			nch = strTLD.GetLength();
+			for	( x = 0; x < nch; x++ )
+				if	( (WORD)strTLD[x] > 0x7f )
+					break;
+			if	( x < nch )
+				continue;
+
+			// Check if the domain is on the blacklist.
+
+			for	( x = 0; x >= 0; ){
+				CString	strDrop = m_strDomains.Tokenize( _T("\n"), x );
+				if	( strDrop.IsEmpty() )
+					break;
+				if	( strDrop == strTLD ){
+					FilterError( IDS_RF_LINK_DOMAIN, attr );
+					if	( attr.m_strLinks.Find( strLink ) < 0 )
+						attr.m_strLinks += strLink + _T("\n");
+					break;
+				}
+			}
+		}
+	}
+#endif//UNICODE
+}
+
+bool
+CMainWnd::GetLinkInHTML( CString strLog, int& xLines, CString& strLink, CString& strDisplay )
+{
+	int	x = strLog.Find( ':', xLines );
+	CString	strScheme = strLog.Mid( xLines, x+3-xLines );
+	int	nchScheme = strScheme.GetLength();
+
+	if	( strLog[xLines+nchScheme+1] == '"' ||
+		  strLog[xLines+nchScheme+1] == ' ' ){
+		xLines += nchScheme+1;
+		return	false;
+	}
+
+	// Seek '<a' before the scheme.
+
+	for	( x = xLines; x >= 0; x-- )
+		if	( strLog[x] == '<' )
+			break;
+	CString	strTag = strLog.Mid( x, xLines-x );
+	strTag.MakeLower();
+	if	( strTag.Find( _T("href") ) < 0 ){
+		xLines += nchScheme;
+		return	false;
+	}
+
+	x = strTag.Find( _T(" ") );
+	if	( x >= 0 )
+		strTag = strTag.Left( x );
+	xLines += nchScheme;
+	if	( strTag != _T("<a") )
+		return	false;
+
+	// Take a URL.
+
+	strLink = strLog.Mid( xLines );
+	int	xLink = strLink.Find( _T(">") );
+	if	( xLink < 0 )
+		return	false;
+
+	xLines += xLink +1;
+
+	// Get the string between <a> and </a>.
+
+	CString	strLeft = strLog.Mid( xLines );
+	strLeft.MakeLower();
+	x = strLeft.Find( _T("</a") );
+	if	( x >= 0 ){
+		strDisplay = strLog.Mid( xLines, x );
+		xLines += x;
+	}
+	strLink = strLink.Left( xLink );
+
+	// Get the URL quoted.
+
+	xLink = strLink.Find( '"' );
+	if	( xLink >= 0 )
+		strLink = strLink.Left( xLink );
+
+	return	true;
+}
+
+void
+CMainWnd::GetLinkInText( CString strLog, int& xLines, CString& strLink )
+{
+	int	x = strLog.Find( ':', xLines );
+	CString	strScheme = strLog.Mid( xLines, x+3-xLines );
+	xLines += strScheme.GetLength();
+
+	// Seek a delimiter character.
+
+	for	( x = xLines; ; x++ ){
+		TCHAR	ch = strLog[x];
+		if	( ch == '%' )
+			continue;
+		else if	( ch == '#' )
+			continue;
+		else if	( ch == '<' )
+			break;
+		else if	( ch <  '+' )
+			break;
+		else if	( ch >= '{' && ch <= 0x7f )
+			break;
+
+		// Leave large alphanumeric characters.
+
+		else if	( ch >= 0x80 ){
+			if	( ch == 0x2215 )			// Division operator
+				continue;
+			else if	( IsEvasiveCode( strLog, x ) )
+				continue;
+			else
+				break;
+		}
+	}
+
+	strLink = strLog.Mid( xLines, x-xLines );
+	xLines = x;
+}
+
+bool
+CMainWnd::IsEvasiveCode( CString strLog, int& xLines )
+{
+	TCHAR	ch = strLog[xLines];
+
+	if	( ch >= 0x2460 && ch <= 0x2468 )	// Circled numbers 1 to 9
+		return	true;
+	else if	( ch >= 0x24b6 && ch <= 0x24ea )	// Circled letters A to z + 0
+		return	true;
+	else if	( ch >= 0x2776 && ch <= 0x277e )	// Black circled numbers 1 to 9
+		return	true;
+	else if	( ch >= 0x2780 && ch <= 0x2788 )	// White circled numbers 1 to 9
+		return	true;
+	else if	( ch >= 0x278a && ch <= 0x2792 )	// Black circled numbers 1 to 9
+		return	true;
+#if	0
+	else if	( ch >= 0xff10 && ch <= 0xff19 )	// Large numbers 0 to 9
+		return	true;
+	else if	( ch >= 0xff21 && ch <= 0xff3a )	// Large letters A to Z
+		return	true;
+	else if	( ch >= 0xff41 && ch <= 0xff5a )	// Large letters a to z
+		return	true;
+#endif
+	else if	( ch >= 0xd800 && ch <= 0xdbff ){	// Letters in a surrogate pair
+		UINT	uch = ( ch & 0x3ff ) << 10;
+		ch = strLog[++xLines];
+		if	( ch >= 0xdc00 && ch <= 0xdfff ){
+			uch |= ( ch & 0x3ff );
+			uch += 0x10000;
+			if	( uch >= 0x1d400 && uch <= 0x1d6a3 )	// Decorated letters A to z
+				return	true;
+			else if	( uch >= 0x1f10b && uch <= 0x1f189 )	// Decorated letters 0 to Z
+				return	true;
+			else if	( uch >= 0x1f1e6 && uch <= 0x1f1ff )	// Small letters A to Z
+				return	true;
+		}
+	}
+
+	return	false;
+}
+
+void
+CMainWnd::SetLinkVisible( CString& strLink, CAttr& attr )
+{
+	bool	bEncoded = false;
+	for	( int x = 0;; ){
+		int	n = strLink.GetLength();
+		if	( x > n-3 )
+			break;
+		x = strLink.Find( _T("%"), x );
+		if	( x < 0 )
+			break;
+		if	( x > n-2 )
+			break;
+
+		TCHAR*	pch = strLink.GetBuffer();
+		pch += x+1;
+		if	( isspace( pch[0] ) || isspace( pch[1] ) ){
+			x += 2;
+			continue;
+		}
+		TCHAR	achHex[3] = { 0 };
+		achHex[0] = pch[0];
+		achHex[1] = pch[1];
+		TCHAR*	pchNew = NULL;
+		WCHAR	wch = (WORD)wcstol( achHex, &pchNew, 16 );
+		if	( pchNew != achHex+2 ){
+			x++;
+			continue;
+		}
+
+		if	( wch > 0x80 )
+			bEncoded = true;
+
+		strLink.Delete( x, 2 );
+		strLink.SetAt( x, wch );
+	}
+
+	if	( bEncoded ){
+		CStringA strEncoded;
+		int	n = strLink.GetLength();
+		for	( int x = 0; x < n; x++ )
+			strEncoded += (char)strLink[x];
+		strLink = StringFromCodePage( strEncoded, attr );
+	}
+}
+
+void
+CMainWnd::FilterError( UINT uIdError, CAttr& attr )
+{
+	if	( uIdError == IDS_RF_AUTH ){
+		if	( attr.m_nAuth < m_nAuth )
+			uIdError = 0;
+	}
+	else if	( uIdError >= IDS_RF_CHARSET && uIdError <= IDS_RF_EVASIVECODE ){
+		int	i = uIdError-IDS_RF_CHARSET;
+		if	( !( m_dwCode & (1<<i) ) )
+			uIdError = 0;
+	}
+	else if	( uIdError == IDS_RF_DOMAIN ){
+	}
+	else if	( uIdError == IDS_RF_FAKE_ALIAS ){
+	}
+	else if	( uIdError >= IDS_RF_MESSAGEID && uIdError <= IDS_RF_LINK_FAKED ){
+		int	i = uIdError-IDS_RF_MESSAGEID;
+		if	( !( m_dwSender & (1<<i) ) )
+			uIdError = 0;
+	}
+	else if	( uIdError == IDS_RF_LINK_DOMAIN ){
+	}
+	else if	( uIdError == IDS_RF_LINK_EVASIVE ){
+		if	( !( m_dwCode & (1<<(IDS_RF_EVASIVECODE-IDS_RF_CHARSET)) ) )
+			uIdError = 0;
+	}
+	else if	( uIdError == IDS_RF_TIMEZONE ){
+	}
+
+	if	( uIdError ){
+		uIdError -= IDS_RF_AUTH;
+		attr.m_dwReason |= 1<<uIdError;
+	}
+}
+
+void
 CMainWnd::ConnectPOP( void )
 {
-	if	( FeedDebug() ){
+	if	( ReadFromEML( NULL ) ){
 		KillTimer( TID_POLL );
 		return;
 	}
@@ -3139,21 +3546,30 @@ CMainWnd::ClosePOP( int nError )
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////
-// Debug Aids
+// EML log re-evaluation
 
 bool
-CMainWnd::FeedDebug( void )
+CMainWnd::ReadFromEML( LPCTSTR pchFolder )
 {
-	CString	strPath;
 	{
+		CString	strTip;
+		(void)strTip.LoadString( IDS_NI_REEVAL );
+		ModNI( IDI_YELLOW, strTip );
+	}
+
+	CString	strPath;
+	if	( pchFolder ){
+		strPath = pchFolder;
+	}
+	else{
 		TCHAR	ach[_MAX_PATH];
 		GetModuleFileName( NULL, ach, _countof( ach ) );
 		strPath = ach;
 	
 		int	i = strPath.ReverseFind( '\\' );
 		strPath = strPath.Left( i+1 );
+		strPath += _T("Mails\\");
 	}
-	strPath += _T("Mails");
 
 	class	CFileTime
 	{
@@ -3168,14 +3584,14 @@ CMainWnd::FeedDebug( void )
 	if	( CFile::GetStatus( strPath, fs ) ){
 		CFileFind finder;
 		CString	strFile;
-		BOOL	  bWorking = finder.FindFile( strPath + _T("\\*.eml") );
+		BOOL	  bWorking = finder.FindFile( strPath + _T("*.eml") );
 		if	( bWorking ){
 			m_nMail = 0;
 			m_strSummary.Empty();
 		}
 		while	( bWorking ){
 			bWorking = finder.FindNextFile();
-			strFile.Format( _T("%s\\%s"), strPath.GetBuffer(), finder.GetFileName().GetBuffer() );
+			strFile.Format( _T("%s%s"), strPath.GetBuffer(), finder.GetFileName().GetBuffer() );
 			CFileTime ft;
 			ft.m_strFile = strFile;
 			ft.m_time = 0;
@@ -3205,8 +3621,9 @@ CMainWnd::FeedDebug( void )
 	}
 
 	INT_PTR	i, n = aFileTime.GetCount();
+
 	for	( i = 0; i < n; i++ )
-		ReadDebug( aFileTime[i].m_strFile );
+		ReadEML( aFileTime[i].m_strFile );
 
 	if	( n )
 		ModNI( 0, NULL );
@@ -3215,7 +3632,7 @@ CMainWnd::FeedDebug( void )
 }
 
 void
-CMainWnd::ReadDebug( CString strFile )
+CMainWnd::ReadEML( CString strFile )
 {
 	CFile	fIn;
 	if	( fIn.Open( strFile, CFile::modeRead | CFile::shareDenyNone ) ){
@@ -3224,7 +3641,14 @@ CMainWnd::ReadDebug( CString strFile )
 		char*	pch = new char[cch+1];
 		fIn.Read( pch, cch );
 		pch[cch] = '\0';
-		if	( ParseMail( pch, true ) )
+		int	x = strFile.ReverseFind( '\\' );
+		strFile = strFile.Mid( x+1 );
+		x = strFile.ReverseFind( '.' );
+		strFile = strFile.Left( x );
+		if	( strFile[0] == '!' )
+			strFile.Delete( 0, 1 );
+
+		if	( ParseMail( pch, strFile ) )
 			m_nMail++;
 
 		delete	[] pch;

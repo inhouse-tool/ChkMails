@@ -196,6 +196,8 @@ CSetupDlg::OnButtonRefLog( void )
 
 	dlg.m_ofn.lpstrInitialDir = m_strLogPath.GetBuffer();
 	dlg.m_ofn.lpstrTitle      = _T("Select a log folder");
+	dlg.m_ofn.lpstrFilter     = _T("Any File\0*.*\0\0");
+
 	m_strModal = dlg.m_ofn.lpstrTitle;
 
 	INT_PTR	iAnswer = dlg.DoModal();

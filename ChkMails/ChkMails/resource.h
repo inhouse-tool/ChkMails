@@ -4,13 +4,14 @@
 //
 #define IDR_MAINFRAME                   128
 #define IDR_MENU_POPUP                  129
-#define IDD_ACCOUNTS                    131
-#define IDD_SETUP                       132
-#define IDD_AUTH                        133
-#define IDD_CODE                        134
-#define IDD_DOMAIN                      135
-#define IDD_ZONE                        136
-#define IDD_SENDER                      137
+#define IDD_ACCOUNTS                    130
+#define IDD_SETUP                       131
+#define IDD_AUTH                        132
+#define IDD_CODE                        133
+#define IDD_DOMAIN                      134
+#define IDD_NAME                        135
+#define IDD_SENDER                      136
+#define IDD_ZONE                        137
 #define IDI_IDLE                        140
 #define IDI_BUSY                        141
 #define IDI_RED                         142
@@ -18,6 +19,7 @@
 #define IDS_MB_INTRODUCE                150
 #define IDS_MB_EXIT                     151
 #define IDS_MB_POP_UNCHOSEN             152
+#define IDS_MB_REEVAL                   153
 #define IDS_CAPT_FILTER                 160
 #define IDS_TEXT_DST_NONE               161
 #define IDS_TEXT_DST_HEADER             162
@@ -30,16 +32,17 @@
 #define IDS_NI_0MAIL                    175
 #define IDS_NI_1MAIL                    176
 #define IDS_NI_NMAIL                    177
+#define IDS_NI_REEVAL                   178
 #define IDD_WHITE                       180
 #define IDS_RF_AUTH                     200
 #define IDS_RF_CHARSET                  201
 #define IDS_RF_CONTROLCODE              202
 #define IDS_RF_EVASIVECODE              203
 #define IDS_RF_DOMAIN                   204
-#define IDS_RF_MESSAGEID                205
-#define IDS_RF_FAKE_DOMAIN              206
-#define IDS_RF_FAKE_ALIAS               207
-#define IDS_RF_CALL_BY_ADDR             208
+#define IDS_RF_FAKE_ALIAS               205
+#define IDS_RF_MESSAGEID                206
+#define IDS_RF_CALL_BY_ADDR             207
+#define IDS_RF_FAKE_DOMAIN              208
 #define IDS_RF_LINK_FAKED               209
 #define IDS_RF_LINK_DOMAIN              210
 #define IDS_RF_LINK_EVASIVE             211
@@ -89,17 +92,22 @@
 #define IDC_EDIT_DOMAIN                 1041
 #define IDC_BUTTON_DOMAIN_ADD           1042
 #define IDC_BUTTON_DOMAIN_DEL           1043
-#define IDC_CHECK_SENDER_MESSAGEID      1050
-#define IDC_CHECK_SENDER_CALLALIAS      1051
-#define IDC_CHECK_SENDER_FAKEUSER       1052
-#define IDC_CHECK_SENDER_FAKEALIAS      1053
-#define IDC_CHECK_SENDER_FAKELINK       1054
-#define IDC_LIST_TIMEZONE               1060
-#define IDC_STATIC_DST                  1061
-#define IDC_STATIC_LOCALTIME            1062
-#define IDC_LIST_WHITE                  1070
-#define IDC_BUTTON_WHITE_DEL            1071
-#define IDC_STATIC_WHITE                1072
+#define IDC_LIST_NAME                   1050
+#define IDC_EDIT_NAME_ALIAS             1051
+#define IDC_EDIT_NAME_DOMAIN            1052
+#define IDC_EDIT_NAME_ALIAS2            1052
+#define IDC_BUTTON_NAME_ADD             1053
+#define IDC_BUTTON_NAME_DEL             1054
+#define IDC_CHECK_SENDER_MESSAGEID      1060
+#define IDC_CHECK_SENDER_CALLALIAS      1061
+#define IDC_CHECK_SENDER_FAKEUSER       1062
+#define IDC_CHECK_SENDER_FAKELINK       1063
+#define IDC_LIST_TIMEZONE               1070
+#define IDC_STATIC_DST                  1071
+#define IDC_STATIC_LOCALTIME            1072
+#define IDC_LIST_WHITE                  1080
+#define IDC_BUTTON_WHITE_DEL            1081
+#define IDC_STATIC_WHITE                1082
 #define ID_MENU_ACCOUNTS                32771
 #define ID_MENU_SETUP                   32772
 #define ID_MENU_FILTER                  32773
@@ -110,9 +118,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        181
+#define _APS_NEXT_RESOURCE_VALUE        182
 #define _APS_NEXT_COMMAND_VALUE         32780
-#define _APS_NEXT_CONTROL_VALUE         1080
+#define _APS_NEXT_CONTROL_VALUE         1090
 #define _APS_NEXT_SYMED_VALUE           110
 #endif
 #endif

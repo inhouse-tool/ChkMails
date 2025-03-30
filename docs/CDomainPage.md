@@ -28,7 +28,7 @@
 
 #### 固有関数
 
-[`SortDomain`](#SortDomain)
+[`SortDomain`](#sortdomain)
 [`CompareDomain`](#comparedomain)
 
 
@@ -79,7 +79,7 @@
 1. List Control を全カラムで選択表示するように設定.
 1. List Control をグリッド表示するように設定.
 1. List Control に 2カラム追加.
-1. [`SortDomain`](#SortDomain) でドメイン配列をソート.
+1. [`SortDomain`](#sortdomain) でドメイン配列をソート.
 1. 「ドメイン配列」をList Control に追加.
 1. 「破棄対象配列」に含まれていたら List Control を&#x2611;.
 1. List Control のカラム幅を自動調整.

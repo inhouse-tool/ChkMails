@@ -58,15 +58,17 @@ public:
 			m_strSender;
 	     CStringA	m_strZone;
 		int	m_nAuth;
-		CString	m_strReason;
+		DWORD	m_dwReason;
 		CString	m_strLinks;
+		CString	m_strFile;
 		CAttr( void )
 		{
 			m_iType    = unsupported;
 			m_iSubType = uninterested;
 			m_iCharset = -1;
 			m_iEncode  = Bit7;
-			m_nAuth  = 0;
+			m_nAuth    = 0;
+			m_dwReason = 0;
 		}
 };
 
@@ -88,6 +90,7 @@ protected:
 		int	m_nAuth;
 		DWORD	m_dwCode;
 		CString	m_strDomains;
+		CString	m_strNames;
 		DWORD	m_dwSender;
 		CString	m_strTimes;
 		CString	m_strWhites;
@@ -143,6 +146,7 @@ protected:
 		bool	AddNI( void );
 		void	DelNI( void );
 		void	ModNI( UINT uIcon, CString strTip );
+
 		void	SetMenu( void );
 
 		bool	Introduce( void );
@@ -166,7 +170,7 @@ protected:
 
 		void	PollNow( void );
 		void	PollMails( void );
-		bool	ParseMail( CStringA strMail, bool bForceLog = false );
+		bool	ParseMail( CStringA strMail, LPCTSTR pchFile = NULL );
 
 		CAttr	GetAttr(   CStringA strMail );
 		void	GetAuth(   CStringA strMail, CAttr& attr );
@@ -175,18 +179,13 @@ protected:
 		void	GetType(   CStringA strMail, CAttr& attr );
 		void	GetEncode( CStringA strMail, CAttr& attr );
 		void	GetTime(   CStringA strMail, CAttr& attr );
-		int	GetCodePage( CStringA strMail );
-		void	CheckMID(  CStringA strMail, CAttr& attr );
-
-		void	CheckAlias( CString strLog, CAttr& attr );
+		int	GetCodePage(   CStringA strMail );
+		void	CheckMID(      CStringA strMail, CAttr& attr );
+		void	CheckReceived( CStringA strMail, CAttr& attr );
 		void	CheckBlackList( CStringA strSender, CAttr& attr );
-		void	CheckWhiteList( CString  strLog,    CAttr& attr );
-		void	CheckLink( CString& strLines, TCHAR* pchScheme, CAttr& attr );
-		void	CheckUnicode( WCHAR* pch, int nch,  CAttr& attr );
-		void	FilterError( UINT uIdError, CAttr& attr );
 
 		CString	MakeLog( CStringA strMail, CAttr& attr );
-		void	SaveLog( CStringA strMail, CString strLog, CAttr& attr, bool bForceLog );
+		void	SaveLog( CStringA strMail, CString strLog, CAttr& attr );
 		bool	IsDuplicated( CString strFile, CTime time );
 		CString	AddSuffix( CString strFile );
 		void	TrimFiles( CString strPath, CString strFile, int nFile );
@@ -204,13 +203,25 @@ protected:
 	       CStringA	EscapeFromJIS(      CStringA strIn, CAttr& attr );
 	       CStringA	StringToUTF8( CStringW strIn, CAttr& attr );
 		void	LFtoCRLF(     CString& strLines );
-		void	HexToASCII(   CString& strLines );
 		void	HexToUnicode( CString& strLines );
+
+		void	CheckUnicode(   CString& strLog,   CAttr& attr );
+		void	CheckAlias(     CString  strLog,   CAttr& attr );
+		int	CompareWild( CString strWild, CString strName );
+		void	NormalizeAlias( CString& strName );
+		void	CheckWhiteList( CString  strLog,   CAttr& attr );
+		void	CheckLink(      CString& strLog,   CAttr& attr );
+		bool	GetLinkInHTML(  CString  strLog, int& xLines, CString& strLink, CString& strDisplay );
+		void	GetLinkInText(  CString  strLog, int& xLines, CString& strLink );
+		bool	IsEvasiveCode(  CString  strLog, int& xLines );
+		void	SetLinkVisible( CString& strLink,  CAttr& attr );
+
+		void	FilterError( UINT uIdError, CAttr& attr );
 
 		void	ConnectPOP( void );
 		void	RespondPOP( CStringA strMessage );
 		void	ClosePOP( int nwError );
 
-		bool	FeedDebug( void );
-		void	ReadDebug( CString strFile );
+		bool	ReadFromEML( LPCTSTR pchFolder );
+		void	ReadEML( CString strFile );
 };

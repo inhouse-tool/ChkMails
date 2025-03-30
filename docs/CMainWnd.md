@@ -81,7 +81,7 @@
 #### メールチェック関連
 
 [`PollNow`](#pollnow)
-[`PollMails`](#pollnow)
+[`PollMails`](#pollmails)
 [`ParseMail`](#parsemail)<br>
 [`GetAttr`](#getattr)
 [`GetAuth`](#getauth)
@@ -90,14 +90,10 @@
 [`GetType`](#gettype)
 [`GetEncode`](#getencode)
 [`GetTime`](#gettime)
-[`GetCodePage`](#getcodepage)
-[`CheckMID`](#checkmid)<br>
-[`CheckAlias`](#checkalias)
+[`GetCodePage`](#getcodepage)<br>
+[`CheckMID`](#checkmid)
+[`CheckReceived`](#checkreceived)
 [`CheckBlackList`](#checkblacklist)
-[`CheckWhiteList`](#checkwhitelist)
-[`CheckLink`](#checklink)
-[`CheckUnicode`](#checkunicode)
-[`FilterError`](#filtererror)
 
 #### ログ関連
 
@@ -123,9 +119,25 @@
 [`StringFromCodePage`](#stringfromcodepage)
 [`EscapeFromJIS`](#escapefromjis)
 [`StringToUTF8`](#stringtoutf8)
-[`LFtoCRLF`](#letocrlf)
+[`LFtoCRLF`](#lftocrlf)
 [`HexToASCII`](#hextoascii)
 [`HexToUnicode`](#hextounicode)
+
+#### ログチェック関連
+
+[`CheckUnicode`](#checkunicode)
+[`CheckAlias`](#checkalias)
+[`NormalizeAlias`](#normalizealias)
+[`CheckWhiteList`](#checkwhitelist)<br>
+[`CheckLink`](#checklink)
+[`GetLinkInHTML`](#getlinkinhtml)
+[`GetLinkInText`](#getlinkintext)
+[`IsEvasiveCode`](#isevasivecode)
+[`SetLinkVisible`](#setlinkvisible)
+
+#### エラーフィルター
+
+[`FilterError`](#filtererror)
 
 #### 通信関連
 
@@ -133,10 +145,10 @@
 [`RespondPOP`](#respondpop)
 [`ClosePOP`](#closepop)
 
-#### デバッグ関連
+#### 再評価関連
 
-[`FeedDebug`](#feeddebug)
-[`ReadDebug`](#readdebug)
+[`ReadFromEML`](#readfromeml)
+[`ReadEML`](#reademl)
 
 
 ## 概要
@@ -153,7 +165,7 @@
 1. タスクバーの通知領域にアイコンを仕込む.
 1. タイマーを仕掛ける.
 
-で, タイマーが満了するごとに,
+で, タイマーが満了するたびに,
 
 1. 設定されていたメールサーバーに[POP3](https://ja.wikipedia.org/wiki/Post_Office_Protocol)で接続する.
 1. 設定されていたユーザー名とパスワードで POP3 にサインインする.
@@ -211,8 +223,8 @@
 
 | 関数 | 初期化対象 |
 | --- | --- |
-| [`LoadSettings`](#loadsettings) | [Setup](../README.md#setup) で設定できるパラメーターの読み込み |
-| [`LoadFilters`](#loadfilters) | [Filter](../README.md#filter) で設定できるパラメーターの読み込み |
+| [`LoadSettings`](#loadsettings) | [Setup](../README.md#setup) で設定されたパラメーターの読み込み |
+| [`LoadFilters`](#loadfilters) | [Filter](../README.md#filter) で設定されたパラメーターの読み込み |
 | [`LoadTLDs`](#loadtlds) | 過去に受信した実績のある [TLD ( Top Level Domain )](https://ja.wikipedia.org/wiki/トップレベルドメイン) 名の読み込み |
 | [`MakeBlob`](#makeblob) | 復号用 [BLOB](https://ja.wikipedia.org/wiki/バイナリ・ラージ・オブジェクト) の読み込み |
 
@@ -347,7 +359,7 @@ Window Message `WM_SOCKET_NOTIFY`
 に対するハンドラーです.
 
 `WM_USER_TRAY_NOTIFY` は, [`AddNI`](#addni) にて呼び返しの message として登録しているので,
-アイコンが操作されると投げ返されてくる Window Message です.
+タスクバーに常駐しているアイコンが操作されると投げ返されてくる Window Message です.
 
 下記の操作を取り扱っています.
 
@@ -432,7 +444,7 @@ Windows&reg; 10 では上下左右に動かせるので,
 [`CChkMailsApp`](CChkMailsApp.md) で定義した Window Message `WM_GET_SENDER`
 に対するハンドラーです.
 
-今回の通信で得たメールの
+今回の通信 ( または今回与えられた `.eml` ファイル ) で得たメールから抽出した
 
 * 送信者の「名義」( `From:` に書いてあった送信者名 )
 * 実際の送信者名 ( `Authentication-Results:` などに挙がっていた送信者名 )
@@ -542,6 +554,14 @@ Windows&reg; 10 では上下左右に動かせるので,
 1. [`SaveFilters`](#savefilters) にて, 変更された設定値をセーブ.
 1. この関数の終了に伴い, [`CFilterSheet`](CFilterSheet.md) も消失 ( destruct される ).
 
+また, [`Filter`](../README.md#filter) のいずれかの設定が変更された場合は,
+その新たな設定でログ ( `.eml` ) を再評価してみるかを問い合わせる
+[`AfxMessageBox()`](https://learn.microsoft.com/ja-jp/cpp/mfc/reference/cstring-formatting-and-message-box-display#afxmessagebox)
+を出します.
+これに `Yes` と答えると,
+いま蓄積しているログ ( `.eml` ) 全てを再評価します.
+[Filter](../README.md#filter) 設定が甘かった or やり過ぎたの判断材料になるでしょう.
+
 
 ## `OnMenuLogs`
 
@@ -569,11 +589,11 @@ Windows&reg; 10 では上下左右に動かせるので,
 1. [`SaveSettings`](#savesettingss) にて, 変更された設定値をセーブ.
 1. この関数の終了に伴い, [`CSetupDlg`](CSetupDlg.md) も消失 ( destruct される ).
 
-* [Action](../README.md#action) の時間間隔が変更された場合は,
-直ちメールを一度チェックしてから設定された時間間隔に入ります.
-* [Log](../README.md#log) のフォルダーが変更された場合は,
+* [Action](../README.md#action) の「時間間隔」が変更された場合は,
+一度メールをチェックしてから設定された時間間隔に入ります.
+* [Log](../README.md#log) の「フォルダー」が変更された場合は,
 [`MoveFiles`](#movefiles) でログファイルの引っ越しが行われます.
-* [Log](../README.md#log) のファイル数が変更された場合は,
+* [Log](../README.md#log) の「ファイル数」が変更された場合は,
 [`TrimFiles`](#trimfiles) でログファイル数の調整が行われます.
 
 
@@ -790,8 +810,7 @@ Windows&reg; 10 では上下左右に動かせるので,
 [TLD ( Top Level Domain)](https://ja.wikipedia.org/wiki/トップレベルドメイン) 履歴をロードします.
 
 ここでいう「TLD 履歴」とは,
-これまでに受信したことのあるメールの発信元や
-埋め込まれていたリンクの URL のドメインのトップ ( 右端 ) を記録しておいたものです.
+これまでに受信したことのあるメールの発信元のドメインのトップ ( 右端 ) を記録しておいたものです.
 新しいドメインからメールが来るたびに追加されていきます.
 ( お馴染みのドメインばかりになったときに頭打ちになります. )
 [Filter](../README.md#filter) の [Domain](../README.md#domain) を設定する際に,
@@ -911,7 +930,7 @@ Windows&reg; 10 では上下左右に動かせるので,
 その中身を解析した結果を `true` ( 残すべきメール ) か `false` ( 破棄すべきメール ) で返します.
 
 呼び出し元は [`RespondPOP`](#respondpop) (通常営業) か
-[`ReadDebug`](#readdebug) (デバッグ時) で,
+[`ReadEML`](#reademl) (再評価時) で,
 複数の未読メールが溜まっている状況でも, 1つのメールに付き 1回ずつ呼ばれます.
 
 引数の「中身の文字列」はメールサーバーから受信したままの文字列
@@ -956,9 +975,10 @@ Windows&reg; 10 では上下左右に動かせるので,
 | [`GetEncode`](#getencode)	| `Content-Transfer-Encoding:` にあるエンコード方式を抜き出す. |
 | [`GetTime`](#gettime)		| `Date:` にある日時を抜き出してチェック. |
 | [`CheckMID`](#checkmid)	| `Message-ID:` にある ID がマトモかチェック. |
+| [`CheckReceived`](#checkreceived)	| `Received:` にある timezone もチェック. |
 
 上記委託先から集められた情報を `CAttr` という情報構造に収めて,
-受注先の [`ParseMail`](#parsemail) に納品します.
+発注元の [`ParseMail`](#parsemail) に納品します.
 
 いずれの委託先も抜き出した部分にスパムの兆候を見つけたら,
 納品された `CAttr` に「破棄理由」として報告を上げてくれる約束になっています.
@@ -1165,22 +1185,20 @@ UTC への変換も必要です.
 系列としては [`GetAttr`](#getattr) 傘下で, 他からの受注は請け負っていません.
 
 
-## `CheckAlias`
+## `CheckReceived`
 
-「別名」( [Sender](../README.md#sender) の「別名 ( Alias )」関係 )
-に引っかかっているかチェックします.
+[メールヘッダー](https://www.dekyo.or.jp/soudan/contents/ihan/header.html)の
+`Received:` にあるタイムゾーンをチェックした結果を `CAttr` に納品します.
 
-この関数一つで
+[`GetTime`](#gettime) でやっているチェックと同様ですが,
+`Date:` をごまかしている事例に遭遇したので,
+`Received:` でダブルチェックするようにしました.
 
-* 別名 ( Alias ) を騙ったメールアドレス
-* 無駄な別名 ( Alias ) で呼びかけてくるメール
+引っかかっていたらその旨を `attr.m_strReason` に書いて報告を上げます.
 
-の両方をチェックしています.
 
-呼び出し元は, [`MakeLog`](#makelog) で,
-[`GetAttr`](#getattr) 傘下ではありません.
-[`MakeLog`](#makelog) 傘下でデコードが済んだメールヘッダーから
-`From:` や `To:` を抜き出してチェックします.
+系列としては [`GetAttr`](#getattr) 傘下で, 他からの受注は請け負っていません.
+
 
 ## `CheckBlackList`
 
@@ -1193,57 +1211,6 @@ UTC への変換も必要です.
 
 呼び出し元は[`GetFrom`](#getfrom)と[`GetSender`](#getsender)で,
 メールの「名義」( `From:` ) と「実際の送信者」の両方を見張っています.
-
-
-## `CheckWhiteList`
-
-「ホワイトリスト」( [Whitelist](../README.md#whitelist) に登録された「名義」と「送信者」 )
-に含まれているかチェックします.
-
-含まれていた場合は `attr.m_strReason` を空にします. それにより今後の処理では「スパムメール」扱いされず,
-見逃してもらえるようになります.
-
-呼び出し元は[`ParseMail`](#parsemail)のみです.
-
-
-## `CheckLink`
-
-埋め込まれているリンクの URL をチェックします.
-
-チェックの内容は
-
-* URL 記述に「回避的な文字コード」が含まれていないか.
-* URL は [Domain](../README.md#domain) で&#x2611;されたドメインに属していないか.
-
-となっています.
-チェックに引っかかった場合は `CAttr` に「破棄理由」としてその旨を書いて報告を上げます.
-
-[`StringFromBody`](#stringfrombody) のみから呼ばれています.
-
-
-## `CheckUnicode`
-
-UNICODE ( [UTF-16LE](https://ja.wikipedia.org/wiki/UTF-16) ) 文字列をチェックします.
-
-[Coding](../README.md#coding) に挙げた
-「疑わしい制御文字」や「回避的な文字コード」の有無をチェックしています.
-該当する文字を見つけた場合は `CAttr` に「破棄理由」としてその旨を書いて報告を上げます.
-
-[`StringFromCodePage`](#stringfromcodepage) から呼ばれています.
-
-
-## `FilterError`
-
-与えられた「破棄理由」がメールの破棄に相当するか判定します.
-
-[Filter](../README.md#filter) の各種設定を引数として与えられた「破棄理由」のコードで参照し,
-実際にメールを破棄するかどうかを判定します.
-
-破棄すべきとの判定が下った場合は「破棄理由」のコードを文字列化し,
-その文字列を「破棄理由」を保持している `attr.m_strReason` に追記します.
-「追記します」と言っているように, 1つのメールが複数の「破棄理由」に引っかかることもあります.
-
-この関数は本 class のあちこちから呼ばれています.
 
 
 ## `MakeLog`
@@ -1553,7 +1520,8 @@ Message-ID: <20241202023811304176@moneylionkmp.top>
 1. [`LFtoCRLF`](#lftocrlf) で LF 改行を CR/LF 改行に一括変換.
 1. `attr.m_iSubType` が `HTML` なら,<br>
 [`HexToUnicode`](#hextounicode) で16進数表記を文字化.<br>
-[`CheckLink`](#checklink) で埋め込まれているリンクの URL をチェック.
+1. [`CheckUnicode`](#checkunicode) でヤバい文字コードが含まれていないかチェック.
+1. [`CheckLink`](#checklink) で埋め込まれているリンクの URL をチェック.
 1. できあがった文字列 ( `CString` ) を返す.
 
 という段取りになっています.
@@ -1614,12 +1582,6 @@ Message-ID: <20241202023811304176@moneylionkmp.top>
 * code page が [`ISO_2022_JP`](https://ja.wikipedia.org/wiki/ISO-2022-JP) だったら,
 [`EscapeFromJIS`](#escapefromjis)にて
 [エスケープシーケンス](https://ja.wikipedia.org/wiki/エスケープシーケンス)の前処理を行っておく.
-
-後処理として:
-
-* ヤバい文字コードが含まれていないか[`CheckUnicode`](#checkunicode)でチェック.
-
-が挟まっています.
 
 また,
 変換に失敗した場合は `CAttr` に「破棄理由」を書いて報告を上げることにいちおうなっています.
@@ -1692,7 +1654,166 @@ LF改行をCR/LF改行に入れ替えます.
 メール本文をデコードしてみたら「`&#x002e&#x0063&#x006e`」のように検索逃れと思しき事例に遭遇したので,
 ログが読みやすくなるように入れてみました.
 
+[`StringFromBody`](#stringfrombody) からのみ呼ばれています.
+
+
+## `CheckUnicode`
+
+UNICODE ( [UTF-16LE](https://ja.wikipedia.org/wiki/UTF-16) ) 文字列をチェックします.
+
+[`StringFromBody`](#stringfrombody) からのみ呼ばれています.
+
+[Coding](../README.md#coding) に挙げた
+「疑わしい制御文字」の有無をチェックしています.
+該当する文字を見つけた場合は `CAttr` に「破棄理由」としてその旨を書いて報告を上げます.
+
+あと, ログ上では「疑わしい制御文字」は取り除いたうえで,
+`&#x202b;` のような形式でどこにどういう制御文字が挟まっていたのか痕跡を残すようにしました.
+制御文字をそのままにしておくと, ログをメモ帳で開いたときに下記のようにハマるケースがあったからです.
+
+![](../pics/ControlCode.png)
+
+<sup>▲ 制御コード `U+202b` ( Right-To-Left Embedding ) でハマってしまったメモ帳の例: 何度 `OK` ボタンを押してもまた出てくるので close しづらい.</sup>
+
+## `CheckAlias`
+
+「Alias」( [Sender](../README.md#sender) の「Alias ( 別名 )」関係 )
+に引っかかっているかチェックします.
+
+この関数一つで
+
+* 別名 ( Alias ) を騙ったメールアドレス
+* 無駄な別名 ( Alias ) で呼びかけてくるメール
+
+の両方をチェックしています.
+
+呼び出し元は, [`MakeLog`](#makelog) で,
+[`GetAttr`](#getattr) 傘下ではありません.
+[`MakeLog`](#makelog) 傘下でデコードが済んだメールヘッダーから
+`From:` や `To:` を抜き出してチェックします.
+
+
+## `NormalizeAlias`
+
+「別名」( [Sender](../README.md#sender) の「別名 ( Alias )」関係 ) を比較しやすいように「正規化」します.
+
+ここでやっている「正規化」とは
+
+* 別名の中のダブルクオート `"` を空白に変換
+* 別名の中のダブルクオート `'` を空白に変換
+* 別名の中の中黒 `・` を削除
+* 別名の中のアンダースコア `_` を空白に変換
+* 別名の中の空白を削除
+
+ということを行っています.
+
+また,
+スパムメールの別名に多い「人間の目で見るとアルファベットに見えるが文字コード的には ASCII ではない文字列」を,
+該当する ASCII コードに変換します.
+( “&#x24B8;&#x24C4;&#x24C2;”→“COM”等 )
+
+[`CheckAlias`](#checkalias) から呼ばれています.
+
+
+## `CheckWhiteList`
+
+「ホワイトリスト」( [Whitelist](../README.md#whitelist) に登録された「名義」と「送信者」 )
+に含まれているかチェックします.
+
+含まれていた場合は `attr.m_dwReason` を空にします. それにより以降の処理では「スパムメール」扱いされず,
+見逃してもらえるようになります.
+
+呼び出し元は[`ParseMail`](#parsemail) のみです.
+
+
+## `CheckLink`
+
+埋め込まれているリンクの URL をチェックします.
+
+チェックの内容は
+
+* URL 記述に「回避的な文字コード」が含まれていないか.
+* URL は [Domain](../README.md#domain) で&#x2611;されたドメインに属していないか.
+
+となっています.
+チェックに引っかかった場合は `CAttr` に「破棄理由」としてその旨を書いて報告を上げます.
+
 [`StringFromBody`](#stringfrombody) のみから呼ばれています.
+
+
+## `GetLinkInHTML`
+
+与えられた URL 文字列が, HTML 中に埋め込まれたリンクか否かを確認します.
+
+[`CheckLink`](#checklink) の下請け関数で,
+発注元が見つけた `http://` または `https://` が `<a` と `</a` に囲まれ,
+さらに `href` を含んだ正当なリンクか否かを確認します.
+
+リンクか否かを `true` `false` で返します.
+リンクであった場合は, URL 文字列と URL の代わりに表示される文字列も返します.
+
+HTML 記述の場合, 埋め込まれたリンクは
+
+`<a href="https://phishing.com/">https://*****.amazon.com</a>`
+
+のような表示上の騙りも多いので, そのチェック用の判断材料も返しているわけです.
+
+
+## `GetLinkInText`
+
+与えられた URL 文字列が, プレーンテキスト中に埋め込まれたリンクか否かを確認します.
+
+[`CheckLink`](#checklink) の下請け関数で,
+発注元が見つけた `http://` または `https://` のあとに続く URL 文字列をリンクとして切り出します.
+
+ただし, メーラー上ではリンクとして有効ではない ( かもしれない )
+「人間の目で見るとアルファベットに見えるが文字コード的には ASCII ではない文字列」
+( “&#x24B8;&#x24C4;&#x24C2;”等 ) も含めて切り出します.
+スパマーが何をしたかったのかを表現するためです.
+
+
+## `IsEvasiveCode`
+
+与えられた文字が, 「回避的文字コード」か否かを返します.
+
+ここでいう「回避的文字コード」とは,
+「人間の目で見るとアルファベットに見えるが文字コード的には ASCII ではない文字列」
+( “&#x24B8;&#x24C4;&#x24C2;”等 ) のことです.
+
+1文字の確認なので, 文字コード 1つを引数に渡せば済みそうなものですが,
+この関数は文字列としての `CString` とその何番目の文字かを示す `int&` を引数として受け取ります.
+
+これは, 1つも文字コードでは表せない文字
+( [サロゲートペア](https://ja.wikipedia.org/wiki/Unicode#サロゲートペア): 2コードで 1文字を表現 )
+も確認対象に含んでいるからです.
+
+
+## `SetLinkVisible`
+
+与えられた URL 文字列に残っているエンコード成分をデコードします.
+
+スパマーによっては, デコードした文字列の中にさらに要デコードな文字列を残すような誤ったエンコードをする者も居ました.
+この関数はそうした文字列をさらにデコードし, スパマーが何をやりたかったのかを視覚的に判りやすいかたちにします.
+
+リンクとしては無効なものなのでほっといても実害はないのですが,
+「何がしたかったんだ? こいつ」という疑問が残って気分的にすっきりしないので,
+いちいち再デコードするようにしました.
+
+[`CheckLink`](#checklink) の専属下請け関数です.
+
+
+## `FilterError`
+
+与えられた「破棄理由」がメールの破棄に相当するか判定します.
+
+[Filter](../README.md#filter) の各種設定を引数として与えられた「破棄理由」のコードで参照し,
+実際にメールを破棄するかどうかを判定します.
+
+破棄すべきとの判定が下った場合は「破棄理由」のコードを文字列化し,
+その文字列を「破棄理由」を保持している `attr.m_strReason` に追記します.
+「追記します」と言っているように, 1つのメールが複数の「破棄理由」に引っかかることもあります.
+
+この関数は本 class のあちこちから呼ばれています.
 
 
 ## `ConnectPOP`
@@ -1892,9 +2013,9 @@ Return-Path: <中略>
 問題なく完了した場合は, 単に [`CParaSocket`](CParaSocket.md) を片付けます.
 
 
-## `FeedDebug`
+## `ReadFromEML`
 
-デバッグ用データを供給します.
+EML ファイルを再評価します.
 
 `ChkMails.exe` の置いてあるフォルダーに `Mails` というサブフォルダーがあって,
 そのサブフォルダーに `.eml` ファイルが 1つ以上入っていると,
@@ -1905,21 +2026,20 @@ Return-Path: <中略>
 
 1. `Mails` サブフォルダーから `*.eml` を検索する.
 1. 検索結果を日時順に並べる.
-1. 1つづつ [`ReadDebug`](#readdebug) で読み込む.
+1. 1つづつ [`ReadEML`](#reademl) で読み込む.
 1. 読み込んだ `.eml` があったら [`ModNI`](#modni) で結果をお知らせする.
 1. 1つでも読んだ実績があるなら `true` を, そうでなければ `false` を返す.
 
 としています.
 
-「デバッグ」と称していますが,
-実際の運用でハネられたもしくは通過ししてしまったメールの `*.eml` を使って,
-[Filter](../README.md#filter) の条件を再吟味するなど,
-デバッグ目的以外の使用の方がメジャーでしょう.
+実際の運用でハネられたもしくは通過してしまったメールの `*.eml` を使って,
+[Filter](../README.md#filter) の条件を再評価するのが主目的ですが,
+本 class の実装をデバッグするときにも有用です.
 
 
-## `ReadDebug`
+## `ReadEML`
 
-デバッグ用データを読み込みます.
+EML ファイルをを読み込みます.
 
 単に引数として与えられたファイル ( `.eml` ) を読んでいるだけですが,
 読み終わったあと, 読み取った文字列を [`ParseMail`](#parsemail) に引き渡して,

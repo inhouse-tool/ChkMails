@@ -2,7 +2,7 @@
 
 以下, 実例を少し挙げておきます.
 
-以下はいくつかのメールを, [Base64](https://ja.wikipedia.org/wiki/Base64) でデコード済みのイメージで挙げています.
+メールの実例は, [Base64](https://ja.wikipedia.org/wiki/Base64) でデコード済みのイメージで挙げています.
 全部挙げると長くなるのでメールヘッダーのみ ( 本文はカット ), さらに不要な場所はカットし,
 受信者に関する情報は伏せて ( 書き換えて ) ありますのでご了承ください.
 <br>
@@ -102,7 +102,7 @@ URL における `@` の右側の文字列って, ユーザー名指定の文字
 にこの URL を突っ込んでみたところ,
 `Dangerous`
 と出ました.
-`𝕝𝕠𝕟𝕖𝕨𝕒𝕪.cn` と入れても `loneway.cn` と入れても判定は変わらなかったので,
+`loneway.cn` と入れても判定は変わらなかったので,
 やはり「loneway」かどうかの文字列検索から逃れるために「𝕝𝕠𝕟𝕖𝕨𝕒𝕪」などと言っているのだと思われます.
 
 
@@ -314,7 +314,6 @@ Authentication-Results: mx.provider.ne.jp; spf=pass
 で, 念のため [arara.com で検索](https://www.google.com/search?q=arara.com)してみると,
 ホントに「メール配信代行業者」のようで, ようやく一安心した次第です.
 愉快犯が愉快なメールをバラまいて愉快がっているのかと誤解してごめんなさい.
-でも, この経緯って一般のスパムメールに対して当方が踏んでいた段取りと同じなんです.
 
 そもそも `sender-id=permerror` って[民主党の基準](http://archive.dpj.or.jp/special/dkim/index.html)によると,
 「登録情報に誤りがある」そうですよ.
@@ -431,7 +430,7 @@ Authentication-Results: mx.provider.ne.jp; spf=pass
 <sub>
 `Amazon.co.jp` がもうちょっと国別のローカライズを心掛けてくれたら, スパム対策ももうちょっと的を絞れるんですが,
 `Amazon` のようないんたあなしょなるな超巨大企業には, 「国」なんて些細な単位を気に掛けるヒマはないんですかね.
-「スパムが騙る人気企業ナンバーワン」( 当アプリ調べ, 2024 ) に君臨する企業様としては,
+「スパムが騙る人気企業ナンバーワン」( 2024, 当アプリ調べ ) に君臨する企業様としては,
 もうちょっと下々の者にも気を使っていただきたいものです.
 </sub>
 
@@ -506,6 +505,7 @@ Content-Transfer-Encoding: 7bit
 | [Authentication](../README.md#authentication) | デフォルト ( `2` ) |
 | [Coding](../README.md#coding) | デフォルト ( 全て&#x2611; ) |
 | [Domain](../README.md#domain) | カスタマイズ (<br> `.asia`, `.cc`, `.cn`, `.co`, `.cyou`, `.gd`, `.goog`, `.icu`, `.pl`, `.sbs`, `.se`, `.top`, `.world`, `.xyz` に&#x2611; ) |
+| [Name](../README.md#name) | 必要もなかったけど~~面白がって~~評価のためにカスタマイズ ( [別ファイル参照](docs/ChkMails.Names.txt) ) |
 | [Sender](../README.md#sender) | デフォルト ( 全て&#x2611; ) |
 | [Time Zone](../README.md#time-zone) | カスタマイズ ( +0800 に&#x2611; ) |
 | [Whitelist](../README.md#whitelist) | デフォルト ( 未使用 ) |
@@ -520,3 +520,4 @@ Content-Transfer-Encoding: 7bit
 In-house Tool / 家中 徹
 </div>
 
+ 

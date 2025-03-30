@@ -200,6 +200,7 @@
     <ClInclude Include="framework.h" />
     <ClInclude Include="MainWnd.h" />
     <ClInclude Include="MessageBox.h" />
+    <ClInclude Include="NamePage.h" />
     <ClInclude Include="NotifyWnd.h" />
     <ClInclude Include="ParaSocket.h" />
     <ClInclude Include="pch.h" />
@@ -221,6 +222,7 @@
     <ClCompile Include="FilterSheet.cpp" />
     <ClCompile Include="MainWnd.cpp" />
     <ClCompile Include="MessageBox.cpp" />
+    <ClCompile Include="NamePage.cpp" />
     <ClCompile Include="NotifyWnd.cpp" />
     <ClCompile Include="ParaSocket.cpp" />
     <ClCompile Include="pch.cpp">

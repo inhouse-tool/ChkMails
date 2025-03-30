@@ -18,6 +18,7 @@ C++ ‚È‚Ì‚Å, ŽÀ‘•‚Í class ‚²‚Æ‚É‚Ü‚Æ‚ß‚ç‚ê‚Ä‚¢‚Ü‚·.
 | [`CAuthPage`](CAuthPage.md) | [Filter](../README.md#filter) ‚Ì [Authentication](../README.md#authentication) ’S“– |
 | [`CCodePage`](CCodePage.md) | [Filter](../README.md#filter) ‚Ì [Coding](../README.md#coding) ’S“– |
 | [`CDomainPage`](CDomainPage.md) | [Filter](../README.md#filter) ‚Ì [Domain](../README.md#domain) ’S“– |
+| [`CNamePage`](CNamePage.md) | [Filter](../README.md#filter) ‚Ì [Name](../README.md#name) ’S“– |
 | [`CSenderPage`](CSenderPage.md) | [Filter](../README.md#filter) ‚Ì [Sender](../README.md#sender) ’S“– |
 | [`CZonePage`](CZonePage.md) | [Filter](../README.md#filter) ‚Ì [TimeZone](../README.md#time-zone) ’S“– |
 | [`CWhitePage`](CWhitePage.md) | [Filter](../README.md#filter) ‚Ì [Whitelist](../README.md#whitelist) ’S“– |

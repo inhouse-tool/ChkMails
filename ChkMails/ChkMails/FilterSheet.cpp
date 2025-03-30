@@ -138,6 +138,7 @@ CFilterSheet::AddPages( void )
 	AddPage( &m_pageAuth );
 	AddPage( &m_pageCode );
 	AddPage( &m_pageDomain );
+	AddPage( &m_pageName );
 	AddPage( &m_pageSender );
 	AddPage( &m_pageZone );
 	AddPage( &m_pageWhite );

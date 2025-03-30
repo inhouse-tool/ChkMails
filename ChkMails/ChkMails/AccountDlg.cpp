@@ -153,7 +153,7 @@ CAccountDlg::OnOK( void )
 			if	( strHost.IsEmpty() && strUser.IsEmpty() && strPass.IsEmpty() )
 				;
 			else{
-				AfxMessageBox( IDS_MB_POP_UNCHOSEN );
+				AfxMessageBox( IDS_MB_POP_UNCHOSEN, MB_ICONEXCLAMATION );
 				return;
 			}
 		}
