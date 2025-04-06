@@ -18,6 +18,7 @@ DHL		dhl-news.com
 DHL		dhl.??
 ETC		etc-meisai.jp
 JCB		jcb.co.jp
+マネックス証券	monex.co.jp
 MasterCard	mastercard
 マスターカード	mastercard
 メッセージＲ	!
@@ -30,6 +31,7 @@ paidy		paidy.com
 ペイディ		paidy.com
 pia		pia.co.jp
 ponta		ponta.jp
+SBI証券		sbisec.co.jp
 SMBC		smbc.co.jp
 SMBC		vpass.ne.jp
 Vpass		smbc.co.jp
@@ -76,6 +78,8 @@ eplus		eplus.co.jp
 国税庁		nta.go.jp
 日専連		nissenren*.or.jp
 日本郵便		japanpost.jp
+野村證券		nomura.com
+野村證券		nomura.co.jp
 楽天		rakuten
 横浜バンクカード	boy.co.jp
 横浜バンクカード	vpass.ne.jp
