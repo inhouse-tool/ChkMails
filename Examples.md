@@ -505,6 +505,7 @@ Content-Transfer-Encoding: 7bit
 | [Authentication](../README.md#authentication) | デフォルト ( `2` ) |
 | [Coding](../README.md#coding) | デフォルト ( 全て&#x2611; ) |
 | [Domain](../README.md#domain) | カスタマイズ (<br> `.asia`, `.cc`, `.cn`, `.co`, `.cyou`, `.gd`, `.goog`, `.icu`, `.pl`, `.sbs`, `.se`, `.top`, `.world`, `.xyz` に&#x2611; ) |
+| [Name](../README.md#name) | 必要もなかったけど~~面白がって~~評価のためにカスタマイズ ( [別ファイル参照](docs/ChkMails.Names.txt) ) |
 | [Sender](../README.md#sender) | デフォルト ( 全て&#x2611; ) |
 | [Time Zone](../README.md#time-zone) | カスタマイズ ( +0800 に&#x2611; ) |
 | [Whitelist](../README.md#whitelist) | デフォルト ( 未使用 ) |
