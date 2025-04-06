@@ -1023,21 +1023,6 @@ In-house Tool / 家中 徹
 </div>
 
 
-| --- | --- |
-| [Authentication](../README.md#authentication) | デフォルト ( `2` ) |
-| [Coding](../README.md#coding) | デフォルト ( 全て&#x2611; ) |
-| [Domain](../README.md#domain) | カスタマイズ (<br> `.asia`, `.cc`, `.cn`, `.co`, `.cyou`, `.gd`, `.goog`, `.icu`, `.pl`, `.sbs`, `.se`, `.top`, `.world`, `.xyz` に&#x2611; ) |
-| [Name](../README.md#name) | 必要もなかったけど~~面白がって~~評価のためにカスタマイズ ( [別ファイル参照](docs/ChkMails.Names.txt) ) |
-| [Sender](../README.md#sender) | デフォルト ( 全て&#x2611; ) |
-| [Time Zone](../README.md#time-zone) | カスタマイズ ( +0800 に&#x2611; ) |
-| [Whitelist](../README.md#whitelist) | デフォルト ( 未使用 ) |
-
-> [!IMPORTANT]
-あくまで当方の交流範囲に基づいての設定なので, 万人が丸パクリできるものではありません.
-あなたご自身の交友関係や取引関係に鑑みて設定すべきであることを申し添えておきます.
-「お前が書いた通りに設定しといたら大事なメールが棄てられちゃったじゃんか！」とか言われても,
-当方としては「知らんがな。」としか返しようがありません.
-
 <div style="text-align: right;">
 In-house Tool / 家中 徹
 </div>
