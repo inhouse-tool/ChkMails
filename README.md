@@ -1,234 +1,234 @@
-# ChkMails<br><sup><sup>Version 1.0.5.824</sup></sup>
+﻿# ChkMails<br><sup><sup>Version 1.0.5.824</sup></sup>
 
-���[�����͂��Ă��邩�`�F�b�N����풓�A�v���ł�.
+メールが届いているかチェックする常駐アプリです.
 
 ![](pics/Taskbar.png)
 
-�v��Ȃ����[�����ǂ������`�F�b�N���܂�.
-�v��Ȃ��Ɣ��肵�����[���͎����I�ɍ폜���܂�.
+要らないメールかどうかもチェックします.
+要らないと判定したメールは自動的に削除します.
 <br>
-�v�����, �X�p�����[���΍�<sup>*</sup>�Ȃ�ł�.
+要するに, スパムメール対策<sup>*</sup>なんです.
 <br>
 <br>
 <sub>
 *
-���ۂɂ�
-�u( spam )�X�p�����[���΍�v�Ƃ�������
-�u( phishing )�t�B�b�V���O���[���΍�v�Ȃ�ł���,
-�ȍ~�̋L�q�́u�X�p�����[���v�œ��ꂵ�Ă��܂�.
-�u����ȏ�]�v�ȃ��[���͌��������Ȃ��v�Ƃ������@�ō�����A�v���Ȃ̂�,
-�C���I�ɂ́u�X�p�����[���΍�v�Ȃ̂���, ��.
+実際には
+「( spam )スパムメール対策」というよりは
+「( phishing )フィッシングメール対策」なんですが,
+以降の記述は「スパムメール」で統一しています.
+「これ以上余計なメールは見たくもない」という動機で作ったアプリなので,
+気分的には「スパムメール対策」なのかな, と.
 </sub>
 
-## �o��
+## 経緯
 
-�Ƃ������悩��u�T�[�o�[�ɕs���A�N�Z�X����A���q�l�̃��[���A�h���X�̗��o���m�F�������܂����B�v�Ƃ̘A��������,
-�قǂȂ����ăE�`�ɂ��X�p�����[�����͂��悤�ɂȂ�܂���.
-�����̓��[���[�œ��e��ڎ��m�F���Ă���폜���Ă����̂ł���, ����������ɖʓ|�ɂȂ�,
-�܂�, ����ɉ��\�ʂ�����̂�, �̐S�̃��[���̓������������Ă��܂������ȏ󋵂������܂���.
+とある取引先から「サーバーに不正アクセスされ、お客様のメールアドレスの流出を確認いたしました。」との連絡があり,
+ほどなくしてウチにもスパムメールが届くようになりました.
+当初はメーラーで内容を目視確認してから削除していたのですが, それもすぐに面倒になり,
+また, 一日に何十通も来るので, 肝心のメールの到着も見逃してしまいそうな状況が続きました.
 
-���X���[���̓��������m�点���邨�萻�̃A�v�����ғ������Ă����̂ł���,
-���̃A�v�������[���̓������m�F�����i�Ƃ��ėp���Ă���[POP3](https://ja.wikipedia.org/wiki/Post_Office_Protocol)��,
-�u�w��̃��[�����폜����R�}���h(`DELE`)�v�����邱�ƂɎv������,
-�Ƃ肠����
-�u[���[���w�b�_�[](https://www.dekyo.or.jp/soudan/contents/ihan/header.html)�����邾����
-�X�p���ł��邱�Ƃ���ڗđR�ȃ��[���v
-�����̃A�v���ɍ폜�����邱�Ƃɂ����,
-�ڎ��m�F���Ă���폜�����Ɨ� ( ����, �u���[�����͂����v�Ƃ̂��m�点����U��ɏI���� ) �����炻���ƍl��������ł�.
-
-
-## ����
-
-�X�p�����[���ł��邩�ۂ������S�ɋ�ʂ�����@�͂���܂���.
-�u��ʁv���ł��Ȃ��̂Ȃ�u���ʁv���邵���Ȃ��Ƃ����̂����̃A�v���̃X�^���X�ł�.
-�Ⴆ�΁u���̍�����̃��[���͑S�ăX�p���ɈႢ�Ȃ��v�Ƃ��������ʂł�.
-
-�ǂ�����̃��[�����v��Ȃ��̂���, �l�ɂ���ĈقȂ�܂�.
-�Ȃ̂�, �ǂ��������[�����v��Ȃ��̂��̓��[�U�[���ݒ肷��悤�ɂ��Ă��܂�.
-�ȍ~�͂��̐ݒ�ɏ]����, �v��Ȃ��Ɣ��肳�ꂽ���[���͓�������폜���܂�.
-
-[�x�C�W�A���t�B���^�[](https://ja.wikipedia.org/wiki/�x�C�W�A���t�B���^)�Ȃǂ̊w�K�I��@�͎g���Ă��܂���.
-���[���w�b�_�[�̓��e�Ɩ{�����ɖ��ߍ��܂ꂽ�����N���`�F�b�N����, �v��Ȃ����[�����ۂ��̔�������Ă��܂�.
+元々メールの到着をお知らせするお手製のアプリを稼働させていたのですが,
+そのアプリがメールの到着を確認する手段として用いている[POP3](https://ja.wikipedia.org/wiki/Post_Office_Protocol)に,
+「指定のメールを削除するコマンド(`DELE`)」があることに思い至り,
+とりあえず
+「[メールヘッダー](https://www.dekyo.or.jp/soudan/contents/ihan/header.html)を見るだけで
+スパムであることが一目瞭然なメール」
+をそのアプリに削除させることによって,
+目視確認してから削除する作業量 ( あと, 「メールが届いた」とのお知らせが空振りに終わる回数 ) を減らそうと考えた次第です.
 
 
-## �^�p
+## 原理
 
-�^�X�N�o�[�̒ʒm�̈�ɃA�C�R�����풓���Ă���̂�,
-������}�E�X�ŉE�N���b�N����ƌ���鉺�L�̂悤�ȃ|�b�v�A�b�v���j���[���瑀�삵�܂�.
+スパムメールであるか否かを完全に区別する方法はありません.
+「区別」ができないのなら「差別」するしかないというのがこのアプリのスタンスです.
+例えば「この国からのメールは全てスパムに違いない」といった差別です.
+
+どこからのメールが要らないのかは, 個人によって異なります.
+なので, どういうメールが要らないのかはユーザーが設定するようにしています.
+以降はその設定に従って, 要らないと判定されたメールは到着次第削除します.
+
+[ベイジアンフィルター](https://ja.wikipedia.org/wiki/ベイジアンフィルタ)などの学習的手法は使っていません.
+メールヘッダーの内容と本文中に埋め込まれたリンクをチェックして, 要らないメールか否かの判定をしています.
 
 
-| �C���[�W | ���� | �p�r |
+## 運用
+
+タスクバーの通知領域にアイコンが常駐しているので,
+それをマウスで右クリックすると現れる下記のようなポップアップメニューから操作します.
+
+
+| イメージ | 項目 | 用途 |
 | --- | --- | --- |
-|![](pics/Menu.png)|[Accounts](#accounts)<br>[Filter](#filter)<br>[Setup](#setup)<br>[Logs](#logs)<br>[Help](#help)<br>[Exit](#exit)| ���[���A�J�E���g�ݒ�<br>�X�p����������ݒ�<br>���̑��̐ݒ�<br>���O�m�F<br>�w���v<br>�{�A�v�����I��|
+|![](pics/Menu.png)|[Accounts](#accounts)<br>[Filter](#filter)<br>[Setup](#setup)<br>[Logs](#logs)<br>[Help](#help)<br>[Exit](#exit)| メールアカウント設定<br>スパム判定条件設定<br>その他の設定<br>ログ確認<br>ヘルプ<br>本アプリを終了|
 
-������, ���߂ċN�������ꍇ��, �܂����̂悤�Ȃ��������̃_�C�A���O��, ��ʂ̒[�̕��ɂ�����܂�Əo�Ă��܂�.
+しかし, 初めて起動した場合は, まず下のようなごあいさつのダイアログが, 画面の端の方にこじんまりと出てきます.
 
 ![](pics/Intro.png)
 
-�u���̃A�v�����g���ɂ́A���[���̃A�J�E���g���Z�b�g���Ă��������B�v�Ƃ������Ă��܂�.
-�A���������Ƃ��̏�Ȃ�, �f�t�H���g���u�͂��v�Ȃ̂������t�����܂��������܂���,
-���Ȃ����Ẵ��[����[POP](https://ja.wikipedia.org/wiki/Post_Office_Protocol)���Ď��O�m�F����ɂ�,
-�K�v�ȏ��Ȃ̂ł�. �������̏�, ���������������܂��悤.
+「このアプリを使うには、メールのアカウントをセットしてください。」とか言っています.
+アヤしいことこの上なく, デフォルトが「はい」なのも押し付けがましく感じますが,
+あなた宛てのメールを[POP](https://ja.wikipedia.org/wiki/Post_Office_Protocol)して事前確認するには,
+必要な情報なのです. ご理解の上, ご承諾いただけますよう.
 
-�uNo�v(�u�������v�̃{�^����������, ���̃A�v���͖ق��ďI�����܂�.
-�u����ώg���Ă݂�I�v�ƋC���ς�����ꍇ��, �A�v���̋N�������蒼���Ă�������.<br>
-�uYes�v(�u�͂��v) �̃{�^����������, [Accounts](#accounts) �̐ݒ�ɐi�݂܂�.
+「No」(「いいえ」のボタンを押すと, このアプリは黙って終了します.
+「やっぱ使ってみる！」と気が変わった場合は, アプリの起動からやり直してください.<br>
+「Yes」(「はい」) のボタンを押すと, [Accounts](#accounts) の設定に進みます.
 
 
 ### Accounts
 
-���L�̂悤�ȃ_�C�A���O�������܂�.
+下記のようなダイアログが現われます.
 
 ![](pics/Accounts.png)
 
-��̕��ɂ��郊�X�g ( ����ۂ��ƃ��X�g���Ɣ���Â炢�ł��� ) ��,
-�����̃��[���A�h���X��o�^�ł��邱�Ƃ������Ă��܂�.
-�����͒��ډ�������͂��闓�ł͂Ȃ�,
-���͂̏I��������[���A�h���X���\�������Ƃ���ł�.
-�o�^���e��ڎ��m�F������,
-�N���b�N���đI��ŏC�����邽�߂̃��X�g�ł�.
+上の方にあるリスト ( 空っぽだとリストだと判りづらいですが ) が,
+複数のメールアドレスを登録できることを示しています.
+ここは直接何かを入力する欄ではなく,
+入力の終わったメールアドレスが表示されるところです.
+登録内容を目視確認したり,
+クリックして選んで修正するためのリストです.
 
-������, ���̃��X�g�̉��ɕ���ł���̂�,
-�K�v�ȏ�����͂��闓�ł�.
-���[���[�Ń��[���A�J�E���g��ݒ肵���Ƃ��Ɠ���������͂��܂�.
-�ȉ�, ���ꂼ��̓��͍��ڂɂ��Ă̐����ł�.
+そして, このリストの下に並んでいるのが,
+必要な情報を入力する欄です.
+メーラーでメールアカウントを設定したときと同じ情報を入力します.
+以下, それぞれの入力項目についての説明です.
 
 #### Server
 
-���[���[�Ń��[���A�J�E���g��ݒ肵���Ƃ��́u��M���[���T�[�o�[�v�Ɠ����T�[�o�[������͂��܂�.
-�u[POP3](https://ja.wikipedia.org/wiki/Post_Office_Protocol)�v
-�܂���
-�u[POP3S](https://ja.wikipedia.org/wiki/Post_Office_Protocol#�Í���)�v
-�̃T�[�o�[�Ƃ���Ă�����̂ł�.
-( �u[IMAP](https://ja.wikipedia.org/wiki/Internet_Message_Access_Protocol)�v�ƌ��p�̏ꍇ������܂�. )
-�u[SMTP](https://ja.wikipedia.org/wiki/Simple_Mail_Transfer_Protocol)�v�̃T�[�o�[�ł͂Ȃ����ł�.
+メーラーでメールアカウントを設定したときの「受信メールサーバー」と同じサーバー名を入力します.
+「[POP3](https://ja.wikipedia.org/wiki/Post_Office_Protocol)」
+または
+「[POP3S](https://ja.wikipedia.org/wiki/Post_Office_Protocol#暗号化)」
+のサーバーとされているものです.
+( 「[IMAP](https://ja.wikipedia.org/wiki/Internet_Message_Access_Protocol)」と兼用の場合もあります. )
+「[SMTP](https://ja.wikipedia.org/wiki/Simple_Mail_Transfer_Protocol)」のサーバーではない方です.
 
 #### User
 
-�u���[�U�[���v�܂��́u�A�J�E���g���v�Ƃ���Ă��閼�`����͂��܂�.
-�u���[���A�h���X�v�� `@` �̍����̕����񂾂��̏ꍇ��, �u���[���A�h���X�v�̕����񂷂ׂĂ̏ꍇ������܂��̂�,
-�悭�v���o���Đ��������������͂��܂��傤.
-( �v���o���Ȃ�������, ���[���[���N�����Ă��̃A�J�E���g�ݒ���R�s�y���܂��傤. )
+「ユーザー名」または「アカウント名」とされている名義を入力します.
+「メールアドレス」の `@` の左側の文字列だけの場合と, 「メールアドレス」の文字列すべての場合がありますので,
+よく思い出して正しい文字列を入力しましょう.
+( 思い出せなかったら, メーラーを起動してそのアカウント設定をコピペしましょう. )
 
 #### Password
 
-�u�p�X���[�h�v����͂��܂�.
-�f�t�H���g�ł͓��͂��������񂪌����Ȃ��悤�ɂȂ��Ă��܂���,
-���̗��̉E�ɂ��� `Hide` �Ƃ���&#x2611;���O����,
-���ʂɌ�����悤�ɂȂ�܂�.
-���͂ɐl�����Ȃ����Ƃ��m�F������ł����p��������.
+「パスワード」を入力します.
+デフォルトでは入力した文字列が見えないようになっていますが,
+この欄の右にある `Hide` という&#x2611;を外すと,
+普通に見えるようになります.
+周囲に人が居ないことを確認した上でご利用ください.
 
 #### POP3 ( Port 110 ) / POP3S ( Port 995 )
 
-���[���T�[�o�[�Ƃ̊Ԃ̒ʐM������I�т܂�.
+メールサーバーとの間の通信方式を選びます.
 <br>
-�v���o�C�_�[�Ƃ̌_����e�ɂ��܂���,
-�ŋ߂� [POP3](https://ja.wikipedia.org/wiki/Post_Office_Protocol)
-��� [POP3S](https://ja.wikipedia.org/wiki/Post_Office_Protocol#�Í���) �̕��������Ǝv���܂�.
+プロバイダーとの契約内容によりますが,
+最近は [POP3](https://ja.wikipedia.org/wiki/Post_Office_Protocol)
+より [POP3S](https://ja.wikipedia.org/wiki/Post_Office_Protocol#暗号化) の方が多いと思います.
 
-����Ȃ���Ȃŉ��̂悤�ɑS�Ă����I�������, `Add` �{�^���������܂�.
+そんなこんなで下のように全てを入れ終わったら, `Add` ボタンを押します.
 
 ![](pics/Accounts2.png)
 
-�����, ���̂悤�Ƀ��X�g�ɓ��͂������e ( �̈ꕔ ) �����f����܂�.
+すると, 下のようにリストに入力した内容 ( の一部 ) が反映されます.
 
 ![](pics/Accounts3.png)
 
-���X�g�ɓ������̂��m�F������, `OK` �{�^���������Ɗ����ł�.
+リストに入ったのを確認したら, `OK` ボタンを押すと完了です.
 
-�A�J�E���g�̓o�^�����������, �����Ƀ��[���T�[�o�[ ( POP �T�[�o�[ ) �Ƃ̒ʐM���J�n���܂�.
+アカウントの登録が完了すると, 直ちにメールサーバー ( POP サーバー ) との通信を開始します.
 <br>
-�^�X�N�o�[�̒ʒm�̈�ɂ���A�C�R�����Ԃ��Ȃ����ꍇ��, �o�^���e�̂����ꂩ������Ă��܂�.
-�A�C�R���Ƀ}�E�X�J�[�\�������Ă�����, ���L�̂悤�ɊȒP�Ȑ������o�܂�.
+タスクバーの通知領域にあるアイコンが赤くなった場合は, 登録内容のいずれかが誤っています.
+アイコンにマウスカーソルをあてがうと, 下記のように簡単な説明が出ます.
 
 ![](pics/ConnectionError.png)
 
-��, ���́u�ȒP�Ȑ����v�̃o���G�[�V�����ł���, ���L�̂悤�ɂȂ��Ă��܂�.
+で, この「簡単な説明」のバリエーションですが, 下記のようになっています.
 
-| ���� | �Ӗ� |
+| 文言 | 意味 |
 | --- | --- |
-| `Connection error: Check server name.`| �w�肳�ꂽ�T�[�o�[�ɂȂ���܂���.<br>�T�[�o�[�������������������Ă�������. |
-| `POP error: Check user name or password.`| �ʐM�����ۂ���܂���.<br>���[�U�[���ƃp�X���[�h�����������������Ă�������. |
+| `Connection error: Check server name.`| 指定されたサーバーにつながりません.<br>サーバー名が正しいか見直してください. |
+| `POP error: Check user name or password.`| 通信が拒否されました.<br>ユーザー名とパスワードが正しいか見直してください. |
 
-��L�̂����ꂩ�Ɉ������������ꍇ�͐ݒ���������܂�.
-�������ɂ�, �Ԃ��A�C�R�����}�E�X�ŉE�N���b�N���܂�.
-�����, [�`��](#�^�p)�ŏЉ���悤�ȃ|�b�v�A�b�v���j���[���o�Ă��܂�.
+上記のいずれかに引っかかった場合は設定を見直します.
+見直すには, 赤いアイコンをマウスで右クリックします.
+すると, [冒頭](#運用)で紹介したようなポップアップメニューが出てきます.
 
-`Accounts...` ��I�ԂƍĒ���ł��܂�.
-( `Exit` ��I�ԂƂ�����߂܂�. )
+`Accounts...` を選ぶと再挑戦できます.
+( `Exit` を選ぶとあきらめます. )
 
-������, ���L�̂悤�ɂȂ񂾂��A�C�R�����ڗ����Ȃ��D�F�ɂȂ��Ă��܂���
-( ���̑O�ɂ��傱���ƃA�C�R�������F���Ȃ����悤�ȋC������ ) ���Ȃ�.
+そして, 下記のようになんだかアイコンが目立たない灰色になってしまった
+( その前にちょこっとアイコンが黄色くなったような気がする ) あなた.
 
 ![](pics/Empty.png)
 
-���߂łƂ��������܂�! ���Ȃ��̓��͂Ɍ��͂Ȃ������̂ł�.
-���̊D�F��, �����������ɂȂ��Ă��邱�Ƃ��������̂ł͂���܂���.
-�T�[�o�[�ƒʐM��������, �V�����[�������Ă��Ȃ����Ƃ��m�F���ꂽ�Ƃ����󋵂��������̂ł�.
+おめでとうございます! あなたの入力に誤りはなかったのです.
+その灰色は, 何かが無効になっていることを示すものではありません.
+サーバーと通信した結果, 新着メールが来ていないことが確認されたという状況を示すものです.
 
-�A�C�R���̃J���[�o���G�[�V�����Ƃ��̎����Ӗ������L�ɋ����Ă����܂�.
+アイコンのカラーバリエーションとその示す意味を下記に挙げておきます.
 
-| �C���[�W | �Ӗ� | ��, �ǂ������? |
+| イメージ | 意味 | で, どうすれば? |
 | :-: | --- | --- |
-| ![](pics/Icon.White.png)  | �A�J�E���g���ݒ� | ���[���A�J�E���g��ݒ肵�܂��傤. |
-| ![](pics/Icon.Yellow.png) | �T�[�o�[�ƒʐM�� | �ق��Č����܂��傤. |
-| ![](pics/Icon.Grey.png)   | �V�����[���Ȃ�   | ���[��������̂��y���݂ɑ҂��܂��傤. |
-| ![](pics/Icon.Green.png)  | �V�����[������   | ���[���[���N�����ă��[����ǂ݂܂��傤. |
-| ![](pics/Icon.Red.png)    | �ʐM�G���[ | �A�J�E���g��l�b�g���[�N�̐ݒ���������܂��傤. |
+| ![](pics/Icon.White.png)  | アカウント未設定 | メールアカウントを設定しましょう. |
+| ![](pics/Icon.Yellow.png) | サーバーと通信中 | 黙って見守りましょう. |
+| ![](pics/Icon.Grey.png)   | 新着メールなし   | メールが来るのを楽しみに待ちましょう. |
+| ![](pics/Icon.Green.png)  | 新着メールあり   | メーラーを起動してメールを読みましょう. |
+| ![](pics/Icon.Red.png)    | 通信エラー | アカウントやネットワークの設定を見直しましょう. |
 
- [Accounts](#accounts) �̐ݒ肪��������������, ����
- [Filter](#filter)�ɐi�݂܂�.
+ [Accounts](#accounts) の設定が無事完了したら, 次は
+ [Filter](#filter)に進みます.
 
 ### Filter
 
-���[���̒ʒm���ł���悤�ɂȂ������Ƃ��m�F�ł�����, ���̓X�p�����[���΍�ł�.<br>
-�uFilter�v�Ƃ�����������̂Ȃ����j���[���ŕ\����Ă��܂���,
+メールの通知ができるようになったことを確認できたら, 次はスパムメール対策です.<br>
+「Filter」という当たり障りのないメニュー名で表されていますが,
 
-* �u�����������[���̓X�p�����[���ł���v�Ƃ����u��ʁv
-* �u�����������[���͂ǂ����X�p�����[���ɈႢ�Ȃ��v�Ƃ����u���ʁv
+* 「こういうメールはスパムメールである」という「区別」
+* 「こういうメールはどうせスパムメールに違いない」という「差別」
 
-�Ƃ����u�X�p�����[�����ǂ����̔�������v�����Ȃ��̌�F�֌W�Ɋ�Â��Đݒ肷�郁�j���[���ڂł�.
+という「スパムメールかどうかの判定条件」をあなたの交友関係に基づいて設定するメニュー項目です.
 
-�A�C�R�����E�N���b�N�����Ƃ��Ɍ����
-[�|�b�v�A�b�v���j���[](#�^�p)���� `Filter...` ��I�Ԃ�,
-�^�u���̃_�C�A���O�������܂�.
-�^�u���N���b�N����Ɛݒ荀�ڂ��I�ׂ܂�.
-`Filter` �ɂ͈ȉ��̍��ڂ�����܂�.
+アイコンを右クリックしたときに現れる
+[ポップアップメニュー](#運用)から `Filter...` を選ぶと,
+タブ式のダイアログが現われます.
+タブをクリックすると設定項目が選べます.
+`Filter` には以下の項目があります.
 
-| �ݒ荀�� | �ݒ���e |
+| 設定項目 | 設定内容 |
 | --- | --- |
-| [`Authentication`](#authentication)	| �F�،��ʂɂ����		|
-| [`Coding`](#coding)			| �����R�[�h�ɂ����		|
-| [`Domain`](#domain)			| �h���C�����ɂ�鍷��		|
-| [`Name`](#namen)			| ���`�ɂ����			|
-| [`Sender`](#sender)			| ���M�҂̐U�镑���ɂ����	|
-| [`Time Zone`](#time-zone)		| �^�C���]�[���ɂ�鍷��		|
-| [`Whitelist`](#whitelist)		| �u�z���C�g���X�g�v�ɂ��~��	|
+| [`Authentication`](#authentication)	| 認証結果による区別		|
+| [`Coding`](#coding)			| 文字コードによる区別		|
+| [`Domain`](#domain)			| ドメイン名による差別		|
+| [`Name`](#namen)			| 名義による区別			|
+| [`Sender`](#sender)			| 送信者の振る舞いによる区別	|
+| [`Time Zone`](#time-zone)		| タイムゾーンによる差別		|
+| [`Whitelist`](#whitelist)		| 「ホワイトリスト」による救済	|
 
-�����ꂩ�̐ݒ��ύX�����ꍇ��,
-���̐V���Ȑݒ�Ń��O ( `.eml` ) ���ĕ]�����Ă݂邩�₢�Ԃ���܂�.
-����� `Yes` �Ɠ������,
-���ܒ~�ς��Ă��郍�O ( `.eml` ) �S�Ă��ĕ]�����܂�.
-���X���Ԃ�������܂���, ���̌���,
-���O ( `.txt` ) ���� `Discard-Reason:` ���ǂ��ς�邩�����̂�����͎����Ă݂�̂������ł��傤.
-�uFilter �ݒ肪�Â������v or �u���߂����v�̔��f�ޗ��ɂȂ�܂�.
+いずれかの設定を変更した場合は,
+その新たな設定でログ ( `.eml` ) を再評価してみるか問い返されます.
+これに `Yes` と答えると,
+いま蓄積しているログ ( `.eml` ) 全てを再評価します.
+少々時間がかかりますが, この結果,
+ログ ( `.txt` ) 中の `Discard-Reason:` がどう変わるか興味のある方は試してみるのもいいでしょう.
+「Filter 設定が甘かった」 or 「やり過ぎた」の判断材料になります.
 
-�ȉ�, ���ꂼ��̐ݒ荀�ڂɂ��Ă̐����ł�.
+以下, それぞれの設定項目についての説明です.
 
 #### Authentication
 
 ![](pics/Filter.Authentication.png)
 
-[�F��](https://ja.wikipedia.org/wiki/���M�h���C���F��)
+[認証](https://ja.wikipedia.org/wiki/送信ドメイン認証)
 ( [Authentication](https://en.wikipedia.org/wiki/Email_authentication) )
-�̌��ʂɏ]����, �͂������[�����u��ʁv���܂�.
+の結果に従って, 届いたメールを「区別」します.
 
-�F�؂̕����ɂ�����������܂���,
-�ǂ̔F�،��ʂ������炳��邩�͂��_��̃v���o�C�_�[�ɂ���ĈقȂ�܂�.
-���_��̃v���o�C�_�[���T�|�[�g���Ă��Ȃ��F�ؕ�����, ��ʏ�͔����\������Ă��܂�.
+認証の方式にもいくつかありますが,
+どの認証結果がもたらされるかはご契約のプロバイダーによって異なります.
+ご契約のプロバイダーがサポートしていない認証方式は, 画面上は薄く表示されています.
 
-�͂������[���̃��[���w�b�_�[�������, �F�،��ʂ�����܂�.
-���L�̂悤�� `Authentication-Results:` �Ƃ�����߂�����͂��ł�.
+届いたメールのメールヘッダーを見ると, 認証結果が判ります.
+下記のような `Authentication-Results:` という一節があるはずです.
 
 ```
 Authentication-Results: mx.provider.ne.jp;
@@ -236,313 +236,313 @@ Authentication-Results: mx.provider.ne.jp;
  sender-id=pass header.From=pochi.the.cat@provider.ne.jp
 ```
 
-���̗�̏ꍇ, ��M�ґ��̃v���o�C�_�[���񋟂��Ă���F�؂�,
-[SPF](https://ja.wikipedia.org/wiki/Sender_Policy_Framework) ��
-[Sender-ID](https://ja.wikipedia.org/wiki/Sender_ID) ��2�̂悤�ł�.
-( �t�Ɍ����� [DKIM](https://ja.wikipedia.org/wiki/DKIM) ��
-[DMARC](https://ja.wikipedia.org/wiki/DMARC) �̓T�|�[�g����Ă��Ȃ��悤�ł�. )
-`Authentication-Results:` �̓v���o�C�_�[���t���Ă�����Ȃ̂�,
-���M�҂ɂ���ċU���ł��܂���,
-�q�ϓI�ɐM��������ł�.
+この例の場合, 受信者側のプロバイダーが提供している認証は,
+[SPF](https://ja.wikipedia.org/wiki/Sender_Policy_Framework) と
+[Sender-ID](https://ja.wikipedia.org/wiki/Sender_ID) の2つのようです.
+( 逆に言えば [DKIM](https://ja.wikipedia.org/wiki/DKIM) と
+[DMARC](https://ja.wikipedia.org/wiki/DMARC) はサポートされていないようです. )
+`Authentication-Results:` はプロバイダーが付けている情報なので,
+送信者によって偽造できません,
+客観的に信じられる情報です.
 
-������, ��L�̗�ł�
-`spf=pass` �� `sender-id=pass` �ƂȂ��Ă���̂�, SPF �� Sender-ID �̗����� pass ���Ă��܂�.
-�Ȃ̂�,
-���̃��[���� `pochi.the.cat@provider.ne.jp` ���`�̑��M�҂� `pochi.the.cat@provider.ne.jp` ���瑗�������̂ɊԈႢ�Ȃ���,
-�v���o�C�_�[���F�؍ς݂Ƃ������Ƃł�.<br>
-<sub>(�u�Ȃɓ�����O�̂��ƌ����Ă�?�v�Ǝv������������낤���Ƒ����܂���,
-���̒��ɂ́u���[���z�M��s�Ǝҁv�Ƃ������̂�������,
-�u���`�v�̓N���C�A���g��ƂȂ̂Ɏ��ۂ́u���M�ҁv�͑�s�Ǝ҂Ƃ������[���������̂ł�.
-�������ŃX�p�����[�����ǂ����̌��ɂ߂��ʓ|�ɂȂ�܂���. )</sub>
+そして, 上記の例では
+`spf=pass` と `sender-id=pass` となっているので, SPF と Sender-ID の両方が pass しています.
+なので,
+このメールは `pochi.the.cat@provider.ne.jp` 名義の送信者が `pochi.the.cat@provider.ne.jp` から送ったものに間違いないと,
+プロバイダーが認証済みということです.<br>
+<sub>(「なに当たり前のこと言ってんだ?」と思われる向きもあろうかと存じますが,
+世の中には「メール配信代行業者」というものがあって,
+「名義」はクライアント企業なのに実際の「送信者」は代行業者というメールも多いのです.
+おかげでスパムメールかどうかの見極めも面倒になりました. )</sub>
 
-��, ��̐ݒ��ʂ̗�ł�
+で, 上の設定画面の例では
 
-* 2�ȏ�̔F�؂� pass ���Ă��Ȃ������ꍇ��, ���[����j������
+* 2つ以上の認証が pass していなかった場合は, メールを破棄する
 
-�ƂȂ��Ă��܂�.
-( �t�Ɍ����΁upass �������Ȃ����������̂� 1�܂Łv�Ƃ������Ƃł�. )
+となっています.
+( 逆に言えば「pass しそこないが許されるのは 1つまで」ということです. )
 
-��L�̃��[���̗�ł́upass �������Ȃ����F�؁v�� `0` ( 2�Ƃ� pass ���Ă��� ) �Ȃ̂�,
-���̃��[���͔j�����ꂸ�͂��܂�.
+上記のメールの例では「pass しそこなった認証」は `0` ( 2つとも pass している ) なので,
+このメールは破棄されず届きます.
 
-��L�̉�ʂɂ���v���o�C�_�[�̗�ł� DKIM �� DMARC �͒񋟂���Ă��܂���,
-�����́upass �������Ȃ����F�؁v�ɃJ�E���g����܂���.
+上記の画面にあるプロバイダーの例では DKIM や DMARC は提供されていませんが,
+それらは「pass しそこなった認証」にカウントされません.
 
-�Ƃ����,
-�upass �������Ȃ����������̂� 1�܂Łv�ɑ΂���
-�u1�ł��Ђ�����������_������?�v
-�Ǝv������������낤���Ƃ͑����܂���,
-�����ł���, �}�W��.
-[1���炢�����������Ă��܂����M��](Examples.md#authentication-results-���S�Ă�-pass-���Ă��Ȃ������ȃ��[���̗�)���Ă̂�.<br>
-<sup>( ���[���z�M���s�Ǝ҂ɗ���ł����ƂƂ��ɑ�����ł�.
-��s�Ǝ҂̎d�����e���̂�, �N���C�A���g�̋��͂��s�\���Ȃ̂��͑����܂���. )</sup>
+ところで,
+「pass しそこないが許されるのは 1つまで」に対して
+「1つでもひっかかったらダメだろ?」
+と思われる向きもあろうかとは存じますが,
+居るんですよ, マジで.
+[1つぐらい引っかかってしまう送信者](Examples.md#authentication-results-が全ては-pass-していない正当なメールの例)ってのが.<br>
+<sup>( メール配信を代行業者に頼んでいる企業とかに多いんです.
+代行業者の仕事が粗いのか, クライアントの協力が不十分なのかは存じませんが. )</sup>
 
-������S���n�l�Ă��܂��Ă̓_���Ȃ̂�,
-�u2�ȏ� pass ���Ȃ�������v�Ƃ�����₱������Ŕ��肵�Ă��܂�.
-�����Ă��́u2�v��ݒ��̃f�t�H���g�l ( �����ݒ肵�Ȃ��Ă��ŏ������炻���Ȃ��Ă��� ) �Ƃ��Ă��܂�.
-���̃f�t�H���g�l�̃`���C�X��
+それらを全部ハネてしまってはダメなので,
+「2つ以上 pass しなかったら」というややこしい基準で判定しています.
+そしてこの「2つ」を設定上のデフォルト値 ( 何も設定しなくても最初っからそうなっている ) としています.
+このデフォルト値のチョイスは
 
-* [���̃v���o�C�_�[��2�ȏ�̔F�،��ʂ�t���Ă���.](https://www.dekyo.or.jp/soudan/contents/auth/index.html)
-* �ǂ�ȑ��M�� <sup>( ��s�Ǝ� )</sup> �ł� pass �������Ȃ��̂͂������� 1�܂�.
+* [大抵のプロバイダーは2つ以上の認証結果を付けている.](https://www.dekyo.or.jp/soudan/contents/auth/index.html)
+* どんな送信者 <sup>( 代行業者 )</sup> でも pass しそこなうのはせいぜい 1つまで.
 
-�Ƃ������R�ɂ����̂ł�.
+という理由によるものです.
 
-�Ƃ���ł��́upass ���Ă��Ȃ��v�Ƃ������񂵂Ȍ������ł���,
-`pass` �ȊO�ɂ����L�̃o���G�[�V����������̂�, �u`pass` �ȊO�̌��ʁv�Ƃ����Ӗ��Ŏg���Ă��܂�.
+ところでこの「pass していない」という遠回しな言い方ですが,
+`pass` 以外にも下記のバリエーションがあるので, 「`pass` 以外の結果」という意味で使っています.
 
-| ���ʂ�\�������� | �Ӗ� |
+| 結果を表す文字列 | 意味 |
 | --- | --- |
-| `pass` | �������F�؂��ꂽ |
-| `fail` | �U������Ă��� |
-| `hardfail` | �U������Ă��� |
-| `softfail` | �U������Ă��邩�� |
-| `temperror` | �ꎞ�I�ȔF�؃G���[ |
-| `permerror` | �p���I�ȔF�؃G���[ |
-| `neutral` | �F�،��ʂ�����J |
-| `none` | �F�،��ʂ��Ȃ� |
+| `pass` | 正しく認証された |
+| `fail` | 偽造されている |
+| `hardfail` | 偽造されている |
+| `softfail` | 偽造されているかも |
+| `temperror` | 一時的な認証エラー |
+| `permerror` | 継続的な認証エラー |
+| `neutral` | 認証結果が非公開 |
+| `none` | 認証結果がない |
 
-[`pass` �ȊO�̌��ʂ��ǂ������ׂ���](https://salt.iajapan.org/wpmu/anti_spam/admin/tech/explanation/spf/#60)�ɂ��Ă�,
-�F�X�Ɖ��߂̕�������Ƃ����̂� RFC �I�X�^���X�̂悤�ł���,
-�u�X�p���΍�v�ł���{�A�v���Ƃ��Ắu`pass` �ȊO�̓_���v�ƌ��߂��Ă��܂�.
-( ������, �f�t�H���g�ł́u�_���ł� 1�܂ł͌������v�ƂȂ��Ă��܂���. )
+[`pass` 以外の結果をどう扱うべきか](https://salt.iajapan.org/wpmu/anti_spam/admin/tech/explanation/spf/#60)については,
+色々と解釈の幅があるというのが RFC 的スタンスのようですが,
+「スパム対策」である本アプリとしては「`pass` 以外はダメ」と決めつけています.
+( ただし, デフォルトでは「ダメでも 1つまでは見逃す」となっていますが. )
 
-�Ȃ�, �F�X���߂̕��̂���u`pass` �ȊO�v�ł���,
-���̂��� `fail` �� `hardfail` �͂قڊԈႢ�Ȃ��u�U���v���������̂Ȃ̂�,
-�����Ɋւ��Ă� 1�ł�����΃A�E�g�Ƃ��Ĉ����Ă��܂�.
-�u1�܂ł̓Z�[�t�v�Ƃ��������ʂ邢����͂��܂���.
+なお, 色々解釈の幅のある「`pass` 以外」ですが,
+そのうち `fail` と `hardfail` はほぼ間違いなく「偽造」を示すものなので,
+これらに関しては 1つでもあればアウトとして扱っています.
+「1つまではセーフ」といった生ぬるい判定はしません.
 
-���̔F�؂ɂ��X�p�����[���́u��ʁv��, ����̐���ς��Ȃ������Ȃ��̂�, �u���ʁv�ɂ͂�����܂���.
-�v���o�C�_�[�ɂ���Ă̓T�[�r�X�Ƃ��Ē񋟂��Ă���Ă���Ƃ��������Ǝv���܂�.
-����, �R�������邾���ł��X�p�����[���������ƌ���܂�.
+この認証によるスパムメールの「区別」は, 何らの先入観もない正当なもので, 「差別」にはあたりません.
+プロバイダーによってはサービスとして提供してくれているところもあると思います.
+実際, コレがあるだけでもスパムメールがぐっと減ります.
 
-��, �u����v�����ł�. ���̔F�؂����ł̓n�l���Ȃ��X�p�����[���Ƃ����̂����݂��܂�.
-����œ��A�v���ł�, �ǉ��́u��ʁv��, ����ɓ��ݍ��񂾁u���ʁv��p�ӂ��Ă��܂�.
+が, 「減る」だけです. この認証だけではハネられないスパムメールというのも存在します.
+それで当アプリでは, 追加の「区別」や, さらに踏み込んだ「差別」を用意しています.
 
 
 #### Coding
 
 ![](pics/Filter.Coding.png)
 
-�͂������[���̕����R�[�h�ɂ���ă��[�����u��ʁv���܂�.
+届いたメールの文字コードによってメールを「区別」します.
 
-* �ǂ߂Ȃ������Z�b�g<br>
-Windows&reg; ���ۗL����f�[�^�x�[�X�ɂȂ������Z�b�g�ŏ�����Ă��郁�[����j�����܂�.<br>
-���̃f�[�^�x�[�X��, �ȉ��� registry �̔z���ɂ�����̂��Ӗ����܂�.<br>
+* 読めない文字セット<br>
+Windows&reg; が保有するデータベースにない文字セットで書かれているメールを破棄します.<br>
+このデータベースは, 以下の registry の配下にあるものを意味します.<br>
 `HKEY_CLASSES_ROOT\MIME\Database\Charset\`<br>
-<sub>( ���{�Ɍ����ẴX�p�����[����
-[GB 2312](https://ja.wikipedia.org/wiki/GB_2312) �ŏ����Ă��邤�����肳�������ɂ͋���̂ł���,
-�����������[���͑��̏����ł��n�l����ꍇ�΂��肾�����̂�,
-���ɕ����Z�b�g�Łu���ʁv����@�\�݂͐��Ă��܂���.
-���̏����Ɉ���������̂�, �z���g�ɉ����̊ԈႢ�̂Ƃ������ł�. )<sub>
+<sub>( 日本に向けてのスパムメールを
+[GB 2312](https://ja.wikipedia.org/wiki/GB_2312) で書いてくるうっかりさんも居るには居るのですが,
+こういうメールは他の条件でもハネられる場合ばかりだったので,
+特に文字セットで「差別」する機能は設けていません.
+この条件に引っかかるのは, ホントに何かの間違いのときだけです. )<sub>
 
-* �^�킵�����䕶��<br>
-[UNICODE �̐��䕶��](https://en.wikipedia.org/wiki/Unicode_control_characters)
-�����ߍ��܂�Ă��郁�[����j�����܂�.<br>
-�ǂݎ�Ɏ��ۂƂ͈قȂ镶�����\�����Č�������, �p�^�[���������瓦��邽�߂Ɏg�p���ꂽ��, ��,
-�������������R�[�h�����ߍ��܂�Ă��郁�[���ɂ̓��N�Ȃ��̂�����܂���.<br>
-<sub>( ������, �E���獶�ɏ�������̏ꍇ��, �������ʂɁu�E���獶�ɓǂ�łˁB�v�Ƃ������䕶���������Ă��邱�Ƃ�����̂�,
-������������Ƃ��t�������̂�����͂���&#x2611;���O���Ă�������. )</sub>
+* 疑わしい制御文字<br>
+[UNICODE の制御文字](https://en.wikipedia.org/wiki/Unicode_control_characters)
+が埋め込まれているメールを破棄します.<br>
+読み手に実際とは異なる文字列を表示して見せたり, パターン検索から逃れるために使用されたり, と,
+こういう文字コードが埋め込まれているメールにはロクなものがありません.<br>
+<sub>( ただし, 右から左に書く言語の場合は, ごく普通に「右から左に読んでね。」という制御文字が入っていることがあるので,
+こういう言語とお付き合いのある方はこの&#x2611;を外してください. )</sub>
 
-* ���I�ȕ����R�[�h<br>
-���ߍ��܂ꂽ�����N��Ȃǂ� ASCII �R�[�h�ł͂Ȃ� UNICODE �̎������������ߍ��܂ꂽ���[����j�����܂�.<br>
-���Ƃ��� �g.&#x24B8;&#x24C4;&#x24C2;�h �Ƃ��ł�.
-�g.&#x24B8;&#x24C4;&#x24C2;�h �� �g.com�h �ƑP�ӂɉ��߂��Ă���郁�[���[�ł�����̂ł�����?
-���Ƃ����, �������������R�[�h�𖄂ߍ��񂾃��[���Ƃ����̂�, ���̑P�ӂɂ�����Ńp�^�[���������瓦��邽�߂̂��̂ł��傤.
-�������������R�[�h�����ߍ��܂�Ă��郁�[���ɂ̓��N�Ȃ��̂�����܂���.<br>
-<sub>( �Ђ���Ƃ����,
-�u���ʂɏ������ڗ�����v�Ƃ������R�ł킴�킴�������������R�[�h���g���t�@���L�[�ȓX�܂����邩������܂���.
-���������t�@���L�[�ȓX�܂Ƃ��t�������̂�����͂���&#x2611;���O���Ă�������. )</sub>
+* 回避的な文字コード<br>
+埋め込まれたリンク先などに ASCII コードではなく UNICODE の似た文字が埋め込まれたメールを破棄します.<br>
+たとえば “.&#x24B8;&#x24C4;&#x24C2;” とかです.
+“.&#x24B8;&#x24C4;&#x24C2;” を “.com” と善意に解釈してくれるメーラーでもあるのですかね?
+だとすると, こうした文字コードを埋め込んだメールというのは, その善意につけ込んでパターン検索から逃れるためのものでしょう.
+こういう文字コードが埋め込まれているメールにはロクなものがありません.<br>
+<sub>( ひょっとすると,
+「普通に書くより目立つから」という理由でわざわざこういう文字コードを使うファンキーな店舗もあるかもしれません.
+そういうファンキーな店舗とお付き合いのある方はこの&#x2611;を外してください. )</sub>
 
-�f�t�H���g��, 3�S�� ON �ɂ��Ă��܂�.
+デフォルトで, 3つ全て ON にしています.
 
 
 #### Domain
 
 ![](pics/Filter.Domain.png)
 
-�͂������[���̔��M��[�h���C����](https://ja.wikipedia.org/wiki/�h���C����)�ɂ���ă��[�����u���ʁv���܂�.
+届いたメールの発信元[ドメイン名](https://ja.wikipedia.org/wiki/ドメイン名)によってメールを「差別」します.
 
-�{�A�v���ł�,
-�͂������[����[�g�b�v���x���h���C��](https://ja.wikipedia.org/wiki/�g�b�v���x���h���C��)���L�^�Ɏc���Ă��܂�.
-�������̉�ʂ̗�̂悤�Ƀ��X�g�ɕ\����,
-&#x2611;��t�����h���C�����u�v��Ȃ����[���̔��M���v�Ƃ��āu���ʁv��,
-�ȍ~, ���̃h���C���ɑ����鑗�M�҂���̃��[����S�Ĕj�����܂�.
+本アプリでは,
+届いたメールの[トップレベルドメイン](https://ja.wikipedia.org/wiki/トップレベルドメイン)を記録に残しています.
+それを上の画面の例のようにリストに表示し,
+&#x2611;を付けたドメインを「要らないメールの発信元」として「差別」し,
+以降, そのドメインに属する送信者からのメールを全て破棄します.
 
-�܂�Łu[�N���^�l�͊F������](https://ja.wikipedia.org/wiki/�G�s���j�f�X�̃p���h�b�N�X)�v�Ƃ�����������M����,
-�N���^����̒ʐM�����ׂĎՒf���Ă��܂��悤�Ȃ����ł�.
-������,
-�N���^�Ƃ̌𗬂��S���Ȃ�����̐l�X�ɂƂ��Ă�,
-�u����Ȏ��ɃN���^����̃��[����������A����̓X�p���ɈႢ�Ȃ��B�v�Ƃ������f���A���ł��傤.
+まるで「[クレタ人は皆うそつき](https://ja.wikipedia.org/wiki/エピメニデスのパラドックス)」という言い分を信じて,
+クレタからの通信をすべて遮断してしまうようなやり方です.
+しかし,
+クレタとの交流が全くない立場の人々にとっては,
+「そんな私にクレタからのメールが来たら、それはスパムに違いない。」という判断もアリでしょう.
 
-�l�����Ƃ��Ăǂ����Ǝv���܂����c�c, �߂������Ƃ�, �R�������\������ł�.
+考え方としてどうかと思いますが……, 悲しいことに, コレが結構効くんです.
 
-�Ȃ�, ���́u���ʁv�����h���C�����ǂ����̃`�F�b�N�ł���,
-���[���̑��M���A�h���X�݂̂Ȃ炸, ���[���{���ɖ��ߍ��܂�Ă��郊���N�ɑ΂��Ă��s���Ă��܂�.
-�Ȃ̂�, �u���o���Ȃ����v����̑��M�𑕂����u���o�����ւ̃����N�v�����ߍ��܂ꂽ���[�������l�Ƀn�l�܂�.
+なお, この「差別」したドメインかどうかのチェックですが,
+メールの送信元アドレスのみならず, メール本文に埋め込まれているリンクに対しても行っています.
+なので, 「ヤバくない国」からの送信を装った「ヤバい国へのリンク」が埋め込まれたメールも同様にハネます.
 
-�Ƃ����, �����ł́u�h���C���v�Ɛ������Ă��܂���,
-���̂Ƃ��둗�M�����[���A�h���X�⃊���N��A�h���X��,
-���X�g���&#x2611;���ꂽ�����񂪌����v���邩�ۂ� ( �E�����ׂē������ǂ��� ) �Ŕ��f���Ă���ɂ����܂���.
+ところで, ここでは「ドメイン」と説明していますが,
+実のところ送信元メールアドレスやリンク先アドレスと,
+リスト上で&#x2611;された文字列が後方一致するか否か ( 右から比べて同じかどうか ) で判断しているにすぎません.
 
-�Ȃ̂�,
-�u�V�K�h���C���v�Ƃ��ē���̑��M���̃��[���A�h���X�������Ă�����,
-���̃��[���A�h���X���痈�����[�������l�Ƀn�l�܂�.
+なので,
+「新規ドメイン」として特定の送信元のメールアドレスを加えておくと,
+そのメールアドレスから来たメールも同様にハネます.
 
 ![](pics/Filter.Domain2.png)
 
-��̗�̂悤��, �n�l��������̃��[���A�h���X�� `New Domain:` �ɓ��͂��Ă��� `Add` ��������,<br>
-���̐}�̂悤�Ƀ��X�g�ɓ���܂�.
+上の例のように, ハネたい相手のメールアドレスを `New Domain:` に入力してから `Add` を押すと,<br>
+下の図のようにリストに入ります.
 
 ![](pics/Filter.Domain3.png)
 
-���̒i�K�ł̓��X�g�ɓ��邾���Ȃ̂�,
-�z���g�Ƀn�l��ꍇ��&#x2611;������̂�Y��Ȃ��悤�ɂ��܂��傤.
+この段階ではリストに入るだけなので,
+ホントにハネる場合は&#x2611;を入れるのを忘れないようにしましょう.
 
-�Ƃ������Ƃ�, �h���C�����Ώۂɂ��惁�[���A�h���X���Ώۂɂ���,
-������́u[�u���b�N���X�g](https://ja.wikipedia.org/wiki/�u���b�N���X�g)�v�Ƃ������ƂɂȂ�܂�.
+ということで, ドメインが対象にせよメールアドレスが対象にせよ,
+事実上の「[ブラックリスト](https://ja.wikipedia.org/wiki/ブラックリスト)」ということになります.
 
 
 #### Name
 
 ![](pics/Filter.Name.png)
 
-�͂������[���̖��`�ɂ���ă��[�����u��ʁv���܂�.
+届いたメールの名義によってメールを「区別」します.
 
-���́u���`�v�Ƃ�,
-���[���w�b�_�[�� `From:` ���ɏ����Ă���u���`�v�̂��Ƃ�,
-`<` �� `>` �ň͂܂ꂽ���M�҂̃��[���A�h���X��,
-���̑O (��) �ɒu����Ă��� ( �u����Ă��Ȃ��ꍇ���܂�ɂ���܂��� ) Alias ( �ʖ� ) �̃y�A�ō\������Ă��܂�.
+この「名義」とは,
+メールヘッダーの `From:` 欄に書いてある「名義」のことで,
+`<` と `>` で囲まれた送信者のメールアドレスと,
+その前 (左) に置かれている ( 置かれていない場合もまれにありますが ) Alias ( 別名 ) のペアで構成されています.
 
-�Ⴆ��,
+例えば,
 
 `From: "Amazon.co.jp" <account-update@amazon.co.jp>`
 
-�Ƃ�����ł�:
+という例では:
 
-`"Amazon.co.jp"` �� Alias ��, `account-update@amazon.co.jp` �����[���A�h���X�ł�.
+`"Amazon.co.jp"` が Alias で, `account-update@amazon.co.jp` がメールアドレスです.
 
-�X�p�����[���ł͂قڑS�Ă̗�ł��� Alias ���x���Ă��܂�.
-�}���I�ɂ�
+スパムメールではほぼ全ての例でこの Alias を騙っています.
+図式的には
 
 `Amazon.com <phishing.com>`
 
-�Ƃ����������ɂȂ��Ă��܂�.
+というかたちになっています.
 
-���� Alias �Ŏ�M�҂��x�����Ƃ��Ă���킯�ł�.
-����, ���̂قڂ��ׂĂ̗�Ń��[���A�h���X�͖{�Ƃ̂��̂Ƃ͈قȂ郁�[���A�h���X�ɂȂ��Ă��܂�.
-���[���A�h���X�܂Ŗ{�Ƃ��p�N���, [Authentication](#authentication) �ň���������₷������ł��傤.
+この Alias で受信者を騙そうとしているわけです.
+ただ, そのほぼすべての例でメールアドレスは本家のものとは異なるメールアドレスになっています.
+メールアドレスまで本家をパクると, [Authentication](#authentication) で引っかかりやすいからでしょう.
 
 ![](pics/Filter.Name2.png)
 
-��, ���� [Name](#name) �Ŗ{�Ƃ̌����� Alias �ƌ����ȃ��[���A�h���X�̃y�A��o�^���Ă�����,
-Alias ���x�������[����������, ���[���A�h���X���o�^���Ă�������Ȃ��̂ƈقȂ�̂�,
-�X�p�����[���Ɣ��f���ăn�l��, �Ƃ����킯�ł�.
+で, この [Name](#name) で本家の公式な Alias と公式なメールアドレスのペアを登録しておいて,
+Alias を騙ったメールが来たら, メールアドレスが登録してある公式なものと異なるので,
+スパムメールと判断してハネる, というわけです.
 
-��}�̂悤�� `Alias:` ���� `Domain:` ����,
-���ꂼ��R�������� Alias �Ɩ{�Ƃ̃��[���A�h���X�̃h���C�� ( `@` �̌�� ) ���y�A�œ��͂��܂�.
-��}�̂悤�ɂ��ꂼ��Ɋ܂܂��u�ꕔ�̒P��v�ł��\���܂���.
-���̏ꍇ�ł�����Ȃ���x��̃��[�����n�l����ʂ����҂ł��܂�.
+上図のように `Alias:` 欄と `Domain:` 欄に,
+それぞれ由緒正しい Alias と本家のメールアドレスのドメイン ( `@` の後ろ ) をペアで入力します.
+上図のようにそれぞれに含まれる「一部の単語」でも構いません.
+その場合でもそれなりに騙りのメールをハネる効果が期待できます.
 
- Alias ( �̈ꕔ ) �ƃ��[���A�h���X ( �̈ꕔ ) ����͂��ς񂾂�,
-`Add` �{�^���������܂�.
+ Alias ( の一部 ) とメールアドレス ( の一部 ) を入力が済んだら,
+`Add` ボタンを押します.
 
 ![](pics/Filter.Name3.png)
 
-`Add` �{�^����������, ��}�̂悤�ɓ��͂����y�A�����X�g�ɓo�^����܂�.
+`Add` ボタンを押すと, 上図のように入力したペアがリストに登録されます.
 
-���̓~�X����������, ���X�g��̊Y���s��I��� `Delete` �{�^���������܂�.
+入力ミスがあったら, リスト上の該当行を選んで `Delete` ボタンを押します.
 
-�\��ʂ�̓��͂��ς񂾂�, `OK` �{�^���������܂��傤. ����œo�^�����ł�.
+予定通りの入力が済んだら, `OK` ボタンを押しましょう. それで登録完了です.
 
 ![](pics/Filter.Name4.png)
 
-�h���C���̓��͂� `*` �� `?` ���܂܂�Ă����,
-������u[���K�\��](https://ja.wikipedia.org/wiki/���K�\��#%E5���p�I����)�v�Ƃ݂Ȃ�,
-�����Ă������[����������Ă���h���C�����ƈȉ��̂悤�ɏƍ����܂�.
+ドメインの入力に `*` や `?` が含まれていると,
+いわゆる「[正規表現](https://ja.wikipedia.org/wiki/正規表現#%E5実用的説明)」とみなし,
+送られてきたメールが名乗っているドメイン名と以下のように照合します.
 
-| �L�����N�^�[ | �ƍ����@ |
+| キャラクター | 照合方法 |
 | --- | --- |
-| `*` | 0 �����ȏ�̔C�ӂ̕�����ƍ��v |
-| `?` | 0 �܂��� 1 �����̔C�ӂ̕����ƍ��v |
+| `*` | 0 文字以上の任意の文字列と合致 |
+| `?` | 0 または 1 文字の任意の文字と合致 |
 
-�h���C���̓��͂� `.` ���܂܂�Ă����,
-�u�ꕔ�̒P��v�ł͂Ȃ��u�h���C�����̉E���v���o�^����Ă�����̂Ɣ��f��,
-�����Ă������[����������Ă���h���C�����̉E���ƈ�v���邩�𔻒肵�܂�.
-���\���͂��ʓ|�ł���, �X�p�����n�l�鐸�x�͏オ��܂�.
+ドメインの入力に `.` が含まれていると,
+「一部の単語」ではなく「ドメイン名の右側」が登録されているものと判断し,
+送られてきたメールが名乗っているドメイン名の右側と一致するかを判定します.
+結構入力が面倒ですが, スパムをハネる精度は上がります.
 
- `*` �� `?` �܂��� `.` ���܂܂Ȃ��ꍇ��,
-�����Ă������[����������Ă���h���C�����ɓ��͂����P�ꂪ�܂܂�Ă��邩�Ŕ��肵�܂�.
+ `*` や `?` または `.` を含まない場合は,
+送られてきたメールが名乗っているドメイン名に入力した単語が含まれているかで判定します.
 
-2, 3�h���C�����x�̎g�������Ȃ�,
-���� 2, 3����S�ēo�^���Ă��܂��ׂ��ł��傤.
-���� Alias �ŕ����̃h���C����o�^���邱�Ƃ��ł��܂�.
+2, 3ドメイン程度の使い分けなら,
+その 2, 3件を全て登録してしまうべきでしょう.
+同じ Alias で複数のドメインを登録することもできます.
 
-�{�Ƃ̃h���C���𒲂ׂ�ɂ�,
-web �����Łu[amazon ���[�� �h���C��](https://www.google.co.jp/search?q=amazon+���[��+�h���C��)�v
-�Ƃ����͂���Ƃ����ł��傤.
+本家のドメインを調べるには,
+web 検索で「[amazon メール ドメイン](https://www.google.co.jp/search?q=amazon+メール+ドメイン)」
+とか入力するといいでしょう.
 <br>
 <sup>
-���̌����ɂ� google ���ǂ����ł���.
-[Bing](https://www.bing.com/search?q=amazon+���[��+�h���C��) �ł���, �Ȃ񂩃s���g�̂ڂ������ʂ��o�Ă��܂�.
-( 2025�N3������ )
+この検索には google が良さげですね.
+[Bing](https://www.bing.com/search?q=amazon+メール+ドメイン) でやると, なんかピントのぼけた結果が出てきます.
+( 2025年3月現在 )
 </sup>
 
-����, �ǂ��܂ł��̓o�^�����邩��,
-���Ȃ��̂Ƃ���ɓ��B����X�p�����[���̏󋵂Ƒ��k�ł�.
-������ [Name](#name) �œo�^�����Ƃ�,
-[Filter](#filter) �̑��̍��ڂŏ\���n�l���Ă���̂Ȃ�,
-�ق��Ă����Ă��\���܂���.
-[Name](#name) �Ńn�l�邵���Ȃ��X�p���Ƃ����̂�,
-���ƃ��A�Ȃ͂��ł�.
+さて, どこまでこの登録をするかは,
+あなたのところに到達するスパムメールの状況と相談です.
+あえて [Name](#name) で登録せずとも,
+[Filter](#filter) の他の項目で十分ハネられているのなら,
+ほっておいても構いません.
+[Name](#name) でハネるしかないスパムというのは,
+割とレアなはずです.
 <sub>
-( 2025�N3�� �������� )
+( 2025年3月 当方調べ )
 </sub>
 
-�o�^����Ă��Ȃ� Alias �Ɋւ��Ă�, �Ȃɂ����܂���.
-����ʔ��� Alias �𖼏���Ă�������ȗF�B�������Ƃ��Ă�,
-���̃��[���̓n�l��ꂸ�ɓ��B���܂�.
+登録されていない Alias に関しては, なにもしません.
+毎回面白い Alias を名乗ってくる愉快な友達が居たとしても,
+そのメールはハネられずに到達します.
 <sub>
-( �L����Ɩ��ƃJ�u��Ȃ������ )
+( 有名企業名とカブらない限りは )
 </sub>
 
-�܂�, �ǂ����� Alias ���x���Ă���̂���, �X�p�}�[�̂�肽������Ȃ̂�,
-�uamazon�v�Ƃ͖���炸�u�A�}�]���v�Ɩ�����Ă��鎖������邩������܂���.
-���̏ꍇ��,
-�uamazon�v��o�^�����̂Ƃ͕ʂɁu�A�}�]���v���o�^���Ă����Ȃ��ƌ����R�炵�܂�.
-�{�Ƃ�����鐳���� Alias �ȊO��, �u�X�p�}�[������肻���� Alias�v���o�^���Ă����K�v�����邱�Ƃ��l�����܂�.
+また, どういう Alias を騙ってくるのかは, スパマーのやりたい放題なので,
+「amazon」とは名乗らず「アマゾン」と名乗ってくる事例もあるかもしれません.
+この場合は,
+「amazon」を登録したのとは別に「アマゾン」も登録しておかないと撃ち漏らします.
+本家が名乗る正式な Alias 以外に, 「スパマーが名乗りそうな Alias」も登録しておく必要があることも考えられます.
 
-�Ƃ����,
-�o�^�����������������Ȃ��Ă����,
-����������L GUI ����Ă��܂��܈ꌏ������Ă����̂��ʓ|�Ɋ����邩������܂���.
-�����������ꍇ��,
-���L�̂悤�� Alias �ƃh���C�������^�u (`\t`) �Ŏd�؂����e�L�X�g�t�@�C��������Ă����܂��傤.
+ところで,
+登録したい件数が多くなってくると,
+いちいち上記 GUI を介してちまちま一件ずつ入れていくのも面倒に感じるかもしれません.
+そう感じた場合は,
+下記のように Alias とドメイン名をタブ (`\t`) で仕切ったテキストファイルを作っておきましょう.
 ```
 ANA		ana.co.jp
 ANA		amadeus.com
 Amazon		amazon.com
 Amazon		amazon.co.??
-�A�}�]��		amazon.co.jp
+アマゾン		amazon.co.jp
 American Express	aexp
 American Express	americanexpress
-�A�����J���G�L�X�v���X	aexp
-�A�����J���G�L�X�v���X	americanexpress
+アメリカンエキスプレス	aexp
+アメリカンエキスプレス	americanexpress
 Apple		apple
 ```
-��, ���̃e�L�X�g�t�@�C�������� Name �̃y�[�W�� Drag & Drop �����,
-�e�L�X�g�t�@�C�����̑S���ڂ����݂̐ݒ�ɒǉ�����܂�.
-�Ō�� `OK` �{�^����������, ��C�ɓo�^�����ł�.
+で, そのテキストファイルをこの Name のページに Drag & Drop すると,
+テキストファイル中の全項目が現在の設定に追加されます.
+最後に `OK` ボタンを押せば, 一気に登録完了です.
 
-����������, ��U�t�@�C�������Ă���� Drag & Drop �݂̂Ȃ炸,
-���g�� Copy (`Ctrl`+`C`) �������̂����� Name �̃y�[�W�� Paste (`Ctrl`+`V`) ���Ă�,
-�o�^���e���ێʂ����邱�Ƃ��ł��܂�.
-�Ȃ̂�, �����̐����������̃u���E�U�[��ŏ�L�̐ݒ��̕����� Drag ���� Copy ����,
-���̏�Ԃ� Name �� Paste ���Ă���L�̐ݒ�Ⴊ�ێʂ��ł��܂�.
-��, �ǂ����ێʂ�����Ȃ�,
-[���ۂɓ����ɗ����X�p���� Alias ��ʔ������đS�ēo�^���Ă݂���](Examples.md#filter-�̐ݒ��)��
-Copy & Paste �����������ʔ����ł��傤.
+実を言うと, 一旦ファイル化してからの Drag & Drop のみならず,
+中身を Copy (`Ctrl`+`C`) したものをこの Name のページに Paste (`Ctrl`+`V`) しても,
+登録内容を丸写しすることができます.
+なので, 今この説明をご覧のブラウザー上で上記の設定例の部分を Drag して Copy して,
+その状態で Name に Paste しても上記の設定例が丸写しできます.
+が, どうせ丸写しするなら,
+[実際に当方に来たスパムの Alias を面白がって全て登録してみた例](Examples.md#filter-の設定例)を
+Copy & Paste した方がより面白いでしょう.
 <br>
 <sup>
-( ��x�����������ɑ����, �u�V��v���������邽�тɑ΍R���o�^�������Ȃ�Ƃ����S���I���ʂ������Ă��܂��܂���. )
+( 一度そういう道に走ると, 「新作」が到着するたびに対抗策を登録したくなるという心理的効果が働いてしまいますが. )
 </sup>
 
 
@@ -550,56 +550,56 @@ Copy & Paste �����������ʔ����ł��傤.
 
 ![](pics/Filter.Sender.png)
 
-�^�킵�����M�҂���ߏo�����߂̂��̑��́u��ʁv�ł�.
+疑わしい送信者を締め出すためのその他の「区別」です.
 
-����ŗp�ӂ��Ă���͉̂��L�� 5�ł�.
+現状で用意しているのは下記の 5つです.
 
-* Message-ID ���W���ɏ������Ă��Ȃ����[��<br>
-���[���w�b�_�[�ɂ�, ���̃��[������ӂɎ��ʂ��邽�߂� Message-ID �Ƃ������ʃR�[�h���U���Ă��܂���,
-���̃R�[�h�̏������ɂ��ꉞ
-[�������ׂ��W��](https://datatracker.ietf.org/doc/html/rfc5322#section-3.6.4)�Ƃ������̂�����܂�.<br>
-�X�p�����[���ɂ͂��̕ӂ�����������Ȃ��̂������̂�,
-���f�̍ޗ��̈�Ƃ��ĉ����Ă���܂�.
+* Message-ID が標準に準拠していないメール<br>
+メールヘッダーには, そのメールを一意に識別するための Message-ID という識別コードが振られていますが,
+このコードの書き方にも一応
+[準拠すべき標準](https://datatracker.ietf.org/doc/html/rfc5322#section-3.6.4)というものがあります.<br>
+スパムメールにはこの辺がいいかげんなものが多いので,
+判断の材料の一つとして加えてあります.
 
-* ���ʂ� Alias ( �ʖ� ) �ŌĂт����Ă��郁�[��<sup>��</sup><br>
-��Ƃ͋t��, `To:` �ɂ����M�҂� Alias �Ɋւ���`�F�b�N�ł�.<br>
-�X�p�����[���� Alias �ŌĂт����Ă��邱�Ƃ�����܂���,
-�X�p�����[�����M�҂͈���̃��[���A�h���X�����m��Ȃ��̂�,
-Alias �����[���A�h���X����f�ނ��̂���������ɂȂ�܂�.
-���K�̃��[���͈�ʓI�ɂ���Ȃ��Ƃ͂��Ȃ�
-( ���[�U�[�o�^���ɓ��͂��������Ō�肩���Ă��邩, �������� Alias �Ȃ񂩕t���Ȃ� ) �̂�,
-���������Ӗ��̂Ȃ� Alias ��U���Ă��郁�[����j�����܂�.<br>
-�� ����͓����̌o�����ɂ��`�F�b�N���ڂȂ̂�,
-��������p ( �v�郁�[���܂Ŋ��Ă�ꂽ ) ���o����&#x2611;���O���Ă�������.
+* 無駄な Alias ( 別名 ) で呼びかけてくるメール<sup>※</sup><br>
+上とは逆に, `To:` にある受信者の Alias に関するチェックです.<br>
+スパムメールも Alias で呼びかけてくることがありますが,
+スパムメール送信者は宛先のメールアドレスしか知らないので,
+Alias もメールアドレスから素材を採った文字列になります.
+正規のメールは一般的にそんなことはしない
+( ユーザー登録時に入力した氏名で語りかけてくるか, そもそも Alias なんか付けない ) ので,
+こういう意味のない Alias を振ってくるメールを破棄します.<br>
+※ これは当方の経験則によるチェック項目なので,
+もし副作用 ( 要るメールまで棄てられた ) が出たら&#x2611;を外してください.
 
-* �h���C���𑕂������[���A�h���X<br>
-`From: amazon.com@phishing.com` �̂悤��, �ς��ƌ�, ���݂����Ƃ̐��K�̃h���C������̂��̂ł���悤�Ɍ��������Ȃ���,
-���͂Ƃ�ł��Ȃ����M�҂��痈�Ă���悤�ȃ��[����j�����܂�.<br>
-���M���A�h���X�̖`������˂��đ��M�҂𔻒f����Ȃ̂���l���ׂ������ł�.<br>
-�q���x���̂悤�ł��� ( �ƌ����Ă͎q���Ɏ��炩 )
-[�z���g�ɂ����ł���](Examples.md#dkim-signature-������X�p�����[���̗�), ����������.
+* ドメインを装ったメールアドレス<br>
+`From: amazon.com@phishing.com` のように, ぱっと見, 実在する企業の正規のドメインからのものであるように見せかけながら,
+実はとんでもない送信者から来ているようなメールを破棄します.<br>
+送信元アドレスの冒頭を一瞥して送信者を判断する癖のある人を陥れるやり口です.<br>
+子供騙しのようですが ( と言っては子供に失礼か )
+[ホントにあるんですよ](Examples.md#dkim-signature-があるスパムメールの例), こういうの.
 
-* �h���C���𑕂��������N<br>
-���M�҂��x�����u�h���C���𑕂������[���A�h���X�v��u�ʖ����x�������[���A�h���X�v�ɑ΂�,
-���[���ɖ��ߍ��܂ꂽ�����N���x�������̂ł�.<br>
-`https://phishing.com/amazon.com` �̂悤��, �ς��ƌ�, ���݂����Ƃ̐��K�̃h���C���̂��̂ł���悤�Ɍ��������Ȃ���,
-���͂Ƃ�ł��Ȃ��E�F�u�T�C�g���w���Ă��郊���N�����ߍ��܂ꂽ���[����j�����܂�.<br>
-�����N�̖�������˂��� URL �𔻒f����Ȃ̂���l���ׂ������ł�.
+* ドメインを装ったリンク<br>
+送信者を騙った「ドメインを装ったメールアドレス」や「別名を騙ったメールアドレス」に対し,
+メールに埋め込まれたリンクを騙ったものです.<br>
+`https://phishing.com/amazon.com` のように, ぱっと見, 実在する企業の正規のドメインのものであるように見せかけながら,
+実はとんでもないウェブサイトを指しているリンクが埋め込まれたメールを破棄します.<br>
+リンクの末尾を一瞥して URL を判断する癖のある人を陥れるやり口です.
 
-* Subject ���x�������[��<br>
-`Subject: �y���}�zAmazon.co.jp�A�J�E���g���p���������̂��肢` �̂悤��,
-�ς��ƌ�, `Amazon` ����̃��[���ł���悤�Ɍ��������Ȃ���,
-���� `Amazon` �Ƃ͖��֌W�ȑ��M�҂��痈�Ă���悤�ȃ��[����j�����܂�.
+* Subject を騙ったメール<br>
+`Subject: 【至急】Amazon.co.jpアカウント利用制限解除のお願い` のように,
+ぱっと見, `Amazon` からのメールであるように見せかけながら,
+実は `Amazon` とは無関係な送信者から来ているようなメールを破棄します.
 <br>
-���̃`�F�b�N�� [Name](#name) �ɐݒ肳�ꂽ�u�ʖ��v�Ɓu���[���A�h���X�v�̃y�A�Ɋ�Â��Ď��{���Ă��܂�.
-`Subject:` �̒��ɂ����ꂩ�̑��M���̌����ȁu�ʖ��v�Ƃ��ēo�^����Ă���P�ꂪ�܂܂�Ă����ꍇ,
-���̒P��ɂЂ��t�����ꂽ�����ȁu���[���A�h���X�v����̃��[���łȂ���Δj�����܂�.
+このチェックは [Name](#name) に設定された「別名」と「メールアドレス」のペアに基づいて実施しています.
+`Subject:` の中にいずれかの送信元の公式な「別名」として登録されている単語が含まれていた場合,
+その単語にひも付けされた公式な「メールアドレス」からのメールでなければ破棄します.
 
-�f�t�H���g�� 5�Ƃ� ON �ɂ��Ă��܂�.
+デフォルトで 5つとも ON にしています.
 <br>
 <sup>
-( �ȑO�̃o�[�W�����̎g�p���т�����ꍇ��, �Ō�́uSubject ���x�������[���v�̂� OFF �ŃZ�[�u����Ă��܂�.
-�K�p�����ꍇ�͎蓮�� ON �ɐݒ肵�Ȃ����Ă�������. )
+( 以前のバージョンの使用実績がある場合は, 最後の「Subject を騙ったメール」のみ OFF でセーブされています.
+適用される場合は手動で ON に設定しなおしてください. )
 </sup>
 
 
@@ -607,333 +607,333 @@ Alias �����[���A�h���X����f�ނ��̂���������ɂȂ�܂�.
 
 ![](pics/Filter.TimeZone.png)
 
-���[�����M����[�^�C���]�[��](https://ja.wikipedia.org/wiki/������)�ɂ���ă��[�����u���ʁv���܂�.
+メール発信元の[タイムゾーン](https://ja.wikipedia.org/wiki/等時帯)によってメールを「差別」します.
 
-[Domain](#domain) �ɂ��u���ʁv�����������ł���,
-�������́u���ʁv�͂����Ɣ͈͂��L���ł�.
-��͒�������̃��[�����n�l�悤�Ɠ����������Ă��� `UTC+0800` ��&#x2611;���Ă݂���ł���,
-���̊֌W���Ȃ��I�[�X�g�����A�̃p�[�X ( Perth ) �܂Ŋ������܂�Ă��邱�Ƃ�����܂�.
-�I�[�X�g�����A�̐����ɗF�B�̋���l�͎g��Ȃ������ǂ���i�ł��傤.
+[Domain](#domain) による「差別」もたいがいですが,
+こっちの「差別」はもっと範囲が広いです.
+上は中国からのメールをハネようと同国が属している `UTC+0800` を&#x2611;してみた例ですが,
+何の関係もないオーストラリアのパース ( Perth ) まで巻き込まれていることが判ります.
+オーストラリアの西側に友達の居る人は使わない方が良い手段でしょう.
 
-�����c�c, ��������\������ł���.
-�ǂ�����o���Ă���񂾂�����Ȃ��悤�ɂ��Ă��鑗�M�҂���, ���܂������.
+ただ……, これも結構効くんですよ.
+どこから出しているんだか判らないようにしている送信者って, 居ますからね.
 
-�u�悵�������I���͊C�O�ɂ͗F�B�����Ȃ�����A�O���͑S��&#x2611;���I�v
+「よし解った！俺は海外には友達も居ないから、外国は全部&#x2611;だ！」
 
-�Ǝv���؂������Ȃ�, ����͑��v��������܂���.
-����Ƃɂ�(�킴�킴)�C�O���獑���Ɍ��������[����z������Ƃ���������ł���.
-( ���Ƃ���
-[Amazon �� UTC �� `+0000` ����A�������܂�](Examples.md#date-���ǂ��̍���������Ȃ������ȃ��[���̗�). )
-�F�B�͂������傤�Ԃł�, ���[�U�[�o�^�������[�J�[����̘A�����r�₦�邩������܂���.
-�v���؂������ł̂�, �����g�̃��[���������悭�m�F���Ă���ɂ��܂��傤.
+と思い切ったあなた, それは早計かもしれません.
+大手企業には(わざわざ)海外から国内に向けたメールを配送するところもあるんですよ.
+( たとえば
+[Amazon は UTC の `+0000` から連絡がきます](Examples.md#date-がどこの国だか判らない正当なメールの例). )
+友達はだいじょうぶでも, ユーザー登録したメーカーからの連絡が途絶えるかもしれません.
+思い切った手を打つのは, ご自身のメール履歴をよく確認してからにしましょう.
 
-�Ƃ����, ���̈ꗗ, �u���̍��͂��܉�������?�v������̂ɕ֗��ł�.
-`OK` �{�^���̏�ɏo�Ă��鎞���\����, �I�񂾃^�C���]�[���̌��n�����������Ă��܂�.
-[�T�}�[�^�C��](https://ja.wikipedia.org/wiki/�Ď���)
-( �C�M���X�p��ŁgSummer Time�h / �A�����J�p��� �gDaylight Saving Time�h ) �����f�����\���ł�.
-�C�O�̗F�B�ƘA������Ƃ�, ���n�̎�������l����̂ɕ֗��ł��傤.
+ところで, この一覧, 「あの国はいま何時かな?」を見るのに便利です.
+`OK` ボタンの上に出ている時刻表示は, 選んだタイムゾーンの現地時刻を示しています.
+[サマータイム](https://ja.wikipedia.org/wiki/夏時間)
+( イギリス英語で“Summer Time” / アメリカ英語で “Daylight Saving Time” ) も反映した表示です.
+海外の友達と連絡するとき, 現地の時刻を一考するのに便利でしょう.
 
 
 #### Whitelist
 
 ![](pics/Filter.WhiteList.png)
 
-����܂ł��Љ�����[�����n�l�邽�߂́u��ʁv��u���ʁv�Ƃ͈Ⴂ,
-�����œo�^���Ă��������[���̓n�l���Ɏ󂯓���܂�.
-�܂�, �u[�z���C�g���X�g](https://ja.wikipedia.org/wiki/�z���C�g���X�g)�v�Ƃ����킯�ł�.
+これまでご紹介したメールをハネるための「区別」や「差別」とは違い,
+ここで登録しておいたメールはハネずに受け入れます.
+つまり, 「[ホワイトリスト](https://ja.wikipedia.org/wiki/ホワイトリスト)」というわけです.
 
-���̃`�F�b�N���ڂň��������������[����, ���́u�z���C�g���X�g�v�ɓo�^���Ă��鑗�M�҂���̂��̂�,
-�������������̂��Ȃ��������Ƃɂ��Ď󂯓���܂�.
+他のチェック項目で引っかかったメールも, この「ホワイトリスト」に登録してある送信者からのものは,
+引っかかったのをなかったことにして受け入れます.
 
-[Domain](#domain) �� [Time Zone](#time-zone) �œ���̒n��S�̂�r�����Ă����Ȃ����,
-���n��ɍݏZ���鐔���Ȃ��M�����鑊�肩��̃��[���͎󂯓����, �Ƃ������悤�ȗp�r�Ɏg���܂�.
+[Domain](#domain) や [Time Zone](#time-zone) で特定の地域全体を排除しておきながらも,
+同地域に在住する数少ない信じられる相手からのメールは受け入れる, といったような用途に使えます.
 
-����, ��������̘b�͗F�B�̏��Ȃ�������̎�i�ł�.<br>
-�u���Ƀ��[���𑗂��Ă���l�Ȃ�āA�����Ƃ����ƁA���ƁA���̉�Ђ��炢�Ȃ��񂾁B�v�Ƃ������Ȃ�,
-���Ȃ��ɂ��X�X���̗ǂ����@������܂�.
+さて, ここからの話は友達の少ない方限定の手段です.<br>
+「私にメールを送ってくる人なんて、あいつとこいつと、あと、あの会社ぐらいなもんだ。」というあなた,
+あなたにおススメの良い方法があります.
 
-�܂�, [Authentication](#authentication) ��,
-�upass �������Ȃ����F�؁v�̌����� `0 �ȏ�` �ɐݒ肷��̂ł�. ( ���}�Q�� )
+まず, [Authentication](#authentication) で,
+「pass しそこなった認証」の件数を `0 以上` に設定するのです. ( 下図参照 )
 
 ![](pics/Filter.Authentication0.png)
 
-���������, �S�Ă̔F�؂� pass ���Ă�, �܂�upass �������Ȃ����F�؁v�̌����� `0` �ł�,
-�u`0 �ȏ�`�v�Ƃ��������Ɉ���������̂őS�Ẵ��[�����j������܂�.
-��, �����Łu�z���C�g���X�g�v�ɓo�^����Ă��鑗�M�҂����͂��ڂ��ڂ�����܂�.
-�܂�, ���Ȃ����F�߂����M�҂���̃��[�����������Ȃ��ɓ͂��悤�ɂȂ�̂ł�.
+こうすると, 全ての認証が pass しても, つまり「pass しそこなった認証」の件数が `0` でも,
+「`0 以上`」という条件に引っかかるので全てのメールが破棄されます.
+が, ここで「ホワイトリスト」に登録されている送信者だけはお目こぼしされます.
+つまり, あなたが認めた送信者からのメールだけがあなたに届くようになるのです.
 
-�F�B�Ǝ����S�Ă��u�z���C�g���X�g�v�ɓo�^����̂�������Ɩʓ|�ł���,
-�Ȃ�, �F�B�̏��Ȃ����Ȃ��̂��Ƃł�. �����ɍ�Ƃ͏I���ł��傤.
+友達と取引先全てを「ホワイトリスト」に登録するのがちょっと面倒ですが,
+なに, 友達の少ないあなたのことです. すぐに作業は終わるでしょう.
 
-��, ���̓o�^���@�ł���,
-[Domain](#domain) �̂悤�Ƀ��[���A�h���X�𒼐ړ��͂�����@�͗p�ӂ��Ă��܂���.
-���̗F�B�����悩��̃��[����
+で, その登録方法ですが,
+[Domain](#domain) のようにメールアドレスを直接入力する方法は用意していません.
+その友達や取引先からのメールを
 
-* [`.eml`](https://www.google.com/search?q=.eml+�t�@�C��) �t�@�C���Ƃ��ăZ�[�u���ꂽ���̂����̉�ʂ� Drag & Drop ����.
-* [���[���[�ŕ\�����������[���w�b�_�[](https://www.dekyo.or.jp/soudan/contents/ihan/header.html)
-��S�I�� (`Ctrl`+`A`) ���� Copy (`Ctrl`+`C`) ���Ă���,
-���̉�ʂ� Paste (`Ctrl`+`V`) ����.
+* [`.eml`](https://www.google.com/search?q=.eml+ファイル) ファイルとしてセーブされたものをこの画面に Drag & Drop する.
+* [メーラーで表示させたメールヘッダー](https://www.dekyo.or.jp/soudan/contents/ihan/header.html)
+を全選択 (`Ctrl`+`A`) して Copy (`Ctrl`+`C`) してから,
+この画面に Paste (`Ctrl`+`V`) する.
 
-�� 2�ʂ�̎�i���p�ӂ���Ă��܂�.
+の 2通りの手段が用意されています.
 
-��̎�i�̂����ꂩ�����{�����, ���̂悤�ɗF�B�̃��[���A�h���X���o�^����܂�.
+上の手段のいずれかを実施すると, 下のように友達のメールアドレスが登録されます.
 
 ![](pics/Filter.WhiteList2.png)
 
-[Domain](#domain)�̂悤�ɒ��ړ��͂������Ă��Ȃ��̂�,
-���M�҂̐��m�Ȗ��` ( ���[���w�b�_�[�� `From:` �ɂ��郁�[���A�h���X ) ��,
-���ۂ̑��M�҂̐��m�ȃh���C�� ( ���[���w�b�_�[�� `Authentication-Results:` �ȂǂɋL�^����Ă��鑗�M���h���C�� )
-�� 2�̏��̃y�A���K�v������ł�.
-�u�z���C�g���X�g�v�Ƃ̏ƍ��͂��̃y�A�ōs���Ă��܂�.
-`From:` �����ŏƍ�����ƃX�p�����[���̋U���Ƀ_�}����Ă��܂��܂�����.<p>
+[Domain](#domain)のように直接入力を許していないのは,
+送信者の正確な名義 ( メールヘッダーの `From:` にあるメールアドレス ) と,
+実際の送信者の正確なドメイン ( メールヘッダーの `Authentication-Results:` などに記録されている送信元ドメイン )
+の 2つの情報のペアが必要だからです.
+「ホワイトリスト」との照合はこのペアで行っています.
+`From:` だけで照合するとスパムメールの偽造にダマされてしまいますから.<p>
 <sub>
-������, ��� ( ���[���z�M��o�^�����x���_�[�Ƃ� ) �̃z���C�g���X�g�o�^�ɂ͋C��t���Ă�������.
-���̊Ԃɂ� ( ���[�U�[�ɒf����Ȃ� ) ���M�҂������Ă���ꍇ������̂ł�.
-�͎̂��O�Ń��[����z�M���Ă�����Ƃ�, �z�M�����[���z�M��s�Ǝ҂Ɉϑ������ꍇ�Ȃǂł�.
-���̏ꍇ, �u���`�v�͕ς��Ȃ��̂Ɂu���M�ҁv�������Ă��܂��̂�,
-���́u�z���C�g���X�g�v�̏�������O��Ă��܂��܂�.
-( ���߂Ĉϑ��O�Ƀ��[�U�[�Ɏ��m���Ăق������̂ł�. > �e�N���C�A���g��� )
+ただし, 企業 ( メール配信を登録したベンダーとか ) のホワイトリスト登録には気を付けてください.
+いつの間にか ( ユーザーに断りもなく ) 送信者が代わっている場合があるのです.
+昔は自前でメールを配信していた企業が, 配信をメール配信代行業者に委託した場合などです.
+この場合, 「名義」は変わらないのに「送信者」が代わってしまうので,
+この「ホワイトリスト」の条件から外れてしまいます.
+( せめて委託前にユーザーに周知してほしいものです. > 各クライアント企業 )
 <br>
-�u�z���C�g���X�g�v�ɓ���Ă������͂��̂��̊�Ƃ���̃��[�����r�₦��,
-�Ƃ������ꍇ��, [Logs](#logs)�Ń��O�𒭂߂�, ������݂̂��̊�Ƃ̃��[�����̂Ă��Ă��Ȃ����m�F���Ă݂Ă�������.
-�u�ǂ������荞�݂̃��[���ł��낤�B���̂悤�Ȃ��̂��r�₦�Ă�����ɍ\��ʁI�v( �Ƃ���e�X�g���[�U�[�k ) �Ƃ������ȊO��.
+「ホワイトリスト」に入れておいたはずのあの企業からのメールが途絶えた,
+といった場合は, [Logs](#logs)でログを眺めて, お馴染みのあの企業のメールが捨てられていないか確認してみてください.
+「どうせ売り込みのメールであろう。そのようなものが途絶えても一向に構わぬ！」( とあるテストユーザー談 ) という方以外は.
 </sub>
 
 
 ### Setup
 
-���A�v���̓�������Ȃ��D�݂ɐݒ肵�܂�.
+当アプリの動作をあなた好みに設定します.
 
 ![](pics/Setup.png)
 
-�f�t�H���g�̂܂܂ق��Ƃ��Ă����ɓ���Ɏx��͂���܂���,
-���D�݂̓���ɃJ�X�^�}�C�Y���邱�Ƃ��ł��܂�.
+デフォルトのままほっといても特に動作に支障はありませんが,
+より好みの動作にカスタマイズすることができます.
 
 #### Action
 
-���A�v���̊�{����Ɋւ���ݒ�ł�.
+当アプリの基本動作に関する設定です.
 
 * Interval to check emails<br>
-���[�����`�F�b�N���鎞�ԊԊu��ݒ肵�܂�.<br>
-�f�t�H���g�� `10` [��] �ł�. ����Ȃ���ŏ\�����Ǝv���܂���,
-�ƂĂ��҂��ł���Ă��郁�[���ł�����Ƃ���, ���̊Ԋu��Z������̂������ł��傤.
-�������, ���[���T�[�o�[�ɂ͕��S�ɂȂ�܂���.
+メールをチェックする時間間隔を設定します.<br>
+デフォルトは `10` [分] です. そんなもんで十分だと思いますが,
+とても待ち焦がれているメールでもあるときは, この間隔を短くするのもいいでしょう.
+もちろん, メールサーバーには負担になりますが.
 
 * Launch at startup<br>
-Windows&reg; ���N�������Ƃ� ( ���m�ɂ̓��[�U�[���T�C���C�������Ƃ� ) �ɓ��A�v�����N�����܂�.<br>
-�f�t�H���g�� OFF �ɂȂ��Ă���̂�, �u���̃A�v���͎g����!�v�Ǝv��ꂽ��, &#x2611;���Ă����Ƃ����ł��傤.
+Windows&reg; が起動したとき ( 正確にはユーザーがサインインしたとき ) に当アプリを起動します.<br>
+デフォルトは OFF になっているので, 「このアプリは使える!」と思われたら, &#x2611;しておくといいでしょう.
 
 #### Notification
 
-���[�����M���̂��m�点�Ɋւ���ݒ�ł�.
+メール着信時のお知らせに関する設定です.
 
 * Popup summary<br>
-���[�����M���ɃT�}���[ ( �T�v ) �Ƃ���,
-���̃��[����`Subject:`, `From:`, `Date:` ���܂Ƃ߂����̂���ʂ̒[�Ƀ|�b�v�A�b�v�\�����܂�.<br>
-�f�t�H���g�� OFF �ɂȂ��Ă��܂�.<br>
-ON �ɂ����, ���M�������[���̊T�v�����L�̂悤�ɉ�ʂ̋������ɕ\�����܂�.
-�Â����[�������̕�, �V�������[���͂��̏�ɐςݏグ��悤�ɕ\������܂�.
+メール着信時にサマリー ( 概要 ) として,
+そのメールの`Subject:`, `From:`, `Date:` をまとめたものを画面の端にポップアップ表示します.<br>
+デフォルトは OFF になっています.<br>
+ON にすると, 着信したメールの概要を下記のように画面の隅っこに表示します.
+古いメールが下の方, 新しいメールはその上に積み上げるように表示されます.
 <br><br>
 ![](pics/Summary.png)
 <br><br>
-���̕\���̓N���b�N����Ə����܂�.
-���΂炭�͏������܂܂ł��܂���, �����ɐV���ȃ��[�����͂���,
-��i�ςݑ�������Ԃōĕ\������,
-�����̎d�������܂��Ă����悤�ȃv���b�V���[�����Ȃ��ɗ^���܂�.
+この表示はクリックすると消えます.
+しばらくは消えたままでいますが, そこに新たなメールが届くと,
+一段積み増した状態で再表示され,
+未決の仕事が溜まっていくようなプレッシャーをあなたに与えます.
 
 * Ring<br>
-���[�����M���ɂ��w��� `.wav` �t�@�C����炵�܂�.<br>
-�f�t�H���g�� OFF ��, `.wav` �t�@�C���� Windows&reg; �̃f�t�H���g�̃��[�����M���ł�.
+メール着信時にご指定の `.wav` ファイルを鳴らします.<br>
+デフォルトは OFF で, `.wav` ファイルは Windows&reg; のデフォルトのメール着信音です.
 <br><br>
-�Ƃ����,
-`Ring` ������ `.wav` �t�@�C����I�ԂƂ�,
-�E�� `>>` �{�^���������� Explorer �Ńt�@�C�������ɍs����,
-���}�̂悤�� File name �����r���[�ȏ�Ԃŕ\������邱�Ƃ�����܂�.
+ところで,
+`Ring` させる `.wav` ファイルを選ぶとき,
+右の `>>` ボタンを押して Explorer でファイルを見に行くと,
+下図のように File name が中途半端な状態で表示されることがあります.
 <br><br>
 ![](pics/FileName.png)
 <br><br>
-�����
-[Windows&reg; �̃|�J](https://stackoverflow.com/questions/64424601/cmfceditbrowsectrl-is-cropping-the-file-name)
-�ł�.
-�����ԑO����w�E����Ă���̂�, ���܂��ɒ����Ă��܂���.
-<br><sup>( 2025�N1���� Windows&reg; 11 24H2 �Ŋm�F )</sup>
+これは
+[Windows&reg; のポカ](https://stackoverflow.com/questions/64424601/cmfceditbrowsectrl-is-cropping-the-file-name)
+です.
+だいぶ前から指摘されているのに, いまだに直っていません.
+<br><sup>( 2025年1月に Windows&reg; 11 24H2 で確認 )</sup>
 
 
 #### Log
 
 * Folder<br>
-[���O](#logs) �����܂��Ă����t�H���_�[���w�肵�܂�.<br>
-�f�t�H���g��, ���[�U�[�̃e���|�����[�t�H���_�[�ł�.
+[ログ](#logs) をしまっておくフォルダーを指定します.<br>
+デフォルトは, ユーザーのテンポラリーフォルダーです.
 
 * Keep<br>
-`.eml` �� `.txt` �����ꂼ�ꂢ���܂Ńt�H���_�[�ɂƂ��Ă��������w�肵�܂�.<br>
-�w��̃t�@�C�����𒴂�����, �Â����̂��珇�ɍ폜���Ă����܂�.<br>
-�f�t�H���g�l�� `100` �ł�.
+`.eml` と `.txt` をそれぞれいくつまでフォルダーにとっておくかを指定します.<br>
+指定のファイル数を超えたら, 古いものから順に削除していきます.<br>
+デフォルト値は `100` です.
 
 * files of<br>
-���܂��Ă������O�� `�j�����ꂽ` ���[���Ɍ��肷��̂� `�S�Ă�` ���[���Ƃ���̂���I�т܂�.<br>
-�f�t�H���g�� `�S�Ă�` �ł�.<br>
-[Filter](#filter) �̒�������, �j�����ꂽ���̂��p�X�������̂������Ƃ�, ���Ƃ���m�F�ł������������ł��傤.
+しまっておくログを `破棄された` メールに限定するのか `全ての` メールとするのかを選びます.<br>
+デフォルトは `全ての` です.<br>
+[Filter](#filter) の調整中は, 破棄されたものもパスしたものも両方とも, あとから確認できた方がいいでしょう.
 
 
 ### Logs
 
-���O�̃t�H���_�[���J���܂�.
+ログのフォルダーを開きます.
 
-���̃t�H���_�[�ɂ͈ȉ��� 2��ނ̃t�@�C�����Z�[�u����Ă��܂�.
+このフォルダーには以下の 2種類のファイルがセーブされています.
 
-| �g���q | �t�@�C���̓��e |
+| 拡張子 | ファイルの内容 |
 | --- | --- |
-| [`.eml`](https://www.google.com/search?q=.eml+�t�@�C��) | ���[�������̂܂ܕۑ������t�@�C��. ���[���[�Œ��ڊJ����. |
-| `.txt` | ��L���f�R�[�h�����t�@�C��. ���̂܂܃e�L�X�g�Ƃ��ēǂ߂�. |
+| [`.eml`](https://www.google.com/search?q=.eml+ファイル) | メールをそのまま保存したファイル. メーラーで直接開ける. |
+| `.txt` | 上記をデコードしたファイル. そのままテキストとして読める. |
 
-���A�v���̃`�F�b�N�Ɉ�����������, �j�����ꂽ���[�����t�@�C���̂������ł����ɕۑ�����Ă��܂�.
+当アプリのチェックに引っかかって, 破棄されたメールもファイルのかたちでここに保存されています.
 
-��������t�@�C������, ���̃��[���� `From:` �ɂ��������M�҂́u���`�v�ł�.
-������, �j�����ꂽ���[���̃t�@�C����, �t�@�C�����̖`���� `!` ���t�����Ă���̂Ō��������ȒP�ł�.
-�܂�, �j�����ꂽ���[���� `.txt` �t�@�C���̒��g�ɂ�,
-���̖`���̕��ɉ��L�̏�񂪓��A�v���ɂ���ĉ������Ă��܂�.
+いずれもファイル名は, そのメールの `From:` にあった送信者の「名義」です.
+ただし, 破棄されたメールのファイルは, ファイル名の冒頭に `!` が付けられているので見分けが簡単です.
+また, 破棄されたメールの `.txt` ファイルの中身には,
+その冒頭の方に下記の情報が当アプリによって加えられています.
 
-| ���o�� | �Ӗ� |
+| 見出し | 意味 |
 | --- | --- |
-| `Discard-Reason:` | �j�����R |
-| `Embedded-Link:` | ���ߍ��܂�Ă��������N |
+| `Discard-Reason:` | 破棄理由 |
+| `Embedded-Link:` | 埋め込まれていたリンク |
 
-���� `Discard-Reason:` �ł���, ���L�̂悤�ȃo���G�[�V����������܂�.
+この `Discard-Reason:` ですが, 下記のようなバリエーションがあります.
 
-| `Discard-Reason:` | �Ӗ� |
+| `Discard-Reason:` | 意味 |
 | --- | --- |
-| `Authentication Failure`		| [Authentication](#authentication) �ŕs���i			|
-| `Coded in Unreadable Charset`		| [Coding](#coding) �́u�ǂ߂Ȃ������Z�b�g�v�����o		|
-| `Coded with Doubtful Control Code`	| [Coding](#coding) �́u�^�킵�����䕶���v�����o			|
-| `Coded with Evasive Encoding`		| [Coding](#coding) �́u���I�ȕ����R�[�h�v�����o		|
-| `Domain Unreliable`			| [Domain](#domain) �ł̔r���Ώ�					|
-| `Sender Faking Alias`			| [Name](#name) �́u�ʖ����x�������[���A�h���X�v�����o		|
-| `Sender Using Aberrant Message-ID`	| [Sender](#sender) �́uMessage-ID ���W���ɏ������Ă��Ȃ����[���v�ɊY��	|
-| `Sender Calling Unnecessary Alias`	| [Sender](#sender) �́u���ʂȕʖ��ŌĂт����Ă��郁�[���v�����o	|
-| `Sender Faking a Domain`		| [Sender](#sender) �́u�h���C���𑕂������[���A�h���X�v�����o	|
-| `Sender Faking Links`			| [Sender](#sender) �́u�h���C���𑕂��������N�v�����o		|
-| `Sender Faking the Subject`		| [Sender](#sender) �́uSubject ���x�������[���v�����o		|
-| `Time Zone Unreliable`		| [Time Zone](#time-zone) �ł̔r���Ώ�				|
-| `Link to Unreliable Domain`		| �����N�悪 [Domain](#domain) �ł̔r���Ώ�			|
-| `Evasive Link Path`			| �����N��� [Coding](#coding) �́u���I�ȕ����R�[�h�v�����o	|
+| `Authentication Failure`		| [Authentication](#authentication) で不合格			|
+| `Coded in Unreadable Charset`		| [Coding](#coding) の「読めない文字セット」を検出		|
+| `Coded with Doubtful Control Code`	| [Coding](#coding) の「疑わしい制御文字」を検出			|
+| `Coded with Evasive Encoding`		| [Coding](#coding) の「回避的な文字コード」を検出		|
+| `Domain Unreliable`			| [Domain](#domain) での排除対象					|
+| `Sender Faking Alias`			| [Name](#name) の「別名を騙ったメールアドレス」を検出		|
+| `Sender Using Aberrant Message-ID`	| [Sender](#sender) の「Message-ID が標準に準拠していないメール」に該当	|
+| `Sender Calling Unnecessary Alias`	| [Sender](#sender) の「無駄な別名で呼びかけてくるメール」を検出	|
+| `Sender Faking a Domain`		| [Sender](#sender) の「ドメインを装ったメールアドレス」を検出	|
+| `Sender Faking Links`			| [Sender](#sender) の「ドメインを装ったリンク」を検出		|
+| `Sender Faking the Subject`		| [Sender](#sender) の「Subject を騙ったメール」を検出		|
+| `Time Zone Unreliable`		| [Time Zone](#time-zone) での排除対象				|
+| `Link to Unreliable Domain`		| リンク先が [Domain](#domain) での排除対象			|
+| `Evasive Link Path`			| リンク先に [Coding](#coding) の「回避的な文字コード」を検出	|
 
-���܂ɂ̓��O������ [Filter](#filter) ���u�Â������v���邢�́u���߂����v�̔��ȍޗ��ɂ��g����������.
+たまにはログを見て [Filter](#filter) が「甘かった」あるいは「やり過ぎた」の反省材料にお使いください.
 
-�u���߂��āv���܂��ėv��̂Ƀn�l�Ă��܂������[����
-[`.eml` �t�@�C�������[���[�ɃC���|�[�g������@](https://www.google.com/search?q=.eml+�t�@�C��+�C���|�[�g)��,
-���[���[�ɂ���ĈقȂ�̂�, ���萔�ł����e���ł������̏�, ���Ή��肢�܂�.
+「やり過ぎて」しまって要るのにハネてしまったメールの
+[`.eml` ファイルをメーラーにインポートする方法](https://www.google.com/search?q=.eml+ファイル+インポート)は,
+メーラーによって異なるので, お手数ですが各自でご調査の上, ご対応願います.
 
 
 ### Help
 
-`Help` �ɂ͈ȉ��̂悤�ȃT�u���j���[������܂�.
+`Help` には以下のようなサブメニューがあります.
 
-| �C���[�W | ���� | �p�r |
+| イメージ | 項目 | 用途 |
 | --- | --- | --- |
-|![](pics/Menu.Help.png)|[View info on website](#view-info-on-website)<br>[License announcement](#license-announcement)<br>[About ChkMails](#about-chkmails)| Web �ŏ�������<br>���C�Z���X�錾������<br>�{�A�v���ɂ���|
+|![](pics/Menu.Help.png)|[View info on website](#view-info-on-website)<br>[License announcement](#license-announcement)<br>[About ChkMails](#about-chkmails)| Web で情報を見る<br>ライセンス宣言を見る<br>本アプリについて|
 
 #### View info on website
 
-�{�A�v���� web �y�[�W�ŏ��𒭂߂܂�.
-�Ƃ�����, �������ɂȂ��Ă��邱�̃y�[�W�ł�.
+本アプリの web ページで情報を眺めます.
+というか, 今ご覧になっているこのページです.
 <br>
 <sub>
-�܂�, �ǂ���, �債�����Ƃ͏����Ă���܂���,
-Help �t�@�C���Ƃ���������̖ʓ|���������c�c.
+まあ, どうせ, 大したことは書いてありませんが,
+Help ファイルとか実装するの面倒だったし…….
 </sub>
 
 
 #### License announcement
 
-���C�Z���X�錾�Ƃ������̂����܂�.
+ライセンス宣言とかいうのを見ます.
 
-��[������Ɓu�^�_�Ŏg���Ă�����B�v�ĂȂ��Ƃ������Ă���܂�.
-����,�u�g���ĂȂ񂩂����Ă��ӂ߂Ȃ��łˁB�v�Ƃ������Ă���܂�.
-�܁[, �^�_�Ȃ񂾂�, ����Ȃ���ł͂Ȃ��ł��傤��.
+よーく見ると「タダで使っていいよ。」てなことが書いてあります.
+あと,「使ってなんかあっても責めないでね。」とも書いてあります.
+まー, タダなんだし, そんなもんではないでしょうか.
 
 
 #### About ChkMails
 
-�{�A�v���̃o�[�W�������Ƃ��\�����܂�.
+本アプリのバージョン情報とか表示します.
 
-���܂ɂ͕\��������, ���̃y�[�W�Ɍf�ڂ���Ă���ŐV�o�[�W�����ƌ���ׂĂ�������.
-�A�v���̐��i��, ������o�[�W�����A�b�v���K�v�ȋC������̂ł���.
-( �V��̎�@�Ƃ������������𑱂���H�ڂɂȂ肻���ȗ\�� )
+たまには表示させて, このページに掲載されている最新バージョンと見比べてください.
+アプリの性格上, 今後もバージョンアップが必要な気もするのですよ.
+( 新手の手法といたちごっこを続ける羽目になりそうな予感 )
 
 
 ### Exit
 
-�{�A�v�����I�����܂�.<br>
-��, ���̑O�ɉ��̂悤�Ȋm�F�_�C�A���O�������܂�.
+本アプリを終了します.<br>
+が, その前に下のような確認ダイアログが現われます.
 
 ![](pics/Exit.png)
 
-�f�t�H���g���u�������v�Ȃ̂��������܂��������܂���,
-�uYes�v(�u�͂��v) �̃{�^���������Ƃ���Ȃ�I�����܂�.
+デフォルトが「いいえ」なのも未練がましく感じますが,
+「Yes」(「はい」) のボタンを押すとすんなり終了します.
 <br>
 <sub>
-���̃A�v������, �I�������邱�ƂɈӖ�������̂����ċC�����܂���,
-�ŐV�ł𓱓������Ƃ��ɋ��ł��c�c,
-��. �ォ��ŐV�ł��N������ΐ�ɑ����Ă������ł͉����ނ�����񂾂���.
-����[? �Ȃ�ł���ȋ@�\��t�����񂾂���?
+このアプリって, 終了させることに意味があるのかって気もしますが,
+最新版を導入したときに旧版を……,
+あ. 後から最新版を起動すれば先に走っていた旧版は押し退けられるんだった.
+あれー? なんでこんな機能を付けたんだっけ?
 </sub>
 
-## ����
+## 操作
 
-�{�A�v���̃A�C�R���ɑ΂��Ă�, �ȉ��̑��삪�L���ł�.
+本アプリのアイコンに対しては, 以下の操作が有効です.
 
 
-| ���� | ���� |
+| 操作 | 動作 |
 | --- | --- |
-| �}�E�X�ō��N���b�N  | �����Ƀ��C���̃`�F�b�N���s��. |
-| �}�E�X�ŉE�N���b�N  | [���j���[](#�^�p)���o��. |
+| マウスで左クリック  | 直ちにメイルのチェックを行う. |
+| マウスで右クリック  | [メニュー](#運用)を出す. |
 
-���[�U�[�l�̖ڂɐG��邩�����ŏo���Ă��� GUI ���A�C�R�������Ȃ̂�, ����͂��ꂾ���ł�.
+ユーザー様の目に触れるかたちで出している GUI がアイコンだけなので, 操作はこれだけです.
 
-�Ȃ�,
-`ChkMails.exe` �̒u���Ă���t�H���_�[�� `Mails` �Ƃ����T�u�t�H���_�[���@��,
-���̃T�u�t�H���_�[�Ɏ����Ă݂������[���� `.eml` �����Ă����Ă��� `ChkMails.exe` ���N�������,
-`ChkMails.exe` �͒ʏ�c�Ƃ� POP3 �ł̒ʐM�͂���,
-`.eml` �̒��g��ʐM�Ŏ󂯎�������̂悤�ɓ��삵,
-���̓��e�����ݒ肳��Ă��� [Filter](../README.md#filter) �̏����ōĔ��肵�܂�.
-���������u���K�v���I�������, `Mails` �t�H���_���폜���邩, `Mails` �ȊO�̖��O�ɕt���ւ��邩���܂��傤.
-����Œʏ�c�Ƃɖ߂�܂�.
+なお,
+`ChkMails.exe` の置いてあるフォルダーに `Mails` というサブフォルダーを掘り,
+そのサブフォルダーに試してみたいメールの `.eml` を入れておいてから `ChkMails.exe` を起動すると,
+`ChkMails.exe` は通常営業の POP3 での通信はせず,
+`.eml` の中身を通信で受け取ったかのように動作し,
+その内容を今設定されている [Filter](../README.md#filter) の条件で再判定します.
+そうした「練習」が終わったら, `Mails` フォルダを削除するか, `Mails` 以外の名前に付け替えるかしましょう.
+それで通常営業に戻ります.
 <br>
 <sub>
-������! �u���K�v���n�߂���I��点���肷��̂Ɂu[�I��](#exit)�v���K�v��������.
-�v���o���Ă悩����.
+そうだ! 「練習」を始めたり終わらせたりするのに「[終了](#exit)」が必要だったんだ.
+思い出せてよかった.
 </sub>
 
-## ��
+## 環境
 
-* Visual Studio 2022&reg; �ł� Windows&reg; 11 ���� build �Ȃ̂�, 64bit OS �p�ł�.
-* ���� build �� Windows&reg; 10 �ł����Ȃ����삵�܂���, 64bit �łɌ���܂�.
+* Visual Studio 2022&reg; での Windows&reg; 11 向け build なので, 64bit OS 用です.
+* 同じ build で Windows&reg; 10 でも問題なく動作しますが, 64bit 版に限ります.
 
 
-## ����
+## 実装
 
-�u���O�̌������͉������B�����A�ǂ��̔n�̍����������������Ȃ����̂ɁA�p�X���[�h�Ƃ����͂���̂́c�c�v
-�Ƃ��߂��ꂽ���Ȃ�, ����, ���Ȃ��̊��o������������ł�.
-���̂�����, ���Ȃ��̂悤�Ȋ��o�����ׂ��Ȃ̂ł�.
+「お前の言い分は解った。だが、どこの馬の骨が作ったかも判らないものに、パスワードとか入力するのは……」
+とためらわれたあなた, いえ, あなたの感覚こそ正しいんです.
+このご時世, あなたのような感覚を持つべきなのです.
 
-���̃A�v���� github �Ƃ����u�\�[�X�u����v�ɒu����Ă���̂������炱���ł�.
-Visual C++&reg; �̓ǂ߂����, �\�[�X�R�[�h�����m�F�̏�, �����g�� build ���Ď����Ă݂邱�Ƃ��I�X�X�����܂�.
-����Ȃ��Ȃ������̃A�v���̃\�[�X�R�[�h��ǂ݉����ꏕ�ɂȂ�΂�,
-������Ƃ���[�\�[�X�̐���](docs/README.md)���グ�Ă����܂���.
+このアプリが github という「ソース置き場」に置かれているのもだからこそです.
+Visual C++&reg; の読める方は, ソースコードをご確認の上, ご自身で build して試してみることをオススメします.
+そんなあなたがこのアプリのソースコードを読み解く一助になればと,
+ちょっとした[ソースの説明](docs/README.md)も上げておきました.
 
-## ����
+## 導入
 
-�����āc�c, �u�\�[�X�R�[�h�Ȃ�ēǂރq�}�͂Ȃ��B�Ƃ��Ƃƌ�������z���I�v�Ƃ��l���̂��Ȃ�,
-���������l�����͂������Ȃ��̂��Ǝv���̂ł���,
-���������u�C���X�g�[���[�v�Ƃ��ėp�ӂ������̂�,
-�{�y�[�W�E��́uReleases�v�Ƃ����R�[�i�[�ɏグ�Ă���܂�.
-�ł�, ������_�E�����[�h����O��,
-���߂�[�C���X�g�[���菇](Installation.md)������ǂ�������.
-���Ȃ��̊댯�ȍs�ׂ�j�~���ׂ�, �F�X�� Windows&reg; ���������Ă���͂��ł���,
-�ǂ�����Ă�����U��؂��ď��u�ѓO���邩�������Ă���܂�.
+そして……, 「ソースコードなんて読むヒマはない。とっとと現物を寄越せ！」とお考えのあなた,
+そういう考え方はいかがなものかと思うのですが,
+いちおう「インストーラー」として用意したものが,
+本ページ右上の「Releases」というコーナーに上げてあります.
+でも, それをダウンロードする前に,
+せめて[インストール手順](Installation.md)をご一読ください.
+あなたの危険な行為を阻止すべく, 色々と Windows&reg; が説得してくるはずですが,
+どうやってそれらを振り切って初志貫徹するかが書いてあります.
 
 <div style="text-align: right;">
-In-house Tool / �ƒ� �O
+In-house Tool / 家中 徹
 </div>
  
