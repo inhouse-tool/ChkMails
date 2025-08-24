@@ -1,13 +1,13 @@
-# `CMainWnd`
+﻿# `CMainWnd`
 
-## �\��
+## 構成
 
-�\�[�X�R�[�h���,
-[`MainWnd.h`](../ChkMails/ChkMails/MainWnd.h) ��
+ソースコード上は,
+[`MainWnd.h`](../ChkMails/ChkMails/MainWnd.h) と
 [`MainWnd.cpp`](../ChkMails/ChkMails/MainWnd.cpp)
-�Ŏ�������Ă��܂�.
+で実装されています.
 
-���� class �͈ȉ��̃����o�[�֐��ō\������Ă��܂�.
+この class は以下のメンバー関数で構成されています.
 
 #### Constructor & Destructor
 
@@ -18,14 +18,14 @@
 
 [`DestroyWindow`](#destroywindow)
 
-#### �W�� Window Message �n���h���[
+#### 標準 Window Message ハンドラー
 
 [`OnCreate`](#oncreate)
 [`OnTimer`](#ontimer)
 [`OnGetFont`](#ongetfont)
 [`OnSocketNotify`](#onsocketnotify)
 
-#### ���[�U�[��` Window Message �n���h���[
+#### ユーザー定義 Window Message ハンドラー
 
 [`OnUserTrayNotify`](#onusertraynotify)
 [`OnPopupNotify`](#onpopupnotify)
@@ -33,7 +33,7 @@
 [`OnGetSender`](#ongetsender)
 [`OnShowHelp`](#onshowhelp)
 
-#### �R�}���h�n���h���[
+#### コマンドハンドラー
 
 [`OnMenuWeb`](#onmenuweb)
 [`OnMenuLicense`](#onmenulicense)
@@ -44,21 +44,21 @@
 [`OnMenuSetup`](#onmenusetup)
 [`OnMenuExit`](#onmenuexit)
 
-#### �풓�A�C�R���֘A
+#### 常駐アイコン関連
 
 [`AddNI`](#addni)
 [`DelNI`](#delni)
 [`ModNI`](#modni)
 
-#### ���j���[�֘A
+#### メニュー関連
 
 [`SetMenu`](#setmenu)
 
-#### �����֘A
+#### 導入関連
 
 [`Introduce`](#introduce)
 
-#### �ݒ�l�֘A
+#### 設定値関連
 
 [`LoadAccounts`](#loadaccounts)
 [`SaveAccounts`](#saveaccounts)
@@ -69,16 +69,16 @@
 [`LoadTLDs`](#loadtlds)
 [`SaveTLDs`](#savetlds)
 
-#### �Í��֘A
+#### 暗号関連
 
 [`MakeBlob`](#makeblob)
 [`EnDecrypt`](#endecrypt)
 
-#### �d����Ԋ֘A
+#### 電源状態関連
 
 [`OnPower`](#onpower)
 
-#### ���[���`�F�b�N�֘A
+#### メールチェック関連
 
 [`PollNow`](#pollnow)
 [`PollMails`](#pollmails)
@@ -95,7 +95,7 @@
 [`CheckReceived`](#checkreceived)
 [`CheckBlackList`](#checkblacklist)
 
-#### ���O�֘A
+#### ログ関連
 
 [`MakeLog`](#makelog)
 [`SaveLog`](#savelog)
@@ -104,13 +104,13 @@
 [`TrimFiles`](#trimfiles)
 [`MoveFiles`](#movefiles)
 
-#### �T�}���[�֘A
+#### サマリー関連
 
 [`MakeSummary`](#makesummary)
 [`ShowSummary`](#showsummary)
 [`ShareSummary`](#sharesummary)
 
-#### ������ϊ��֘A
+#### 文字列変換関連
 
 [`StringFromHeader`](#stringfromheader)
 [`StringFromBody`](#stringfrombody)
@@ -123,7 +123,7 @@
 [`HexToASCII`](#hextoascii)
 [`HexToUnicode`](#hextounicode)
 
-#### ���O�`�F�b�N�֘A
+#### ログチェック関連
 
 [`CheckUnicode`](#checkunicode)
 [`CheckAlias`](#checkalias)
@@ -136,1305 +136,1305 @@
 [`IsEvasiveCode`](#isevasivecode)
 [`SetLinkVisible`](#setlinkvisible)
 
-#### �G���[�t�B���^�[
+#### エラーフィルター
 
 [`FilterError`](#filtererror)
 
-#### �ʐM�֘A
+#### 通信関連
 
 [`ConnectPOP`](#connectpop)
 [`RespondPOP`](#respondpop)
 [`ClosePOP`](#closepop)
 
-#### �ĕ]���֘A
+#### 再評価関連
 
 [`ReadFromEML`](#readfromeml)
 [`ReadEML`](#reademl)
 
 
-## �T�v
+## 概要
 
-�̐S�Ȃ��Ƃ�, �S�Ă��� class �̒��ōs���Ă��܂�.
-���̃v���W�F�N�g�̒��ɂ͑��ɂ��F�X class ������܂���,
-���� class �ȊO�͂قƂ�ǐݒ�̂��߂̃_�C�A���O�Ƃ��ʒm�̂��߂̃_�C�A���O�Ƃ�,
-���� class �ƃ��[�U�[�̑Θb�̂��߂ɐ݂���ꂽ���̂ł�.
+肝心なことは, 全てこの class の中で行っています.
+このプロジェクトの中には他にも色々 class がありますが,
+この class 以外はほとんど設定のためのダイアログとか通知のためのダイアログとか,
+この class とユーザーの対話のために設けられたものです.
 
-���� class �̒��ōs���Ă����ȓ����,
-�ȉ��̒ʂ�ł�.
+この class の中で行われている主な動作は,
+以下の通りです.
 
-1. �ݒ�l����荞��.
-1. �^�X�N�o�[�̒ʒm�̈�ɃA�C�R�����d����.
-1. �^�C�}�[���d�|����.
+1. 設定値を取り込む.
+1. タスクバーの通知領域にアイコンを仕込む.
+1. タイマーを仕掛ける.
 
-��, �^�C�}�[���������邽�т�,
+で, タイマーが満了するたびに,
 
-1. �ݒ肳��Ă������[���T�[�o�[��[POP3](https://ja.wikipedia.org/wiki/Post_Office_Protocol)�Őڑ�����.
-1. �ݒ肳��Ă������[�U�[���ƃp�X���[�h�� POP3 �ɃT�C���C������.
-1. ���[�����͂��Ă��邩�m�F��, �͂��Ă���΂��̒��g��ǂݎ����, �ݒ�ɏ]���ăX�p�����ǂ������肷��.
-1. �X�p���Ɣ��肵�����[���͔j������悤 POP3 �Ń��[���T�[�o�[�ɗv������.
-1. �X�p���ł͂Ȃ����[�����͂��Ă�����, �A�C�R���ł��m�点����.
-1. ���[���̃C���[�W�� [`.eml`](https://www.google.com/search?q=.eml+�t�@�C��) �t�@�C���ŕۑ�����.
-1. ��L�C���[�W���f�R�[�h���� `.txt` �t�@�C�����ۑ�����.
+1. 設定されていたメールサーバーに[POP3](https://ja.wikipedia.org/wiki/Post_Office_Protocol)で接続する.
+1. 設定されていたユーザー名とパスワードで POP3 にサインインする.
+1. メールが届いているか確認し, 届いていればその中身を読み取って, 設定に従ってスパムかどうか判定する.
+1. スパムと判定したメールは破棄するよう POP3 でメールサーバーに要請する.
+1. スパムではないメールが届いていたら, アイコンでお知らせする.
+1. メールのイメージを [`.eml`](https://www.google.com/search?q=.eml+ファイル) ファイルで保存する.
+1. 上記イメージをデコードした `.txt` ファイルも保存する.
 
-�Ƃ��������Ƃ��s���Ă��܂�.
+といったことを行っています.
 
-�^�X�N�o�[�ɏ풓�����Ă���A�C�R�����������̓����:
+タスクバーに常駐させているアイコンをつついた時の動作は:
 
-* ���N���b�N���ꂽ�璼���Ƀ��[�����m�F����.
-* �E�N���b�N���ꂽ��|�b�v�A�b�v���j���[���o��.
+* 左クリックされたら直ちにメールを確認する.
+* 右クリックされたらポップアップメニューを出す.
 
-�ƂȂ��Ă���,
-�|�b�v�A�b�v���j���[�ł����ꂩ�̍��ڂ��I�����ꂽ�ꍇ��,
-���̍��ڂ̓�����s���܂�.
+となっており,
+ポップアップメニューでいずれかの項目が選択された場合は,
+その項目の動作を行います.
 
-���̑��ׂ̍�������ł���,
+その他の細かい動作ですが,
 
-* �ݒ�l�̂������[���A�J�E���g�Ɋւ������, �Í������ă��W�X�g���[�Ɋi�[
-* ���[���̃T�}���[��
-[�t�@�C���}�b�s���O](https://learn.microsoft.com/ja-jp/windows/win32/memory/file-mapping)
-�ő��v���Z�X�ɋ��L����@�\����� ( �f�t�H���g�� OFF )
-* �󂯎��ς݂̃��[���� `.eml` ����킹�� [Filter](../README.md#filter) �̐ݒ���u���K�v����@�\�t��
+* 設定値のうちメールアカウントに関する情報は, 暗号化してレジストリーに格納
+* メールのサマリーを
+[ファイルマッピング](https://learn.microsoft.com/ja-jp/windows/win32/memory/file-mapping)
+で他プロセスに共有する機能も具備 ( デフォルトは OFF )
+* 受け取り済みのメールの `.eml` を喰わせて [Filter](../README.md#filter) の設定を「練習」する機能付き
 
-�Ƃ������Ƃ��������܂�.
+といったところもあります.
 
-�Ƃ���ł��� class �� `CWnd` ����h������ window �Ȃ̂ł���,
-�����\�����܂���. �\������C���Ȃ��̂ł�.
-����Ȃ̂ɂȂ��uwindow�v�Ƃ����`�Ԃ��Ƃ��Ă���̂��Ƃ�����,
-�����P�ɁuWindow Message ���󂯂ē�����������v�Ƃ��������ł�.
-���� Windows&reg; �A�v���P�[�V�����́u�񓯊��v�Ƃ�����
-�u[event driven](https://ja.wikipedia.org/wiki/�C�x���g�쓮�^�v���O���~���O)�v�Ȃ��̂ł���,
-�� class �����̗�ɘR�ꂸ, �u*Window Message* driven�v�̓��쌴���œ����Ă��܂�.
+ところでこの class は `CWnd` から派生した window なのですが,
+何も表示しません. 表示する気がないのです.
+それなのになぜ「window」という形態をとっているのかというと,
+ただ単に「Window Message を受けて動きたいから」というだけです.
+大抵の Windows&reg; アプリケーションは「非同期」というか
+「[event driven](https://ja.wikipedia.org/wiki/イベント駆動型プログラミング)」なものですが,
+当 class もその例に漏れず, 「*Window Message* driven」の動作原理で動いています.
 
-�ȉ�, �{ class ���Ɏ������ꂽ�֐����ꂼ��̐����ł�.
+以下, 本 class 内に実装された関数それぞれの説明です.
 
 
 ## `CMainWnd`
 
-���� class �� constructor �ł�.
+この class の constructor です.
 
-�ʂ� constructor �łȂ��Ă�,
-�������̌_�@�͂���1�ʂ�[�uwindow �Ƃ��� create ���ꂽ�Ƃ��v](#oncreate)������̂ł���,
-���̍ۂɏ���������̂́uwindow �Ƃ��� create ����Ă���łȂ��Ə������ł��Ȃ����́v�Ƃ�,
-�����őS�Ẵ����o�[�ϐ������������Ă��܂�.
+別に constructor でなくても,
+初期化の契機はもう1つ別に[「window として create されたとき」](#oncreate)があるのですが,
+その際に初期化するのは「window として create されてからでないと初期化できないもの」とし,
+ここで全てのメンバー変数を初期化しています.
 <sub>
-�������Ă����Ȃ���[C26495](https://learn.microsoft.com/ja-jp/cpp/code-quality/c26495)�����邳���̂�.
+そうしておかないと[C26495](https://learn.microsoft.com/ja-jp/cpp/code-quality/c26495)がうるさいので.
 </sub>
 
-�ʂ̕ϐ��������Ƃ͕ʂ�, �ȉ��̃��[�U�[�ݒ�l�ǂݍ��݂̊֐����Ăяo���Ă��܂�.
+個別の変数初期化とは別に, 以下のユーザー設定値読み込みの関数を呼び出しています.
 
-| �֐� | �������Ώ� |
+| 関数 | 初期化対象 |
 | --- | --- |
-| [`LoadSettings`](#loadsettings) | [Setup](../README.md#setup) �Őݒ肳�ꂽ�p�����[�^�[�̓ǂݍ��� |
-| [`LoadFilters`](#loadfilters) | [Filter](../README.md#filter) �Őݒ肳�ꂽ�p�����[�^�[�̓ǂݍ��� |
-| [`LoadTLDs`](#loadtlds) | �ߋ��Ɏ�M�������т̂��� [TLD ( Top Level Domain )](https://ja.wikipedia.org/wiki/�g�b�v���x���h���C��) ���̓ǂݍ��� |
-| [`MakeBlob`](#makeblob) | �����p [BLOB](https://ja.wikipedia.org/wiki/�o�C�i���E���[�W�E�I�u�W�F�N�g) �̓ǂݍ��� |
+| [`LoadSettings`](#loadsettings) | [Setup](../README.md#setup) で設定されたパラメーターの読み込み |
+| [`LoadFilters`](#loadfilters) | [Filter](../README.md#filter) で設定されたパラメーターの読み込み |
+| [`LoadTLDs`](#loadtlds) | 過去に受信した実績のある [TLD ( Top Level Domain )](https://ja.wikipedia.org/wiki/トップレベルドメイン) 名の読み込み |
+| [`MakeBlob`](#makeblob) | 復号用 [BLOB](https://ja.wikipedia.org/wiki/バイナリ・ラージ・オブジェクト) の読み込み |
 
 
 ## `~CMainWnd`
 
-���� class �� destructor �ł�.
+この class の destructor です.
 
-�ʂ� destructor �łȂ��Ă�,
-�Еt����_�@�͂���1�ʂ�[�uwindow �Ƃ��� destroy ���ꂽ�Ƃ��v](#destroywindow)������̂ł���,
-�uconstructor �ō�������̂� destructor �ŕЕt����v�Ƃ����Ώ̐��̂��߂�,
-�Œ���̌�Еt�����s���Ă��܂�.
+別に destructor でなくても,
+片付ける契機はもう1つ別に[「window として destroy されたとき」](#destroywindow)があるのですが,
+「constructor で作ったものは destructor で片付ける」という対称性のために,
+最低限の後片付けを行っています.
 
 
 ## `DestroyWindow`
 
-`CWnd::DestroyWindow` �� override �ł�.
+`CWnd::DestroyWindow` の override です.
 
-[`DelNI`](#delni) ���Ăяo����, �^�X�N�o�[�̒ʒm�̈�ɐ��荞�܂����A�C�R����Еt��,
-[`CNotifyWnd`](CNotifyWnd.md) ���Еt���܂�.
+[`DelNI`](#delni) を呼び出して, タスクバーの通知領域に潜り込ませたアイコンを片付け,
+[`CNotifyWnd`](CNotifyWnd.md) も片付けます.
 
-�v�́ucreate ���ɍ�������̂� destroy ���ɕЕt����v�Ƃ����Ώ̐��̂��߂�,
-�����ɋ��ݍ���ł��܂�.
-������, ���̌�� `CWnd::DestroyWindow` �Ɉς˂܂�.
-�Ȃ̂Ŗ߂�l�� `CWnd::DestroyWindow` �̔��f�Ɉς˂Ă��܂�.
+要は「create 時に作ったものは destroy 時に片付ける」という対称性のために,
+ここに挟み込んでいます.
+そして, その後は `CWnd::DestroyWindow` に委ねます.
+なので戻り値も `CWnd::DestroyWindow` の判断に委ねています.
 
 
 ## `OnCreate`
 
 Window Message [`WM_CREATE`](https://learn.microsoft.com/ja-jp/windows/win32/winmsg/wm-create)
-�ɑ΂���n���h���[�ł�.
+に対するハンドラーです.
 
-�܂���� class �� `OnCreate` ���ς܂�����,
-[CProperSheet](CProperSheet.md) �ɗ^���錩�₷���t�H���g
+まず基底 class の `OnCreate` を済ませた後,
+[CProperSheet](CProperSheet.md) に与える見やすいフォント
 ( [`CPropertySheet`](https://learn.microsoft.com/ja-jp/cpp/mfc/reference/cpropertysheet-class)
-���������Ă���ǂ݂Â炢�t�H���g�ɑ����� ) ������Ă���,
-���̑��̃_�C�A���O�ɂ����ʂœK�p���铙���̃t�H���g������Ă����܂�.
+が強制してくる読みづらいフォントに代わって ) を作っておき,
+その他のダイアログにも共通で適用する等幅のフォントも作っておきます.
 
-���ꂩ��,
-sleep ��Ԃ���̕��A��ߑ����邽�߂̃n���h���[ [`OnPower`](#onpower) ��o�^���܂�.
+それから,
+sleep 状態からの復帰を捕捉するためのハンドラー [`OnPower`](#onpower) を登録します.
 
-�Ō�Ɂu�����J�n�v�̂��߂̃^�C�}�[ `TID_INIT` ��҂����ԃ[���Ŏd�|���ďI���ł�.
+最後に「準備開始」のためのタイマー `TID_INIT` を待ち時間ゼロで仕掛けて終了です.
 
-�u�҂����ԃ[����������^�C�}�[�Ȃ�Ďd�|�����ɂ��̏�ł���B�v�Ǝv������������낤���Ƒ����܂���,
-����� [`WM_TIMER` �̗D��x�̒Ⴓ](https://learn.microsoft.com/ja-jp/windows/win32/winmsg/wm-timer#remarks)
-�𗘗p�����u�d�؂蒼���v�ł�.
-���́u�d�؂蒼���v�ɂ��, ���ۂɁu�����J�n�v�����{�����̂�,
-����܂ł̏������łȂ񂾂��񂾔�ь����Ă��� Window Message ���S�ăn�P�Ă���Ƃ������ƂɂȂ�܂�.
+「待ち時間ゼロだったらタイマーなんて仕掛けずにその場でやれよ。」と思われる向きもあろうかと存じますが,
+これは [`WM_TIMER` の優先度の低さ](https://learn.microsoft.com/ja-jp/windows/win32/winmsg/wm-timer#remarks)
+を利用した「仕切り直し」です.
+この「仕切り直し」により, 実際に「準備開始」が実施されるのは,
+これまでの初期化でなんだかんだ飛び交っていた Window Message が全てハケてからということになります.
 
 
 ## `OnTimer`
 
 Window Message [`WM_TIMER`](https://learn.microsoft.com/ja-jp/windows/win32/winmsg/wm-timer)
-�ɑ΂���n���h���[�ł�.
+に対するハンドラーです.
 
-���L�̃^�C�}�[�l����舵���Ă��܂�.
+下記のタイマー値を取り扱っています.
 
-| �^�C�}�[�l | �� | �������e |
+| タイマー値 | 状況 | 処理内容 |
 | --- | --- | --- |
-| `TID_INIT` | �u�����J�n�v | [`Introduce`](#introduce) �ɂă��[���A�J�E���g��ǂݍ���. ���ݒ�Ȃ炲���A. |
-| `TID_READY` | �u�������v | [`AddNI`](#addni) �ɂă^�X�N�o�[�̒ʒm�̈�ɃA�C�R���o�^. �o�^�����܂ŌJ��Ԃ�. |
-| `TID_START` | �u�ʏ�c�ƊJ�n�v | [`PollNow`](#pollnow) �ɂčŏ��̃`�F�b�N�ƈȍ~�̂��߂� `TID_POLL` ���Z�b�g. |
-| `TID_POLL` | �u�ʏ�c�ƒ��v | [`PollMails`](#pollmails) �ɂă��[���̃`�F�b�N. |
-| `TID_CLOSE` | �u�X���v | [`RespondPOP`](#respondpop) �ɋ󕶎����n���ĒʐM���I��. |
+| `TID_INIT` | 「準備開始」 | [`Introduce`](#introduce) にてメールアカウントを読み込み. 未設定ならご挨拶. |
+| `TID_READY` | 「準備中」 | [`AddNI`](#addni) にてタスクバーの通知領域にアイコン登録. 登録完了まで繰り返し. |
+| `TID_START` | 「通常営業開始」 | [`PollNow`](#pollnow) にて最初のチェックと以降のために `TID_POLL` をセット. |
+| `TID_POLL` | 「通常営業中」 | [`PollMails`](#pollmails) にてメールのチェック. |
+| `TID_CLOSE` | 「閉店中」 | [`RespondPOP`](#respondpop) に空文字列を渡して通信を終了. |
 
 
 ## `OnGetFont`
 
 Window Message [`WM_GETFONT`](https://learn.microsoft.com/ja-jp/windows/win32/winmsg/wm-getfont)
-�ɑ΂���n���h���[�ł�.
+に対するハンドラーです.
 
-���炩���� [`OnCreate`](#oncreate) �ō���Ă������u���₷���t�H���g�v�� handle ��Ԃ������ł�.
+あらかじめ [`OnCreate`](#oncreate) で作っておいた「見やすいフォント」の handle を返すだけです.
 <br>
-�L�ӂȒl��Ԃ��Ă���̂�, `WM_GETFONT` ��
-[`PostMessage`](https://learn.microsoft.com/ja-jp/windows/win32/api/winuser/nf-winuser-postmessagew) �ł͂Ȃ�
+有意な値を返しているので, `WM_GETFONT` は
+[`PostMessage`](https://learn.microsoft.com/ja-jp/windows/win32/api/winuser/nf-winuser-postmessagew) ではなく
 [`SendMessage`](https://learn.microsoft.com/ja-jp/windows/win32/api/winuser/nf-winuser-sendmessagew)
-�ő����Ă��������̂��O��ł�.
+で送っていただくのが前提です.
 
-������ `WM_GETFONT` �𓊂��Ă���̂�,
-[`CProperSheet`](CProperSheet.md) ���炢�Ȃ��̂ł�.
-���˂Ă��� page �̂��ꂼ���, ���̊֐����Ԃ��Ă���t�H���g��K�p���Ă��܂�.
+ここに `WM_GETFONT` を投げてくるのは,
+[`CProperSheet`](CProperSheet.md) ぐらいなものです.
+束ねている page のそれぞれに, この関数が返しているフォントを適用しています.
 
-���̃_�C�A���O�͕��ʂ̃_�C�A���O�Ȃ̂�, ���ꂼ�ꎩ�O�Ō��₷���t�H���g��ݒ肵�Ă��܂�.
+他のダイアログは普通のダイアログなので, それぞれ自前で見やすいフォントを設定しています.
 
 
 ## `OnSocketNotify`
 
 Window Message `WM_SOCKET_NOTIFY`
-�ɑ΂���n���h���[�ł�.
+に対するハンドラーです.
 
-`WM_SOCKET_NOTIFY` �͌��� MFC �����Ŏg�p���邽�߂̒�`�Ȃ̂ł���
-( �̂ɐ������Ă��� web page �����݂��Ȃ� ),
-���ʂɃr���h����� `#include` �Ɋ܂܂�Ă��� `afxpriv.h` �ɓ����Ă����`�Ȃ̂�,
-�A�v���P�[�V�����v���O���}�[�� ( ����� ) �g�����`�l�ł�.
+`WM_SOCKET_NOTIFY` は元来 MFC 内部で使用するための定義なのですが
+( 故に説明している web page が存在しない ),
+普通にビルドすると `#include` に含まれている `afxpriv.h` に入っている定義なので,
+アプリケーションプログラマーも ( 勝手に ) 使える定義値です.
 
-�����ł� [`CParaSocket`](CParaSocket.md) ����̒ʒm�Ɏg���Ă��܂�.
+ここでは [`CParaSocket`](CParaSocket.md) からの通知に使っています.
 
-�n���������̓��e��
+渡される引数の内容は
 
-| ���� | ���e |
+| 引数 | 内容 |
 | --- | --- |
-| `wParam` | ��� 16bits ���\�P�b�g�̏�Ԃ������R�[�h, ���� 16bits �����[�U�[��`�̎��ʒl. |
-| `lParam` | ���M���\�P�b�g�ւ̃|�C���^. |
+| `wParam` | 上位 16bits がソケットの状態を示すコード, 下位 16bits がユーザー定義の識別値. |
+| `lParam` | 送信元ソケットへのポインタ. |
 
-�ƂȂ��Ă���, �u��Ԃ������R�[�h�v��
+となっており, 「状態を示すコード」は
 [`ParaSocket.h`](../ChkMails/ChkMails/ParaSocket.h)
-�ɒ�`����Ă��� `SOCK_STATE_` ����n�܂� macro ���Œ�`���ꂽ�l�ł�.
-�����ł�
+に定義されている `SOCK_STATE_` から始まる macro 名で定義された値です.
+ここでは
 
-| ��� | �Ӗ� | �� class �̑Ή� |
+| 状態 | 意味 | 当 class の対応 |
 | --- | --- | --- |
-| `SOCK_STATE_FAILED`<br>`SOCK_STATE_IDLE` | �u�Ȃ񂩎��s�����v<br>�u�؂ꂽ�v | `TID_CLOSE` ���������ĒʐM���I��. |
-| `SOCK_STATE_RECEIVED` | �u�Ȃ񂩎�M�����v | [`RespondPOP`](#respondpop) ���Ă�Ŏ�M�������̂��󂯎��. |
+| `SOCK_STATE_FAILED`<br>`SOCK_STATE_IDLE` | 「なんか失敗した」<br>「切れた」 | `TID_CLOSE` をしかけて通信を終了. |
+| `SOCK_STATE_RECEIVED` | 「なんか受信した」 | [`RespondPOP`](#respondpop) を呼んで受信したものを受け取る. |
 
-�� 3��ނ݈̂����Ă��܂�.
+の 3種類のみ扱っています.
 
-`SOCK_STATE_RECEIVED` ���ʒm���ꂽ�ꍇ��,
-��M�����o�C�g�������ǂݎ���� `CStringA` �Ɏd���ĂĂ���,
-[`RespondPOP`](#respondpop) �ɓn���܂�.
+`SOCK_STATE_RECEIVED` が通知された場合は,
+受信したバイト数だけ読み取って `CStringA` に仕立ててから,
+[`RespondPOP`](#respondpop) に渡します.
 
-���ɈӖ��̂���߂�l��Ԃ��Ă����ł��Ȃ��̂�,
-`WM_SOCKET_NOTIFY` ��
+特に意味のある戻り値を返している訳でもないので,
+`WM_SOCKET_NOTIFY` は
 [send](https://learn.microsoft.com/ja-jp/windows/win32/api/winuser/nf-winuser-sendmessagew)
-�ł͂Ȃ�
+ではなく
 [post](https://learn.microsoft.com/ja-jp/windows/win32/api/winuser/nf-winuser-postmessagew)
-�ő����Ă��������Ă��������傤�Ԃł�.
+で送っていただいてもだいじょうぶです.
 
 
 ## `OnUserTrayNotify`
 
-[`CChkMailsApp`](CChkMailsApp.md) �Œ�`���� Window Message `WM_USER_TRAY_NOTIFY`
-�ɑ΂���n���h���[�ł�.
+[`CChkMailsApp`](CChkMailsApp.md) で定義した Window Message `WM_USER_TRAY_NOTIFY`
+に対するハンドラーです.
 
-`WM_USER_TRAY_NOTIFY` ��, [`AddNI`](#addni) �ɂČĂѕԂ��� message �Ƃ��ēo�^���Ă���̂�,
-�^�X�N�o�[�ɏ풓���Ă���A�C�R�������삳���Ɠ����Ԃ���Ă��� Window Message �ł�.
+`WM_USER_TRAY_NOTIFY` は, [`AddNI`](#addni) にて呼び返しの message として登録しているので,
+タスクバーに常駐しているアイコンが操作されると投げ返されてくる Window Message です.
 
-���L�̑������舵���Ă��܂�.
+下記の操作を取り扱っています.
 
-| ���� | �Ӗ� | �� class �̑Ή� |
+| 操作 | 意味 | 当 class の対応 |
 | --- | --- | --- |
-| `WM_LBUTTONUP` | �N���b�N | [`PollNow`](#pollnow) �ɂčŏ��̃`�F�b�N�ƈȍ~�̂��߂� `TID_POLL` ���Z�b�g. |
-| `WM_RBUTTONUP` | �E�N���b�N | �_�C�A���O�\�����Ȃ炻����ɒ��ӊ��N.<br>�łȂ���� [SetMenu](#setmenu) �ɂă��j���[�\��. |
+| `WM_LBUTTONUP` | クリック | [`PollNow`](#pollnow) にて最初のチェックと以降のために `TID_POLL` をセット. |
+| `WM_RBUTTONUP` | 右クリック | ダイアログ表示中ならそちらに注意喚起.<br>でなければ [SetMenu](#setmenu) にてメニュー表示. |
 
-��L�́u�_�C�A���O�\�����Ȃ�v�Ƃ��������,
-[`OnPopupNotify`](#onpopupnotify) ���󂯎�����ŐV�� `lParam` �Ɋ�Â��Ă��܂�.
+上記の「ダイアログ表示中なら」という判定は,
+[`OnPopupNotify`](#onpopupnotify) が受け取った最新の `lParam` に基づいています.
 <br>
 <sub>
-����, ���Ȃ��Ɂu�o�Ă����_�C�A���O�𑀍삷��v�Ƃ��Ă���������΂���Ȃ��Ƃ��Ȃ��Ă��ςނ�ł���,
-�o�Ă����_�C�A���O�ȊO�Ɂu���C�v�����, �u����������Ȃ��B���������B�v�ƒ��ӂ����킯�ł�.
+いや, すなおに「出てきたダイアログを操作する」としていただければこんなことしなくても済むんですが,
+出てきたダイアログ以外に「浮気」すると, 「そっちじゃない。こっちだ。」と注意されるわけです.
 </sub>
 
-���ɈӖ��̂���߂�l��Ԃ��Ă����ł��Ȃ��̂�,
-`WM_USER_TRAY_NOTIFY` ��
+特に意味のある戻り値を返している訳でもないので,
+`WM_USER_TRAY_NOTIFY` は
 [send](https://learn.microsoft.com/ja-jp/windows/win32/api/winuser/nf-winuser-sendmessagew)
-�ł͂Ȃ�
+ではなく
 [post](https://learn.microsoft.com/ja-jp/windows/win32/api/winuser/nf-winuser-postmessagew)
-�ő����Ă��������Ă��������傤�Ԃł�.
+で送っていただいてもだいじょうぶです.
 
 
 ## `OnPopupNotify`
 
-[`CChkMailsApp`](CChkMailsApp.md) �Œ�`���� Window Message `WM_POPUP_NOTIFY`
-�ɑ΂���n���h���[�ł�.
+[`CChkMailsApp`](CChkMailsApp.md) で定義した Window Message `WM_POPUP_NOTIFY`
+に対するハンドラーです.
 
-[`NotifyPopup`](CChkMailsApp.md#notifypopup) �ɂ�� `lParam` �ɑ��M�� window �� handle ���ڂ��Ă���̂�,
-����Ɋ�Â��đ��M�� window �̃T�C�Y������,
-���̃T�C�Y�Ɋ�Â��đ��M�� window ���v���C�}�����j�^�[�̃^�X�N�o�[�̒ʒm�̈�Ɋ��Y���悤�Ȉʒu�ɂȂ�悤�v�Z��,
-���M�� window �̕\���ʒu���ړ������܂�.
+[`NotifyPopup`](CChkMailsApp.md#notifypopup) により `lParam` に送信元 window の handle が載っているので,
+それに基づいて送信元 window のサイズを求め,
+そのサイズに基づいて送信元 window がプライマリモニターのタスクバーの通知領域に寄り添うような位置になるよう計算し,
+送信元 window の表示位置を移動させます.
 
-Windows&reg; 11 �ł̓^�X�N�o�[�̓��j�^�[�̒�ӂɌŒ�ɂȂ�܂�����,
-Windows&reg; 10 �ł͏㉺���E�ɓ�������̂�,
-�^�X�N�o�[���ǂ��ɂ���̂������ɂ߂���ŕ\���ʒu�����肵�Ă��܂�.
+Windows&reg; 11 ではタスクバーはモニターの底辺に固定になりましたが,
+Windows&reg; 10 では上下左右に動かせるので,
+タスクバーがどこにあるのかを見極めた上で表示位置を決定しています.
 
-�Ȃ�, ���� `WM_POPUP_NOTIFY` �������ۂ�
-[`CNotifyWnd`](CNotifyWnd.md) ���\������Ă����ꍇ��, ���̕\���͏����Ă����܂�.
-���ꂩ��n�܂鑗�M�� window �̑���̎ז��ɂȂ�̂�.
+なお, この `WM_POPUP_NOTIFY` が来た際に
+[`CNotifyWnd`](CNotifyWnd.md) が表示されていた場合は, その表示は消しておきます.
+これから始まる送信元 window の操作の邪魔になるので.
 
-�܂�, `WM_POPUP_NOTIFY` ��
-�e�_�C�A���O�� `DoModal` ���甲���Ă��������ۂ� `lParam` ��n���Ă��郋�[���ɂȂ��Ă���̂�,
-�u�����ꂩ�̃_�C�A���O��
+また, `WM_POPUP_NOTIFY` は
+各ダイアログが `DoModal` から抜けてきたら空っぽの `lParam` を渡してくるルールになっているので,
+「いずれかのダイアログが
 [`DoModal`](https://learn.microsoft.com/ja-jp/cpp/mfc/reference/cdialog-class#domodal)
-���ł��邱�Ɓv��m�点���ڂ����˂Ă��܂�.
- [`OnUserTrayNotify`](#onusertraynotify) �ł�,
-�u`OnPopupNotify` �Ŏ󂯎�����ŐV�� `lParam` ������ۂłȂ���΁v
-���̃_�C�A���O���N������悤�ȃ��j���[�̎��s���֎~���Ă��܂�.
+中であること」を知らせる役目も兼ねています.
+ [`OnUserTrayNotify`](#onusertraynotify) では,
+「`OnPopupNotify` で受け取った最新の `lParam` が空っぽでなければ」
+他のダイアログを起動するようなメニューの実行を禁止しています.
 <br>
 <sub>
-����, ���Ȃ��Ɂu�o�Ă����_�C�A���O�𑀍삷��v�Ƃ��Ă���������΂���Ȃ��Ƃ��Ȃ��Ă��ςނ�ł���.
+いや, すなおに「出てきたダイアログを操作する」としていただければこんなことしなくても済むんですが.
 </sub>
 
-���ɈӖ��̂���߂�l��Ԃ��Ă����ł��Ȃ��̂�,
-`WM_POPUP_NOTIFY` ��
+特に意味のある戻り値を返している訳でもないので,
+`WM_POPUP_NOTIFY` は
 [send](https://learn.microsoft.com/ja-jp/windows/win32/api/winuser/nf-winuser-sendmessagew)
-�ł͂Ȃ�
+ではなく
 [post](https://learn.microsoft.com/ja-jp/windows/win32/api/winuser/nf-winuser-postmessagew)
-�ő����Ă��������Ă��������傤�Ԃł�.
+で送っていただいてもだいじょうぶです.
 
 
 ## `OnGetCommonFont`
 
-[`CChkMailsApp`](CChkMailsApp.md) �Œ�`���� Window Message `WM_GET_COMMONFONT`
-�ɑ΂���n���h���[�ł�.
+[`CChkMailsApp`](CChkMailsApp.md) で定義した Window Message `WM_GET_COMMONFONT`
+に対するハンドラーです.
 
-���炩���� [`OnCreate`](#oncreate) �ō���Ă������u�����̃t�H���g�v�� handle ��Ԃ������ł�.
+あらかじめ [`OnCreate`](#oncreate) で作っておいた「等幅のフォント」の handle を返すだけです.
 <br>
-�L�ӂȒl��Ԃ��Ă���̂�, `WM_GETFONT` ��
-[`PostMessage`](https://learn.microsoft.com/ja-jp/windows/win32/api/winuser/nf-winuser-postmessagew) �ł͂Ȃ�
+有意な値を返しているので, `WM_GETFONT` は
+[`PostMessage`](https://learn.microsoft.com/ja-jp/windows/win32/api/winuser/nf-winuser-postmessagew) ではなく
 [`SendMessage`](https://learn.microsoft.com/ja-jp/windows/win32/api/winuser/nf-winuser-sendmessagew)
-�ő����Ă��������̂��O��ł�.
+で送っていただくのが前提です.
 
-������ ( [`GetCommonFont`](CChkMailsApp.md#getcommonfont) �o�R�� ) `WM_GET_COMMONFONT` �𓊂��Ă���̂�,
-�u�����̃t�H���g�v��K�v�Ƃ���_�C�A���O�݂̂Ȃ����, �Y���ґ����ł�.
+ここに ( [`GetCommonFont`](CChkMailsApp.md#getcommonfont) 経由で ) `WM_GET_COMMONFONT` を投げてくるのは,
+「等幅のフォント」を必要とするダイアログのみなさんで, 該当者多数です.
 
 
 ## `OnGetSender`
 
-[`CChkMailsApp`](CChkMailsApp.md) �Œ�`���� Window Message `WM_GET_SENDER`
-�ɑ΂���n���h���[�ł�.
+[`CChkMailsApp`](CChkMailsApp.md) で定義した Window Message `WM_GET_SENDER`
+に対するハンドラーです.
 
-����̒ʐM ( �܂��͍���^����ꂽ `.eml` �t�@�C�� ) �œ������[�����璊�o����
+今回の通信 ( または今回与えられた `.eml` ファイル ) で得たメールから抽出した
 
-* ���M�҂́u���`�v( `From:` �ɏ����Ă��������M�Җ� )
-* ���ۂ̑��M�Җ� ( `Authentication-Results:` �Ȃǂɋ������Ă������M�Җ� )
+* 送信者の「名義」( `From:` に書いてあった送信者名 )
+* 実際の送信者名 ( `Authentication-Results:` などに挙がっていた送信者名 )
 
-�� 2�̏��̃y�A��, 1�̕�����Ƀ}�[�W�������̂�Ԃ��܂�.
+の 2つの情報のペアを, 1つの文字列にマージしたものを返します.
 <br>
-�L�ӂȒl��Ԃ��Ă���̂�, `WM_GET_SENDER` ��
-[`PostMessage`](https://learn.microsoft.com/ja-jp/windows/win32/api/winuser/nf-winuser-postmessagew) �ł͂Ȃ�
+有意な値を返しているので, `WM_GET_SENDER` は
+[`PostMessage`](https://learn.microsoft.com/ja-jp/windows/win32/api/winuser/nf-winuser-postmessagew) ではなく
 [`SendMessage`](https://learn.microsoft.com/ja-jp/windows/win32/api/winuser/nf-winuser-sendmessagew)
-�ő����Ă��������̂��O��ł�.
+で送っていただくのが前提です.
 
-[`CWhitePage`](CWhitePage.md) �� [`TakePair`](CWhitePage.md#takepair) ������ł��� Window Message �ł�.
-�� page �ł�������񂪗~�����̂ł���, ���O�Ŋ���o����肷�łɓ������������Ă��邱����� class ��,
-���̉��������˗����Ă���킯�ł�.
+[`CWhitePage`](CWhitePage.md) の [`TakePair`](CWhitePage.md#takepair) から飛んでくる Window Message です.
+同 page でも同じ情報が欲しいのですが, 自前で割り出すよりすでに同じ情報を握っているこちらの class に,
+情報の横流しを依頼しているわけです.
 
-������, [Filter](../README.md#filter) �Ɉ��������������[���ɑ΂��Ă�,
-����ۂ̕������Ԃ��Ă��܂�.
-������󂯎���� [`TakePair`](CWhitePage.md#takepair) ��,
-�u�ށA���̑��M�҂̓��o�����B�v�Ǝ@����킯�ł�.
+ただし, [Filter](../README.md#filter) に引っかかったメールに対しては,
+空っぽの文字列を返しています.
+それを受け取った [`TakePair`](CWhitePage.md#takepair) は,
+「む、この送信者はヤバいぞ。」と察するわけです.
 
 
 ## `OnShowHelp`
 
-[`CChkMailsApp`](CChkMailsApp.md) �Œ�`���� Window Message `WM_SHOW_HELP`
-�ɑ΂���n���h���[�ł�.
+[`CChkMailsApp`](CChkMailsApp.md) で定義した Window Message `WM_SHOW_HELP`
+に対するハンドラーです.
 
-`Help` �{�^������������_�C�A���O(�ƃV�[�g)����, `Help` �{�^���������ꂽ���ɑ����Ă��܂�.
-`lParam` �ɑ��M�� window �� handle ���n����Ă���̂�,
-����Ɋ�Â��đ��M�� window �̃^�C�g�� ( caption ) ������,
-���̕�������������ɂ���Ȃǂ̉��H���s��,
-���H��������������� github ��̃g�b�v�� [README.md](../README.md) �Ɂu�߂̖��O�v�Ƃ��ĕt�^�������̂��u���E�U�[�ŊJ��,
-�܂�u�Y���̍��ڂ̐�����\��������v�Ƃ���������s���܂�.
+`Help` ボタンを持つあらゆるダイアログ(とシート)から, `Help` ボタンが押された時に送られてきます.
+`lParam` に送信元 window の handle が渡されているので,
+それに基づいて送信元 window のタイトル ( caption ) を求め,
+その文字列を小文字にするなどの加工を行い,
+加工した文字列をこの github 上のトップの [README.md](../README.md) に「節の名前」として付与したものをブラウザーで開く,
+つまり「該当の項目の説明を表示させる」という動作を行います.
 
-���ɈӖ��̂���߂�l��Ԃ��Ă����ł��Ȃ��̂�,
-`WM_SHOW_HELP` ��
+特に意味のある戻り値を返している訳でもないので,
+`WM_SHOW_HELP` は
 [send](https://learn.microsoft.com/ja-jp/windows/win32/api/winuser/nf-winuser-sendmessagew)
-�ł͂Ȃ�
+ではなく
 [post](https://learn.microsoft.com/ja-jp/windows/win32/api/winuser/nf-winuser-postmessagew)
-�ő����Ă��������Ă��������傤�Ԃł�.
+で送っていただいてもだいじょうぶです.
 
 
 ## `OnMenuWeb`
 
-[`SetMenu`](#setmenu) ���񎦂������j���[�� [`View info on website`](../README.md#view-info-on-website)
-���I�΂ꂽ���ɔ��ł��� `ID_HELP_INDEX` �ɑ΂���n���h���[�ł�.
+[`SetMenu`](#setmenu) が提示したメニューの [`View info on website`](../README.md#view-info-on-website)
+が選ばれた時に飛んでくる `ID_HELP_INDEX` に対するハンドラーです.
 
 [`ShellExecute`](https://learn.microsoft.com/ja-jp/windows/win32/api/shellapi/nf-shellapi-shellexecutew)
-��[���A�v���̃g�b�v�y�[�W](../README.md#chkmails) ���J�������ł�.
+で[当アプリのトップページ](../README.md#chkmails) を開くだけです.
 
 
 ## `OnMenuLicense`
 
-[`SetMenu`](#setmenu) ���񎦂������j���[�� [`License announcement`](../README.md#license-announcement)
-���I�΂ꂽ���ɔ��ł��� `ID_HELP_USING` �ɑ΂���n���h���[�ł�.
+[`SetMenu`](#setmenu) が提示したメニューの [`License announcement`](../README.md#license-announcement)
+が選ばれた時に飛んでくる `ID_HELP_USING` に対するハンドラーです.
 
-�P�� [MIT License](https://ja.wikipedia.org/wiki/MIT_License)
-��
+単に [MIT License](https://ja.wikipedia.org/wiki/MIT_License)
+の
 [License terms](https://en.wikipedia.org/wiki/MIT_License#License_terms)
-��
+を
 [`AfxMessageBox`](https://learn.microsoft.com/ja-jp/cpp/mfc/reference/cstring-formatting-and-message-box-display#afxmessagebox)
-�ŕ\�����邾���ł�.
+で表示するだけです.
 
 
 ## `OnMenuAbout`
 
-[`SetMenu`](#setmenu) ���񎦂������j���[�� [`About ChkMails`](../README.md#about-chkmails)
-���I�΂ꂽ���ɔ��ł��� `ID_APP_ABOUT` �ɑ΂���n���h���[�ł�.
+[`SetMenu`](#setmenu) が提示したメニューの [`About ChkMails`](../README.md#about-chkmails)
+が選ばれた時に飛んでくる `ID_APP_ABOUT` に対するハンドラーです.
 
 [`CChkMailsApp::GetVersionInfo`](CChkMailsApp.md#getversioninfo)
-�ň��������Ă����o�[�W��������
+で引っ張ってきたバージョン情報を
 [`AfxMessageBox`](https://learn.microsoft.com/ja-jp/cpp/mfc/reference/cstring-formatting-and-message-box-display#afxmessagebox)
-�ŕ\�����邾���ł�.
+で表示するだけです.
 
 
 ## `OnMenuAccounts`
 
-[`SetMenu`](#setmenu) ���񎦂������j���[�� [`Accounts`](../README.md#accounts)
-���I�΂ꂽ���ɔ��ł��� `ID_MENU_ACCOUNTS` �ɑ΂���n���h���[�ł�.
+[`SetMenu`](#setmenu) が提示したメニューの [`Accounts`](../README.md#accounts)
+が選ばれた時に飛んでくる `ID_MENU_ACCOUNTS` に対するハンドラーです.
 
-�����菇�͈ȉ��ł�.
+処理手順は以下です.
 
-1. [`CAccountDlg`](AccountDlg.md) �����̊֐����Ń��[�J���� ( �����ϐ��Ƃ��� ) �錾 ( construct ����� ).
-1. ���̃N���X�ŕێ����Ă���A�J�E���g�z�� `m_aAccount` �̃R�s�[�����.
-1. [`CAccountDlg`](CAccountDlg.md) �� [`SetAccounts`](CAccountDlg.md#setaccounts) ��ʂ��ăR�s�[(�ւ̎Q��)��^����.
-1. [`CAccountDlg`](CAccountDlg.md) �� [`DoModal`](https://learn.microsoft.com/ja-jp/cpp/mfc/reference/cdialog-class#domodal) ���Ă�ł��̓�����҂�.
-1. ������ `IDOK` ( `OK` �{�^���������ꂽ ) �łȂ���ΏI��.
-1. �R�s�[�ƃI���W�i���� `m_aAccount` ���r.
-1. ����Ă�����R�s�[����荞��, [`SaveAccounts`](#saveaccounts) �ŃZ�[�u�������, [`PollNow`](pollnow) �Ń`�F�b�N�J�n.
-1. �A�J�E���g���S�ď�����Ă�����, �����\�����邽�� [`ModNI`](#modni) �ŃA�C�R���ύX.
-1. ���̊֐��̏I���ɔ���, [`CAccountDlg`](CAccountDlg.md) ������ ( destruct ����� ).
+1. [`CAccountDlg`](AccountDlg.md) をこの関数内でローカルに ( 自動変数として ) 宣言 ( construct される ).
+1. このクラスで保持しているアカウント配列 `m_aAccount` のコピーを作る.
+1. [`CAccountDlg`](CAccountDlg.md) の [`SetAccounts`](CAccountDlg.md#setaccounts) を通してコピー(への参照)を与える.
+1. [`CAccountDlg`](CAccountDlg.md) の [`DoModal`](https://learn.microsoft.com/ja-jp/cpp/mfc/reference/cdialog-class#domodal) を呼んでその答えを待つ.
+1. 答えが `IDOK` ( `OK` ボタンが押された ) でなければ終了.
+1. コピーとオリジナルの `m_aAccount` を比較.
+1. 違っていたらコピーを取り込み, [`SaveAccounts`](#saveaccounts) でセーブした上で, [`PollNow`](pollnow) でチェック開始.
+1. アカウントが全て消されていたら, それを表現するため [`ModNI`](#modni) でアイコン変更.
+1. この関数の終了に伴い, [`CAccountDlg`](CAccountDlg.md) も消失 ( destruct される ).
 
 
 ## `OnMenuFilter`
 
-[`SetMenu`](#setmenu) ���񎦂������j���[�� [`Filter`](../README.md#filter)
-���I�΂ꂽ���ɔ��ł��� `ID_MENU_FILTER` �ɑ΂���n���h���[�ł�.
+[`SetMenu`](#setmenu) が提示したメニューの [`Filter`](../README.md#filter)
+が選ばれた時に飛んでくる `ID_MENU_FILTER` に対するハンドラーです.
 
-�����菇�͈ȉ��ł�.
+処理手順は以下です.
 
-1. [`CFilterSheet`](CFilterSheet.md) �����̊֐����Ń��[�J���� ( �����ϐ��Ƃ��� ) �錾 ( construct ����� ).
-1. ���̃N���X�ŕێ����Ă���ݒ�l�� [`CFilterSheet`](FilterSheet.md) �z���̊e page �Ɏd����.
-1. [`CFilterSheet`](CFilterSheet.md) ��
-[`DoModal`](https://learn.microsoft.com/ja-jp/cpp/mfc/reference/cdialog-class#domodal) ���Ă�ł��̓�����҂�.
-1. ������ `IDOK` ( `OK` �{�^���������ꂽ ) �łȂ���ΏI��.
-1. �e page ����ݒ�l�����.
-1. ��������l�ƃI���W�i���̐ݒ�l���قȂ���̂���荞��.
-1. [`SaveFilters`](#savefilters) �ɂ�, �ύX���ꂽ�ݒ�l���Z�[�u.
-1. ���̊֐��̏I���ɔ���, [`CFilterSheet`](CFilterSheet.md) ������ ( destruct ����� ).
+1. [`CFilterSheet`](CFilterSheet.md) をこの関数内でローカルに ( 自動変数として ) 宣言 ( construct される ).
+1. このクラスで保持している設定値を [`CFilterSheet`](FilterSheet.md) 配下の各 page に仕込む.
+1. [`CFilterSheet`](CFilterSheet.md) の
+[`DoModal`](https://learn.microsoft.com/ja-jp/cpp/mfc/reference/cdialog-class#domodal) を呼んでその答えを待つ.
+1. 答えが `IDOK` ( `OK` ボタンが押された ) でなければ終了.
+1. 各 page から設定値を回収.
+1. 回収した値とオリジナルの設定値が異なるものを取り込む.
+1. [`SaveFilters`](#savefilters) にて, 変更された設定値をセーブ.
+1. この関数の終了に伴い, [`CFilterSheet`](CFilterSheet.md) も消失 ( destruct される ).
 
-�܂�, [`Filter`](../README.md#filter) �̂����ꂩ�̐ݒ肪�ύX���ꂽ�ꍇ��,
-���̐V���Ȑݒ�Ń��O ( `.eml` ) ���ĕ]�����Ă݂邩��₢���킹��
+また, [`Filter`](../README.md#filter) のいずれかの設定が変更された場合は,
+その新たな設定でログ ( `.eml` ) を再評価してみるかを問い合わせる
 [`AfxMessageBox()`](https://learn.microsoft.com/ja-jp/cpp/mfc/reference/cstring-formatting-and-message-box-display#afxmessagebox)
-���o���܂�.
-����� `Yes` �Ɠ������,
-���ܒ~�ς��Ă��郍�O ( `.eml` ) �S�Ă��ĕ]�����܂�.
-[Filter](../README.md#filter) �ݒ肪�Â����� or ���߂����̔��f�ޗ��ɂȂ�ł��傤.
+を出します.
+これに `Yes` と答えると,
+いま蓄積しているログ ( `.eml` ) 全てを再評価します.
+[Filter](../README.md#filter) 設定が甘かった or やり過ぎたの判断材料になるでしょう.
 
 
 ## `OnMenuLogs`
 
-[`SetMenu`](#setmenu) ���񎦂������j���[�� [`Logs`](../README.md#logs)
-���I�΂ꂽ���ɔ��ł��� `ID_MENU_LOGS` �ɑ΂���n���h���[�ł�.
+[`SetMenu`](#setmenu) が提示したメニューの [`Logs`](../README.md#logs)
+が選ばれた時に飛んでくる `ID_MENU_LOGS` に対するハンドラーです.
 
-���O�t�H���_ `m_strLogPath` ��������
+ログフォルダ `m_strLogPath` を引数に
 [`ShellExecute`](https://learn.microsoft.com/ja-jp/windows/win32/api/shellapi/nf-shellapi-shellexecutew)
-�Ɋۓ�������, Explorer �Ń��O�t�H���_���J���Ă��炢�܂�.
+に丸投げして, Explorer でログフォルダを開いてもらいます.
 
 
 ## `OnMenuSetup`
 
-[`SetMenu`](#setmenu) ���񎦂������j���[�� [`Setup`](../README.md#setup)
-���I�΂ꂽ���ɔ��ł��� `ID_MENU_SETUP` �ɑ΂���n���h���[�ł�.
+[`SetMenu`](#setmenu) が提示したメニューの [`Setup`](../README.md#setup)
+が選ばれた時に飛んでくる `ID_MENU_SETUP` に対するハンドラーです.
 
-�����菇�͈ȉ��ł�.
+処理手順は以下です.
 
-1. [`CSetupDlg`](CSetupDlg.md) �����̊֐����Ń��[�J���� ( �����ϐ��Ƃ��� ) �錾 ( construct ����� ).
-1. ���̃N���X�ŕێ����Ă���ݒ�l��[`CSetupDlg`](CSetupDlg.md) �Ɏd����.
-1. [`CSetupDlg`](CSetupDlg.md) �� [`DoModal`](https://learn.microsoft.com/ja-jp/cpp/mfc/reference/cdialog-class#domodal) ���Ă�ł��̓�����҂�.
-1. ������ `IDOK` ( `OK` �{�^���������ꂽ ) �łȂ���ΏI��.
-1. [`CSetupDlg`](CSetupDlg.md) ����ݒ�l�����.
-1. ��������l�ƃI���W�i���̐ݒ�l���قȂ���̂���荞��.
-1. [`SaveSettings`](#savesettingss) �ɂ�, �ύX���ꂽ�ݒ�l���Z�[�u.
-1. ���̊֐��̏I���ɔ���, [`CSetupDlg`](CSetupDlg.md) ������ ( destruct ����� ).
+1. [`CSetupDlg`](CSetupDlg.md) をこの関数内でローカルに ( 自動変数として ) 宣言 ( construct される ).
+1. このクラスで保持している設定値を[`CSetupDlg`](CSetupDlg.md) に仕込む.
+1. [`CSetupDlg`](CSetupDlg.md) の [`DoModal`](https://learn.microsoft.com/ja-jp/cpp/mfc/reference/cdialog-class#domodal) を呼んでその答えを待つ.
+1. 答えが `IDOK` ( `OK` ボタンが押された ) でなければ終了.
+1. [`CSetupDlg`](CSetupDlg.md) から設定値を回収.
+1. 回収した値とオリジナルの設定値が異なるものを取り込む.
+1. [`SaveSettings`](#savesettingss) にて, 変更された設定値をセーブ.
+1. この関数の終了に伴い, [`CSetupDlg`](CSetupDlg.md) も消失 ( destruct される ).
 
-* [Action](../README.md#action) �́u���ԊԊu�v���ύX���ꂽ�ꍇ��,
-��x���[�����`�F�b�N���Ă���ݒ肳�ꂽ���ԊԊu�ɓ���܂�.
-* [Log](../README.md#log) �́u�t�H���_�[�v���ύX���ꂽ�ꍇ��,
-[`MoveFiles`](#movefiles) �Ń��O�t�@�C���̈����z�����s���܂�.
-* [Log](../README.md#log) �́u�t�@�C�����v���ύX���ꂽ�ꍇ��,
-[`TrimFiles`](#trimfiles) �Ń��O�t�@�C�����̒������s���܂�.
+* [Action](../README.md#action) の「時間間隔」が変更された場合は,
+一度メールをチェックしてから設定された時間間隔に入ります.
+* [Log](../README.md#log) の「フォルダー」が変更された場合は,
+[`MoveFiles`](#movefiles) でログファイルの引っ越しが行われます.
+* [Log](../README.md#log) の「ファイル数」が変更された場合は,
+[`TrimFiles`](#trimfiles) でログファイル数の調整が行われます.
 
 
 ## `OnMenuExit`
 
-[`SetMenu`](#setmenu) ���񎦂������j���[�� [`Exit`](../README.md#exit)
-���I�΂ꂽ���ɔ��ł��� `ID_MENU_EXIT` �ɑ΂���n���h���[�ł�.
+[`SetMenu`](#setmenu) が提示したメニューの [`Exit`](../README.md#exit)
+が選ばれた時に飛んでくる `ID_MENU_EXIT` に対するハンドラーです.
 
-�{���ɏI�����邩���m�F����
+本当に終了するかを確認する
 [`AfxMessageBox()`](https://learn.microsoft.com/ja-jp/cpp/mfc/reference/cstring-formatting-and-message-box-display#afxmessagebox)
-���o����,
-������ `IDOK` ( `OK` �{�^���������ꂽ ) �ł����,
+を出して,
+答えが `IDOK` ( `OK` ボタンが押された ) であれば,
 [`WM_CLOSE`](https://learn.microsoft.com/ja-jp/windows/win32/winmsg/wm-close)
-���� window ��
+を自 window に
 [post](https://learn.microsoft.com/ja-jp/windows/win32/api/winuser/nf-winuser-postmessagew)
-���܂�.
+します.
 
 
 ## `AddNI`
 
-�^�X�N�o�[�̒ʒm�̈�ɖ{�A�v���̃A�C�R����ǉ����܂�.
+タスクバーの通知領域に本アプリのアイコンを追加します.
 
-�uNI�v�́uNotification Icon�v����, �Ƃ��������x�̃l�[�~���O�ł�.
+「NI」は「Notification Icon」から, といった程度のネーミングです.
 
-`AddNI` �́uNI�O�Z��v�̒��j�ł�.
+`AddNI` は「NI三兄弟」の長男です.
 
 [`Shell_NotifyIcon`](https://learn.microsoft.com/ja-jp/windows/win32/api/shellapi/nf-shellapi-shell_notifyiconw)
-�ɗ���ŃA�C�R����ǉ����܂���,
-���̌Ăяo���͗��_�㎸�s���邱�Ƃ����邻���Ȃ̂�,
-�����ǉ��ł����� `true` ��, �_���������� `false` ��Ԃ����Ƃɂ��Ă��܂�.
-������ `false` ���Ԃ����ꍇ��,
-�����Ԃ�u���ă��g���C���邱�Ƃɂ��Ă��܂�.
-���́u�Ԃ�u���ă��g���C�v�̂��߂�
-[`OnTimer`](#ontimer) ����Ăяo����Ă��܂�.
+に頼んでアイコンを追加しますが,
+この呼び出しは理論上失敗することがあるそうなので,
+無事追加できたら `true` を, ダメだったら `false` を返すことにしています.
+そして `false` が返った場合は,
+少し間を置いてリトライすることにしています.
+この「間を置いてリトライ」のために
+[`OnTimer`](#ontimer) から呼び出されています.
 
 
 ## `DelNI`
 
-�^�X�N�o�[�̒ʒm�̈�ɂ���{�A�v���̃A�C�R�����폜���܂�.
+タスクバーの通知領域にある本アプリのアイコンを削除します.
 
-`DelNI` �́uNI�O�Z��v�̎��j�ł�.
+`DelNI` は「NI三兄弟」の次男です.
 
-�A�C�R�����s�v�ɂȂ�̂�, �{�A�v�����I������Ƃ��ł�.
-�Ȃ̂�, [DestroyWindow](#destroywindow) ����Ăяo����Ă��܂�.
+アイコンが不要になるのは, 本アプリが終了するときです.
+なので, [DestroyWindow](#destroywindow) から呼び出されています.
 
 
 ## `ModNI`
 
-�^�X�N�o�[�̒ʒm�̈�ɂ���{�A�v���̃A�C�R����ύX���܂�.
+タスクバーの通知領域にある本アプリのアイコンを変更します.
 
-`ModNI` �́uNI�O�Z��v�̖����q�ł�.
+`ModNI` は「NI三兄弟」の末っ子です.
 
-�Z�B�ƈ���ĖZ����, ������������F��ȋǖʂŌĂ΂�Ă��܂�.
+兄達と違って忙しく, あちこちから色んな局面で呼ばれています.
 
-| �Ăяo���� | �� | �Ή� |
+| 呼び出し元 | 状況 | 対応 |
 | --- | --- | --- |
-| [`OnMenuAccounts`](#onmenuaccounts)	| �A�J�E���g���S�č폜���ꂽ | �A�C�R��![](../pics/Icon.White.png)�ƃ��b�Z�[�W�ŃA�J�E���g�������A�s�[��. |
-| [`ConnectPOP`](#connectpop)		| �ڑ����J�n���� | �A�C�R��![](../pics/Icon.Yellow.png)�ƃ��b�Z�[�W�ŊJ�n��������. |
-| [`ClosePOP`](#closepop)		| �ڑ������s���� | �A�C�R��![](../pics/Icon.Red.png)�ƃ��b�Z�[�W�Ŏ��s��i����. |
-| [`RespondPOP`](#respondpop)		| �A�J�E���g�̃`�F�b�N���I����� | �A�C�R��![](../pics/Icon.Grey.png)![](../pics/Icon.Green.png)�ƃ��b�Z�[�W�Ŏ����񍐂���. |
-| [`FeedDebug`](#feeddebug)		| �f�o�b�O�p�t�@�C����ǂݐ؂��� | �A�C�R��![](../pics/Icon.Grey.png)![](../pics/Icon.Green.png)�ƃ��b�Z�[�W�Ŏ����񍐂���. |
+| [`OnMenuAccounts`](#onmenuaccounts)	| アカウントが全て削除された | アイコン![](../pics/Icon.White.png)とメッセージでアカウント無効をアピール. |
+| [`ConnectPOP`](#connectpop)		| 接続を開始した | アイコン![](../pics/Icon.Yellow.png)とメッセージで開始を告げる. |
+| [`ClosePOP`](#closepop)		| 接続が失敗した | アイコン![](../pics/Icon.Red.png)とメッセージで失敗を訴える. |
+| [`RespondPOP`](#respondpop)		| アカウントのチェックが終わった | アイコン![](../pics/Icon.Grey.png)![](../pics/Icon.Green.png)とメッセージで首尾を報告する. |
+| [`FeedDebug`](#feeddebug)		| デバッグ用ファイルを読み切った | アイコン![](../pics/Icon.Grey.png)![](../pics/Icon.Green.png)とメッセージで首尾を報告する. |
 
-�Ō�́u�����񍐂���v�ł���, ���̕񍐂��˗�����Ăяo���̍ۂɂ́u���̃��b�Z�[�W���o���v�Ƃ̎w��������܂���.
-�����ƂȂ��Ă��郁�b�Z�[�W������ۂŌĂяo����܂�.
-����͕񍐂��郁�b�Z�[�W�̑I�ʂ��ۓ�������w����,
-�󃁃b�Z�[�W���󂯎�����{�֐���,
-���ǂ̃��[�����ɏ]���ă��b�Z�[�W�̕���������,
-���ǂ̃��[���̗L���ɏ]���ăA�C�R���̎��
-( ![](../pics/Icon.Grey.png)��![](../pics/Icon.Green.png) ) ��I�т܂�.
+最後の「首尾を報告する」ですが, この報告を依頼する呼び出しの際には「このメッセージを出せ」との指示がありません.
+引数となっているメッセージが空っぽで呼び出されます.
+これは報告するメッセージの選別を丸投げする指示で,
+空メッセージを受け取った本関数は,
+未読のメール数に従ってメッセージの文言を決め,
+未読のメールの有無に従ってアイコンの種別
+( ![](../pics/Icon.Grey.png)か![](../pics/Icon.Green.png) ) を選びます.
 
-���̊֐��͏󋵕ω����������ۂɕK���ʂ�؂���ɂȂ��Ă���̂�,
-���̊֐����� [`ShowSummary`](#showsummary) �� [`ShareSummary`](#sharesummary) ���Ăяo����,
-���ł� [Notification](../README.md#notification) ���s���Ă��܂�.
+この関数は状況変化があった際に必ず通る切り口になっているので,
+この関数から [`ShowSummary`](#showsummary) や [`ShareSummary`](#sharesummary) も呼び出して,
+ついでに [Notification](../README.md#notification) も行っています.
 
 
 ## `SetMenu`
 
-�|�b�v�A�b�v���j���[��\�����܂�.
+ポップアップメニューを表示します.
 
-[`OnUserTrayNotify`](#onusertraynotify) ����A�C�R�����E�N���b�N���ꂽ�Ƃ��ɌĂяo����܂�.
+[`OnUserTrayNotify`](#onusertraynotify) からアイコンが右クリックされたときに呼び出されます.
 
-�i���Ƃ��Ă�:
+段取りとしては:
 
-1. ���j���[���� `IDR_MENU_POPUP` �� 0 �Ԗڂ̃T�u���j���[���Q�b�g.<br>( `IDR_MENU_POPUP` �̃��j���[�ł͂Ȃ�, ���� 0 �Ԗڂ̃T�u���j���[ )
-1. [`SetForegroundWindow`](https://learn.microsoft.com/ja-jp/windows/win32/api/winuser/nf-winuser-setforegroundwindow)�ŋ����I�� foreground �ɖ��o��.
-1. [`GetCursorPos`](https://learn.microsoft.com/ja-jp/windows/win32/api/winuser/nf-winuser-getcursorpos)�Ō��� ( �A�C�R�����E�N���b�N�����Ƃ��� ) �̃}�E�X�̈ʒu���Q�b�g.
-1. [`TrackPopupMenu`](https://learn.microsoft.com/ja-jp/windows/win32/api/winuser/nf-winuser-trackpopupmenu)�Ń}�E�X�|�C���^�[�̈ʒu�� 0 �Ԗڂ̃T�u���j���[��\��.
-1. ���܂��Ȃ��� `WM_NULL` ��[`PostMessage`](https://learn.microsoft.com/ja-jp/windows/win32/api/winuser/nf-winuser-postmessagew).
+1. メニュー項目 `IDR_MENU_POPUP` の 0 番目のサブメニューをゲット.<br>( `IDR_MENU_POPUP` のメニューではなく, その 0 番目のサブメニュー )
+1. [`SetForegroundWindow`](https://learn.microsoft.com/ja-jp/windows/win32/api/winuser/nf-winuser-setforegroundwindow)で強制的に foreground に躍り出る.
+1. [`GetCursorPos`](https://learn.microsoft.com/ja-jp/windows/win32/api/winuser/nf-winuser-getcursorpos)で現在 ( アイコンを右クリックしたときの ) のマウスの位置をゲット.
+1. [`TrackPopupMenu`](https://learn.microsoft.com/ja-jp/windows/win32/api/winuser/nf-winuser-trackpopupmenu)でマウスポインターの位置に 0 番目のサブメニューを表示.
+1. おまじないで `WM_NULL` を[`PostMessage`](https://learn.microsoft.com/ja-jp/windows/win32/api/winuser/nf-winuser-postmessagew).
 
-�ƂȂ��Ă��܂�.
+となっています.
 
-���̂��� 5. �̂��܂��Ȃ���, �×� Visual Studio&reg; ���[�U�[�̊Ԃł͓`������Ă������U�ł���,
-�ŋ�, ����[�Ō������̕K�v����F�߂�Ƃ���ƂȂ�܂���.
+このうち 5. のおまじないは, 古来 Visual Studio&reg; ユーザーの間では伝承されてきたワザですが,
+最近, ついに[版元もその必要性を認めるところとなりました.
 ](https://learn.microsoft.com/ja-jp/windows/win32/api/winuser/nf-winuser-trackpopupmenu#remarks)
 <br>
 <sup>
-����, �u�����v���������񂶂�Ȃ���, �u�C���v���Ă���񂩂�?
+いや, 「回避策」を説明するんじゃなくて, 「修正」してくれんかね?
 </sup>
 
 
 ## `Introduce`
 
-�u�����v���܂�.
+「導入」します.
 
-�u�����v�Ƃ��Ă�, �܂� [`LoadAccounts`](#loadaccounts)�Őݒ�ς݂̃��[���A�J�E���g��ǂݍ��ނ��Ƃ���n�߂܂�.
+「導入」としては, まず [`LoadAccounts`](#loadaccounts)で設定済みのメールアカウントを読み込むことから始めます.
 
-�Ăяo������ [`OnTimer`](#ontimer) �Ń^�C�}�[ `TID_INIT` �����������Ƃ��ł�.
-( ������u�N�����Ă����v�ł�. )
+呼び出し元は [`OnTimer`](#ontimer) でタイマー `TID_INIT` が満了したときです.
+( だから「起動してすぐ」です. )
 
-��, ���łɃA�J�E���g���ݒ�ς݂������ꍇ��,
-`true` ��Ԃ��Ă����܂��ł�.
+で, すでにアカウントが設定済みだった場合は,
+`true` を返しておしまいです.
 
-���, �ݒ�ς݃A�J�E���g���[���������ꍇ��,
+一方, 設定済みアカウントがゼロだった場合は,
 [`AfxMessageBox()`](https://learn.microsoft.com/ja-jp/cpp/mfc/reference/cstring-formatting-and-message-box-display#afxmessagebox)
-���ĉ��L�̂悤�Ɏ��ȏЉ�܂�.<br>
+して下記のように自己紹介します.<br>
 
 ![](../pics/Intro.png)<br>
 <sup>
 [`AfxMessageBox()`](https://learn.microsoft.com/ja-jp/cpp/mfc/reference/cstring-formatting-and-message-box-display#afxmessagebox)
-�Ȃ̂Ɏ��O�̃A�C�R�����Y�����Ă���̂�, �����������Ƃ��ł���悤�ɏ��׍H���ꂽ
-���Ɛ���[`DoMessageBox`](CChkMailsApp.md#domessagebox) ���g���Ă��邩��ł�.
+なのに自前のアイコンが添えられているのは, そういうことができるように小細工された
+自家製の[`DoMessageBox`](CChkMailsApp.md#domessagebox) を使っているからです.
 </sup>
 
-�܂�,<br>
-�u���q����A���߂Ă���? ���[���A�J�E���g�̐ݒ肪�K�v�Ȃ񂾂��A�����邩��?�v
+つまり,<br>
+「お客さん、初めてだね? メールアカウントの設定が必要なんだが、続けるかい?」
 <br>
-�Ɗm�F���Ă���킯�ł���,
-���ꂪ�f��ꂽ�ꍇ�� `false` ��Ԃ��đf���Ɉ���������܂�.
+と確認しているわけですが,
+これが断られた場合は `false` を返して素直に引き下がります.
 
-������ꂽ�ꍇ��,
-�� window �� `ID_MENU_ACCOUNTS` ���΂���,
-[`OnMenuAccounts`](#onmenuaccounts) �Ɏ������݂܂�.
+応じられた場合は,
+自 window に `ID_MENU_ACCOUNTS` を飛ばして,
+[`OnMenuAccounts`](#onmenuaccounts) に持ち込みます.
 
 
 ## `LoadAccounts`
 
-[Accounts](../README.md#accounts) �ݒ�����[�h���܂�.
+[Accounts](../README.md#accounts) 設定をロードします.
 
-�Ăяo�����͑O�o�� [`Introduce`](#introduce) �ł�.
+呼び出し元は前出の [`Introduce`](#introduce) です.
 
-�{�A�v���� 1�l�̃��[�U�[�������̃��[���A�J�E���g�������ƂɑΉ����Ă���̂�,
-�ݒ肳��Ă���A�J�E���g���S�Ă�ǂݍ��݂܂�.
-�A�J�E���g���͂��������Í������Ă��܂��Ă���̂�,
-�ǂݍ��ނƂ��͕������ĕ����񉻂��Ă��܂�.
-������
-[`EnDecrypt`](#endecrypt) �Ƃ����ǂ��������Ȗ��O�̊֐����S���ł�.
+本アプリは 1人のユーザーが複数のメールアカウントを持つことに対応しているので,
+設定されているアカウント情報全てを読み込みます.
+アカウント情報はいちおう暗号化してしまってあるので,
+読み込むときは復号して文字列化しています.
+復号は
+[`EnDecrypt`](#endecrypt) というどっちつかずな名前の関数が担当です.
 
 
 ## `SaveAccounts`
 
-[Accounts](../README.md#accounts) �ݒ���Z�[�u���܂�.
+[Accounts](../README.md#accounts) 設定をセーブします.
 
-�{�A�v���� 1�l�̃��[�U�[�������̃��[���A�J�E���g�������ƂɑΉ����Ă���̂�,
-�ݒ肳�ꂽ�A�J�E���g���S�Ă��������݂܂�.
-�A�J�E���g���͂��������Í������Ă��܂��Ă���̂�,
-�������ނƂ��͕�������Í������Ă��܂�.
-�Í�����
-[`EnDecrypt`](#endecrypt) �Ƃ����ǂ��������Ȗ��O�̊֐����S���ł�.
+本アプリは 1人のユーザーが複数のメールアカウントを持つことに対応しているので,
+設定されたアカウント情報全てを書き込みます.
+アカウント情報はいちおう暗号化してしまってあるので,
+書き込むときは文字列を暗号化しています.
+暗号化は
+[`EnDecrypt`](#endecrypt) というどっちつかずな名前の関数が担当です.
 
-[`OnMenuAccounts`](#onmenuaccounts) �ŃA�J�E���g�o�^�ɕύX���������Ƃ��ɌĂяo����Ă��܂�.
+[`OnMenuAccounts`](#onmenuaccounts) でアカウント登録に変更があったときに呼び出されています.
 
-�A�J�E���g��������悤�Ȑݒ�����ꂽ�Ƃ���,
-���łɎg���Ȃ��Ȃ����L�^�����܂ł��c���Ă����̂��A���Ȃ̂�,
-�����������L�^�𖕏����邽�߂�
+アカウント数が減るような設定をされたときに,
+すでに使われなくなった記録をいつまでも残しておくのもアレなので,
+そういった記録を抹消するために
 [`DeleteProfileValue`](CChkMailsApp.md#deleteprofilevalue)
-�̂����b�ɂȂ��Ă��܂�.
-���֐��� `FALSE` (�u����Ȃ̂˂���v) ��Ԃ��Ă���܂ŌĂяo�����J��Ԃ���,
-�s�v�ȋL�^�͑S�Ė������ꂽ���ƂɂȂ�܂�.
+のお世話になっています.
+同関数が `FALSE` (「そんなのねえよ」) を返してくるまで呼び出しを繰り返せば,
+不要な記録は全て抹消されたことになります.
 
 
 ## `LoadSettings`
 
-[Setup](../README.md#setup) �̐ݒ�l�����[�h���܂�.
+[Setup](../README.md#setup) の設定値をロードします.
 
-�\�[�X�R�[�h�������܂�܂�, ���ɂǂ����Ă��Ƃ̂Ȃ������ł���,
-[���O](../README.md#log)�����܂��Ă����t�H���_�[�̏����l��,
-�Œ�l�ł͂Ȃ����[�U�[���Ƃ̃e���|�����[�t�H���_�[�Ƃ��邽��,
+ソースコードを見たまんまの, 特にどうってことのない処理ですが,
+[ログ](../README.md#log)をしまっておくフォルダーの初期値は,
+固定値ではなくユーザーごとのテンポラリーフォルダーとするため,
 [`GetTempPath`](https://learn.microsoft.com/ja-jp/windows/win32/api/fileapi/nf-fileapi-gettemppathw)
-�̂����b�ɂȂ��Ă��܂�.
+のお世話になっています.
 
-[constructor](#cmainwnd-1) ����Ăяo����Ă��܂�.
+[constructor](#cmainwnd-1) から呼び出されています.
 
 
 ## `SaveSettings`
 
-[Setup](../README.md#setup) �̐ݒ�l���Z�[�u���܂�.
+[Setup](../README.md#setup) の設定値をセーブします.
 
-�\�[�X�R�[�h�������܂�܂�, ���ɂǂ����Ă��Ƃ̂Ȃ������ł�.
+ソースコードを見たまんまの, 特にどうってことのない処理です.
 
-[`OnMenuSetup`](#onmenusetup) �Őݒ�ɕύX���������Ƃ���,
-[`GetAuth`](#getauth) �ŐV���ȔF�ؕ����ɑ��������Ƃ��ɌĂяo����Ă��܂�.
+[`OnMenuSetup`](#onmenusetup) で設定に変更があったときと,
+[`GetAuth`](#getauth) で新たな認証方式に遭遇したときに呼び出されています.
 
 
 ## `LoadFilters`
 
-[Filter](../README.md#filter) �ݒ�����[�h���܂�.
+[Filter](../README.md#filter) 設定をロードします.
 
-�\�[�X�R�[�h�������܂�܂�, ���ɂǂ����Ă��Ƃ̂Ȃ������ł�.
+ソースコードを見たまんまの, 特にどうってことのない処理です.
 
-[constructor](#cmainwnd-1) ����Ăяo����Ă��܂�.
+[constructor](#cmainwnd-1) から呼び出されています.
 
 
 ## `SaveFilters`
 
-[Filter](../README.md#filter) �ݒ���Z�[�u���܂�.
+[Filter](../README.md#filter) 設定をセーブします.
 
-�\�[�X�R�[�h�������܂�܂�, ���ɂǂ����Ă��Ƃ̂Ȃ������ł�.
+ソースコードを見たまんまの, 特にどうってことのない処理です.
 
-[`OnMenuFilter`](#onmenufilter) �Őݒ�ɕύX���������Ƃ��ɌĂяo����Ă��܂�.
+[`OnMenuFilter`](#onmenufilter) で設定に変更があったときに呼び出されています.
 
 
 ## `LoadTLDs`
 
-[TLD ( Top Level Domain)](https://ja.wikipedia.org/wiki/�g�b�v���x���h���C��) ���������[�h���܂�.
+[TLD ( Top Level Domain)](https://ja.wikipedia.org/wiki/トップレベルドメイン) 履歴をロードします.
 
-�����ł����uTLD �����v�Ƃ�,
-����܂łɎ�M�������Ƃ̂��郁�[���̔��M���̃h���C���̃g�b�v ( �E�[ ) ���L�^���Ă��������̂ł�.
-�V�����h���C�����烁�[�������邽�тɒǉ�����Ă����܂�.
-( ������݂̃h���C���΂���ɂȂ����Ƃ��ɓ��ł��ɂȂ�܂�. )
-[Filter](../README.md#filter) �� [Domain](../README.md#domain) ��ݒ肷��ۂ�,
-�I������񎦂��邽�߂Ɏg���Ă�����ł�.
+ここでいう「TLD 履歴」とは,
+これまでに受信したことのあるメールの発信元のドメインのトップ ( 右端 ) を記録しておいたものです.
+新しいドメインからメールが来るたびに追加されていきます.
+( お馴染みのドメインばかりになったときに頭打ちになります. )
+[Filter](../README.md#filter) の [Domain](../README.md#domain) を設定する際に,
+選択肢を提示するために使われている情報です.
 
-[constructor](#cmainwnd-1) ����Ăяo����Ă��܂�.
+[constructor](#cmainwnd-1) から呼び出されています.
 
 
 ## `SaveTLDs`
 
-[TLD ( Top Level Domain)](https://ja.wikipedia.org/wiki/�g�b�v���x���h���C��) �������Z�[�u���܂�.
+[TLD ( Top Level Domain)](https://ja.wikipedia.org/wiki/トップレベルドメイン) 履歴をセーブします.
 
-`LoadTLDs` �ƈ���Ă�����������Ă΂�Ă��܂�.
+`LoadTLDs` と違ってあちこちから呼ばれています.
 
-| �Ăяo���� | �Ăяo���_�@ |
+| 呼び出し元 | 呼び出す契機 |
 | --- | --- |
-| [`OnMenuFilter`](#onmenufilter)	| `New Domain` �Ƃ��ĉ����ǉ����ꂽ��<br>�����ꂩ�̃h���C�����폜���ꂽ�� |
-| [`GetFrom`](#getfrom)	| �V���ȃh���C�����烁�[���������� |
-| [`CheckLink`](#checklink)	| �V���ȃh���C���ւ̃����N���������� |
+| [`OnMenuFilter`](#onmenufilter)	| `New Domain` として何か追加されたら<br>いずれかのドメインが削除されたら |
+| [`GetFrom`](#getfrom)	| 新たなドメインからメールが来たら |
+| [`CheckLink`](#checklink)	| 新たなドメインへのリンクを見つけたら |
 
 
 ## `MakeBlob`
 
-�A�J�E���g���̈Í����E�����p�� [BLOB](https://ja.wikipedia.org/wiki/�o�C�i���E���[�W�E�I�u�W�F�N�g) �𐶐����܂�.
+アカウント情報の暗号化・復号用の [BLOB](https://ja.wikipedia.org/wiki/バイナリ・ラージ・オブジェクト) を生成します.
 
-���łɐ����ς݂Ȃ牽�����Ȃ��̂�,
-�{�i�I�� BLOB �𐶐�����̂�, �{�A�v�����񓱓����� 1�񂾂��ł�.
-��������� BLOB �͖���Ⴄ���e�Ȃ̂�,
-���ʓI�ɂ悻���܂��Í����������͕̂����ł��Ȃ��悤�ɂȂ��Ă��܂�.
+すでに生成済みなら何もしないので,
+本格的に BLOB を生成するのは, 本アプリ初回導入時の 1回だけです.
+生成される BLOB は毎回違う内容なので,
+結果的によそさまが暗号化したものは復号できないようになっています.
 
-[constructor](#cmainwnd-1) ����Ăяo����Ă��܂�.
+[constructor](#cmainwnd-1) から呼び出されています.
 
 
 ## `EnDecrypt`
 
-�A�J�E���g���̈Í����E�������s���܂�.
+アカウント情報の暗号化・復号を行います.
 
-�Ȃ񂩂ǂ��������̖��O�ł���,
-�Í������������r���܂ł͓����ߒ���ʂ�̂�, �������p�ɂ��������ł�.
-�Ō�̈��� `bool bEncode` �łǂ�����s���̂����w�肵�܂�.
-( `true` �ňÍ��� / `false` �ŕ��� )
+なんかどっちつかずの名前ですが,
+暗号化も復号も途中までは同じ過程を通るので, 両方兼用にしたせいです.
+最後の引数 `bool bEncode` でどちらを行うのかを指定します.
+( `true` で暗号化 / `false` で復号 )
 
-�Ăяo������
-[`LoadAccounts`](#loadaccounts) (����) ��
-[`SaveAccounts`](#saveaccounts) (�Í���) �� 2�����ł�.
+呼び出し元は
+[`LoadAccounts`](#loadaccounts) (復号) と
+[`SaveAccounts`](#saveaccounts) (暗号化) の 2か所です.
 
-�߂�l�̓G���[�R�[�h��, ����I���Ȃ� `0` ��Ԃ��܂�.
+戻り値はエラーコードで, 正常終了なら `0` を返します.
 
 
 ## `OnPower`
 
-�V�X�e�������f�܂��͍ĊJ���ꂽ�Ƃ��ɓ����n���h���[�ł�.
+システムが中断または再開されたときに動くハンドラーです.
 
-[`OnCreate`](#oncreate) ��
+[`OnCreate`](#oncreate) で
 [`PowerRegisterSuspendResumeNotification`](https://learn.microsoft.com/ja-jp/windows/win32/api/powerbase/nf-powerbase-powerregistersuspendresumenotification)
-���Ă�Ŏd�|�����n���h���[�ł�.
-�����ł̓V�X�e���ĊJ���ɂ��݂₩�Ƀ��[�����`�F�b�N���邽�߂ɓ����Ă��܂�.
-����, �V�X�e���ĊJ���シ���Ƀ��[����ǂ����Ƃ��Ă����s���邱�Ƃ��l������̂�,
-���� ( �f�t�H���g�� `5`[�b] ) �҂��Ă���`�F�b�N���n�߂�悤�ɂ��Ă��܂�.
+を呼んで仕掛けたハンドラーです.
+ここではシステム再開時にすみやかにメールをチェックするために働いています.
+ただ, システム再開直後すぐにメールを読もうとしても失敗することが考えられるので,
+少し ( デフォルトで `5`[秒] ) 待ってからチェックを始めるようにしています.
 
 
 ## `PollNow`
 
-�u���v���[�����`�F�b�N���܂�.
+「今」メールをチェックします.
 
-�Ă΂���, ������ 1�񃁁[�����`�F�b�N���܂�.
-<br>( �Ƃ͂����Ă��u���[�����`�F�b�N����^�C�}�[�v���������邾���ł���. )
+呼ばれると, 直ちに 1回メールをチェックします.
+<br>( とはいっても「メールをチェックするタイマー」をしかけるだけですが. )
 
-��, 2��ڈȍ~�͐ݒ肳�ꂽ���� ( �f�t�H���g�� `10`[��] ) �ł̃`�F�b�N�𑱂��܂�.
-�܂胁�[�����`�F�b�N����V���Ȏ����̎n�܂�ɂȂ�܂�.
+で, 2回目以降は設定された周期 ( デフォルトで `10`[分] ) でのチェックを続けます.
+つまりメールをチェックする新たな周期の始まりになります.
 
-�Ăяo�����͈ȉ��݂̂Ȃ���ł�.
+呼び出し元は以下のみなさんです.
 
-| �Ăяo���� | �Ăяo���_�@ |
+| 呼び出し元 | 呼び出す契機 |
 | --- | --- |
-| [`OnTimer`](#ontimer)	| �^�C�}�[ `TID_START` �����������Ƃ� |
-| [`OnUserTrayNotify`](#onusertraynotify) | �A�C�R�����N���b�N���ꂽ�Ƃ� |
-| [`OnMenuAccounts`](#onmenuaccounts) | �A�J�E���g�o�^�ɕύX���������Ƃ� |
-| [`OnMenuSetup`](#onmenusetup) | ���[���`�F�b�N�̎��ԊԊu�ɕύX���������Ƃ� |
+| [`OnTimer`](#ontimer)	| タイマー `TID_START` が満了したとき |
+| [`OnUserTrayNotify`](#onusertraynotify) | アイコンがクリックされたとき |
+| [`OnMenuAccounts`](#onmenuaccounts) | アカウント登録に変更があったとき |
+| [`OnMenuSetup`](#onmenusetup) | メールチェックの時間間隔に変更があったとき |
 
 
 ## `PollMails`
 
-���[�����`�F�b�N���܂�.
+メールをチェックします.
 
-�܂��O�̂��ߑO��̃`�F�b�N�̌�Еt��
+まず念のため前回のチェックの後片付け
 
-* [`ClosePOP`](#closepop) ��[POP3](https://ja.wikipedia.org/wiki/Post_Office_Protocol) �ڑ������.
-* `m_iUser` �� `0` �Ƃ��āu�ŏ��̃A�J�E���g�v����n�܂�悤�ɂ���.
-* `m_nMail` �� `0` �Ƃ��āu���ǃ��[�����v���`�����ɂ���.
-* `m_strSummary` ����ɂ���, �u�T�}���[�v���`�����ɂ���.
+* [`ClosePOP`](#closepop) で[POP3](https://ja.wikipedia.org/wiki/Post_Office_Protocol) 接続を閉じる.
+* `m_iUser` を `0` として「最初のアカウント」から始まるようにする.
+* `m_nMail` を `0` として「未読メール数」をチャラにする.
+* `m_strSummary` を空にして, 「サマリー」をチャラにする.
 
-�����Ă���, ����̃��[���`�F�b�N�̂��߂�
+をしてから, 今回のメールチェックのために
 
-* [`ConnectPOP`](#connectpop) ���Ă�.
+* [`ConnectPOP`](#connectpop) を呼ぶ.
 
-�Ƃ����i���ł�.
+という段取りです.
 
-�u��? �ڑ����邾��?�v�Ǝv������������낤���Ƒ����܂���,
-���̐ڑ����_�@�ɂȂ񂾂��񂾂Ń��[���̃`�F�b�N���i��,
-���̊Ԃɂ��S�A�J�E���g�̃`�F�b�N���s���邱�ƂɂȂ�܂�.
+「え? 接続するだけ?」と思われる向きもあろうかと存じますが,
+この接続を契機になんだかんだでメールのチェックが進み,
+いつの間にやら全アカウントのチェックが行われることになります.
 <br>
 <sub>
-�������������I�ɒi���𗝉�����Ƃ��낪,
-�u�񓯊��v�Ƃ������u[event driven](https://ja.wikipedia.org/wiki/�C�x���g�쓮�^�v���O���~���O)�v�Ƃ������umessage driven�v�Ȃ��̎����̓����Ȃ̂�������܂���.
+こういう直感的に段取りを理解し難いところが,
+「非同期」というか「[event driven](https://ja.wikipedia.org/wiki/イベント駆動型プログラミング)」というか「message driven」なこの実装の特徴なのかもしれませんが.
 </sub>
 
-�Ăяo������ [`OnTimer`](#ontimer) �Ń^�C�}�[ `TID_POLL` �����������Ƃ��ł�.
-�f�t�H���g�� `10`[��] �����ŌĂ΂�܂�.
+呼び出し元は [`OnTimer`](#ontimer) でタイマー `TID_POLL` が満了したときです.
+デフォルトで `10`[分] 周期で呼ばれます.
 
 
 ## `ParseMail`
 
-���[������͂��܂�.
+メールを解析します.
 
-1�̃��[���̒��g�̕�����������Ƃ��Ď󂯎��,
-���̒��g����͂������ʂ� `true` ( �c���ׂ����[�� ) �� `false` ( �j�����ׂ����[�� ) �ŕԂ��܂�.
+1つのメールの中身の文字列を引数として受け取り,
+その中身を解析した結果を `true` ( 残すべきメール ) か `false` ( 破棄すべきメール ) で返します.
 
-�Ăяo������ [`RespondPOP`](#respondpop) (�ʏ�c��) ��
-[`ReadEML`](#reademl) (�ĕ]����) ��,
-�����̖��ǃ��[�������܂��Ă���󋵂ł�, 1�̃��[���ɕt�� 1�񂸂Ă΂�܂�.
+呼び出し元は [`RespondPOP`](#respondpop) (通常営業) か
+[`ReadEML`](#reademl) (再評価時) で,
+複数の未読メールが溜まっている状況でも, 1つのメールに付き 1回ずつ呼ばれます.
 
-�����́u���g�̕�����v�̓��[���T�[�o�[�����M�����܂܂̕�����
-( [`.eml`](https://www.google.com/search?q=.eml+�t�@�C��)���� ) ��,
-�K�� 7bit �����R�[�h�L�q ( [UNICODE](https://ja.wikipedia.org/wiki/Unicode) �Ȃǂł͂Ȃ� ASCII ������ )
-�Ȃ̂ň����̌^�� `CStringA`�ł�.
+引数の「中身の文字列」はメールサーバーから受信したままの文字列
+( [`.eml`](https://www.google.com/search?q=.eml+ファイル)相当 ) で,
+必ず 7bit 文字コード記述 ( [UNICODE](https://ja.wikipedia.org/wiki/Unicode) などではなく ASCII 文字列 )
+なので引数の型は `CStringA`です.
 <br>
 <sup>
-`CStringW` ��ǂ����̖���������Ȃ� `CString` �ł͂���܂���.
+`CStringW` やどっちの味方か判らない `CString` ではありません.
 </sup>
 
-�d���̒i���͉��L�̂悤�ɂȂ��Ă��܂�.
+仕事の段取りは下記のようになっています.
 
-1. [`GetAttr`](#getattr) �Ń��[���w�b�_�[�̍\���v�f�𔲂��o���ă`�F�b�N����.
-1. [`MakeLog`](#makelog) �Ń��[���̃��O�t�@�C���ɃZ�[�u���镶����Ƀf�R�[�h����.
-1. [`CheckWhiteList`](#checkwhitelist) �� [`Whitelist`](../README.md#whitelist) �Əƍ�����.
-1. �j�����R�̂Ȃ����[���Ȃ�, [�T�}���[](../README.md#notification) �ɒǉ�����.
-1. �j�����R�̂��郁�[���Ȃ�, �߂�l�Ƃ��� `�j�����ׂ����[��` ��I��.
-1. [`�S�Ă�`���[�������O�ɗ��Ƃ��ݒ�](../README.md#log)��, �j���Ɣ��肵�����[���Ȃ�, [`SaveLog`](#savelog) �Ń��O�ɃZ�[�u����.
-1. ���茋�ʂ�Ԃ�.
+1. [`GetAttr`](#getattr) でメールヘッダーの構成要素を抜き出してチェックする.
+1. [`MakeLog`](#makelog) でメールのログファイルにセーブする文字列にデコードする.
+1. [`CheckWhiteList`](#checkwhitelist) で [`Whitelist`](../README.md#whitelist) と照合する.
+1. 破棄理由のないメールなら, [サマリー](../README.md#notification) に追加する.
+1. 破棄理由のあるメールなら, 戻り値として `破棄すべきメール` を選ぶ.
+1. [`全ての`メールをログに落とす設定](../README.md#log)か, 破棄と判定したメールなら, [`SaveLog`](#savelog) でログにセーブする.
+1. 判定結果を返す.
 
-���̊֐������{�A�v���́u����v��,
-���݂̂�Ȃ͂��́u����v���d�����ʂ�����悤���͂��Ă���Ă��鑶�݂ƌ����Ă������ł��傤.
+この関数こそ本アプリの「主役」で,
+他のみんなはこの「主役」が仕事を果たせるよう協力してくれている存在と言ってもいいでしょう.
 <br>
 <sup>
-( ����, �ǂ̎q���������琬�藧���Ȃ��Ȃ邩�������̂Ȃ��q�����ł���. )
+( いや, どの子も欠けたら成り立たなくなるかけがえのない子たちですが. )
 </sup>
 
 
 ## `GetAttr`
 
-[���[���w�b�_�[](https://www.dekyo.or.jp/soudan/contents/ihan/header.html)�ɂ���\���v�f�𔲂��o���ă`�F�b�N���܂�.
+[メールヘッダー](https://www.dekyo.or.jp/soudan/contents/ihan/header.html)にある構成要素を抜き出してチェックします.
 
-�Ƃ����Ă��������Ɋۓ������Ă��邾����, ���ۂ̎d��������Ă���͉̂��L�݂̂Ȃ���ł�.
+といっても下請けに丸投げしているだけで, 実際の仕事をやっているのは下記のみなさんです.
 
-| �ϑ���				| �Ɩ����e |
+| 委託先				| 業務内容 |
 | ---				| --- |
-| [`GetAuth`](#getauth)		| `Authentication-Results:` �ɂ���F�،��ʂ𔲂��o���ă`�F�b�N. |
-| [`GetFrom`](#getfrom)		| `From:` �ɂ��鑗�M�� ( �̖��` ) �𔲂��o���ă`�F�b�N. |
-| [`GetSender`](#getsender)	| `Authentication-Results:` �Ȃǂɂ��� ( ���ۂ� ) ���M�҂𔲂��o���ă`�F�b�N. |
-| [`GetType`](#gettype)		| `Content-Type:` �ɂ��邠�ꂱ��𔲂��o���ă`�F�b�N. |
-| [`GetEncode`](#getencode)	| `Content-Transfer-Encoding:` �ɂ���G���R�[�h�����𔲂��o��. |
-| [`GetTime`](#gettime)		| `Date:` �ɂ�������𔲂��o���ă`�F�b�N. |
-| [`CheckMID`](#checkmid)	| `Message-ID:` �ɂ��� ID ���}�g�����`�F�b�N. |
-| [`CheckReceived`](#checkreceived)	| `Received:` �ɂ��� timezone ���`�F�b�N. |
+| [`GetAuth`](#getauth)		| `Authentication-Results:` にある認証結果を抜き出してチェック. |
+| [`GetFrom`](#getfrom)		| `From:` にある送信者 ( の名義 ) を抜き出してチェック. |
+| [`GetSender`](#getsender)	| `Authentication-Results:` などにある ( 実際の ) 送信者を抜き出してチェック. |
+| [`GetType`](#gettype)		| `Content-Type:` にあるあれこれを抜き出してチェック. |
+| [`GetEncode`](#getencode)	| `Content-Transfer-Encoding:` にあるエンコード方式を抜き出す. |
+| [`GetTime`](#gettime)		| `Date:` にある日時を抜き出してチェック. |
+| [`CheckMID`](#checkmid)	| `Message-ID:` にある ID がマトモかチェック. |
+| [`CheckReceived`](#checkreceived)	| `Received:` にある timezone もチェック. |
 
-��L�ϑ��悩��W�߂�ꂽ���� `CAttr` �Ƃ������\���Ɏ��߂�,
-�������� [`ParseMail`](#parsemail) �ɔ[�i���܂�.
+上記委託先から集められた情報を `CAttr` という情報構造に収めて,
+発注元の [`ParseMail`](#parsemail) に納品します.
 
-������̈ϑ���������o���������ɃX�p���̒������������,
-�[�i���ꂽ `CAttr` �Ɂu�j�����R�v�Ƃ��ĕ񍐂��グ�Ă����񑩂ɂȂ��Ă��܂�.
+いずれの委託先も抜き出した部分にスパムの兆候を見つけたら,
+納品された `CAttr` に「破棄理由」として報告を上げてくれる約束になっています.
 
 
 ## `GetAuth`
 
-[���[���w�b�_�[](https://www.dekyo.or.jp/soudan/contents/ihan/header.html)��
-`Authentication-Results:` �ɂ���
-[�F��](https://ja.wikipedia.org/wiki/���M�h���C���F��)���ʂ𔲂��o���� `CAttr` �ɔ[�i���܂�.
+[メールヘッダー](https://www.dekyo.or.jp/soudan/contents/ihan/header.html)の
+`Authentication-Results:` にある
+[認証](https://ja.wikipedia.org/wiki/送信ドメイン認証)結果を抜き出して `CAttr` に納品します.
 
-�ߋ��̔F�ؗ��� ( `m_dwAuthCache` ) �ɂȂ��F�،��ʂ�����ꂽ�ꍇ��,
-�F�ؗ����ɒǉ��̏�, [`SaveSettings`](#savesettings) �ɂčX�V���Ă����܂�.
-( ���̓���������̂���, ���Ԃ�{�A�v��������ŏ��̃��[���ł����ł��傤����. )
+過去の認証履歴 ( `m_dwAuthCache` ) にない認証結果が得られた場合は,
+認証履歴に追加の上, [`SaveSettings`](#savesettings) にて更新しておきます.
+( その動きをするのって, たぶん本アプリ導入後最初のメールでだけでしょうけど. )
 
-�Ō��, �F�؂� pass ���Ȃ���������
-[Authentication](../README.md#authentication) �Őݒ肳�ꂽ���e���𒴂��Ă��Ȃ����`�F�b�N��,
-�����������Ă����炻�̎|�� `attr.m_strReason` �ɏ����ĕ񍐂��グ�܂�.
+最後に, 認証に pass しなかった数が
+[Authentication](../README.md#authentication) で設定された許容数を超えていないかチェックし,
+引っかかっていたらその旨を `attr.m_strReason` に書いて報告を上げます.
 
-�n��Ƃ��Ă� [`GetAttr`](#getattr) �P����, ������̎󒍂͐��������Ă��܂���.
+系列としては [`GetAttr`](#getattr) 傘下で, 他からの受注は請け負っていません.
 
 
 ## `GetFrom`
 
-[���[���w�b�_�[](https://www.dekyo.or.jp/soudan/contents/ihan/header.html)��
-`From:` �ɂ��鑗�M�� ( �̖��` ) �𔲂��o���� `CAttr` �ɔ[�i���܂�.
+[メールヘッダー](https://www.dekyo.or.jp/soudan/contents/ihan/header.html)の
+`From:` にある送信者 ( の名義 ) を抜き出して `CAttr` に納品します.
 
-�u`From:` �ɂ���̂́g���`�h�Ȃ񂩂���Ȃ��āA�z���g�ɑ��M�҂̃��[���A�h���X����?�v
-�Ǝv������������邩������܂���, ���� `From:` ���Ă��
+「`From:` にあるのは“名義”なんかじゃなくて、ホントに送信者のメールアドレスだろ?」
+と思われる向きもあるかもしれませんが, この `From:` ってやつは
 
-1. �X�p�����[���̏ꍇ�͋U������Ă���ꍇ������.
-1. ���[���z�M��s�Ǝ҂����M�������[���̏ꍇ��, �N���C�A���g��Ƃ̃A�h���X�ɂȂ��Ă���.
+1. スパムメールの場合は偽造されている場合が多い.
+1. メール配信代行業者が送信したメールの場合は, クライアント企業のアドレスになっている.
 
-�Ƃ������Ƃ�, �u�X�p���΍�A�v���v�Ƃ��Ắu���`�v�Ɓu���M�ҁv�͕ʕ��Ƃ��Ĉ����Ă��܂�.
+ということで, 「スパム対策アプリ」としては「名義」と「送信者」は別物として扱っています.
 <br>
 <sub>
-���� 2. �̂������ŃX�p���΍����₱�������ƂɂȂ�܂���.
+特に 2. のおかげでスパム対策もややこしいことになりました.
 </sub>
 
-�Ɩ����e�͈ȉ��̒ʂ�ł�.
+業務内容は以下の通りです.
 
-1. �^����ꂽ������̒����� `From: ` �� `from: ` ��T��.
-<br><sup>Q: ��? `from: ` �Ȃ�ď����Ă����������ł���? A: �����ł���. �Ƃ������̋Ǝ҂����ł���.</sup>
+1. 与えられた文字列の中から `From: ` か `from: ` を探す.
+<br><sup>Q: え? `from: ` なんて書いてくるやつが居るんですか? A: 居るんですよ. とある特定の業者だけですが.</sup>
 
-2. Alias (�ʖ�) �̑��� `<` �� `>` �ň͂܂ꂽ�A�h���X������΂���� `attr.m_strFrom` �Ƃ��Ĕ[�i.
+2. Alias (別名) の他に `<` と `>` で囲まれたアドレスがあればそれを `attr.m_strFrom` として納品.
 
-1. Alias (�ʖ�) ���Ȃ�������, `From: ` �ɓY���Ă���A�h���X�� `attr.m_strFrom` �Ƃ��Ĕ[�i.
+1. Alias (別名) がなかったら, `From: ` に添えてあるアドレスを `attr.m_strFrom` として納品.
 
-1. `attr.m_strFrom` ��
-[TLD ( Top Level Domain )](https://ja.wikipedia.org/wiki/�g�b�v���x���h���C��)�������o�̂��̂łȂ�������,
-TLD �����ɒǉ�.
+1. `attr.m_strFrom` の
+[TLD ( Top Level Domain )](https://ja.wikipedia.org/wiki/トップレベルドメイン)名が既出のものでなかったら,
+TLD 履歴に追加.
 
-1. `attr.m_strFrom` ���u�u���b�N���X�g�v( [Domain](../README.md#domain) ��&#x2611;���ꂽ�A�h���X )
-�Ɉ����������Ă��Ȃ��� [`CheckBlackList`](#checkblacklist) �ɂă`�F�b�N.
+1. `attr.m_strFrom` が「ブラックリスト」( [Domain](../README.md#domain) で&#x2611;されたアドレス )
+に引っかかっていないか [`CheckBlackList`](#checkblacklist) にてチェック.
 
-1. `attr.m_strFrom` �� [�h���C���𑕂������[���A�h���X](../README.md#sender) ���`�F�b�N.
+1. `attr.m_strFrom` が [ドメインを装ったメールアドレス](../README.md#sender) かチェック.
 
-��, �ӊO�Ƃ��낢�����Ă��܂�.
+と, 意外といろいろやっています.
 
-�`�F�b�N�̌���, �X�p���̒������������,
-���̔��藝�R�� `attr.m_strReason` �Ƃ��ĕ񍐂��グ�܂�.
+チェックの結果, スパムの兆候を見つけたら,
+その判定理由を `attr.m_strReason` として報告を上げます.
 
-�n��Ƃ��Ă� [`GetAttr`](#getattr) �P���ł���,
-[`OnGetSender`](#ongetsender) ����̎󒍂����Ȃ��Ă��܂�.
+系列としては [`GetAttr`](#getattr) 傘下ですが,
+[`OnGetSender`](#ongetsender) からの受注もこなしています.
 
 
 ## `GetSender`
 
-[���[���w�b�_�[](https://www.dekyo.or.jp/soudan/contents/ihan/header.html)��
-`Authentication-Results:` �Ȃǂɂ��� ( ���ۂ� ) ���M�҂𔲂��o���� `CAttr` �ɔ[�i���܂�.
+[メールヘッダー](https://www.dekyo.or.jp/soudan/contents/ihan/header.html)の
+`Authentication-Results:` などにある ( 実際の ) 送信者を抜き出して `CAttr` に納品します.
 
-�܂�, `Authentication-Results:` �ɂ���͂��� `smtp.mailfrom=` �Ƃ����������T���܂�.
+まず, `Authentication-Results:` にあるはずの `smtp.mailfrom=` という文字列を探します.
 
-`smtp.mailfrom=` ���������ꍇ: ( RFC 5451 ���� )
+`smtp.mailfrom=` があった場合: ( RFC 5451 準拠 )
 
-* �Y�����Ă��鑗�M�҂̃A�h���X�𔲂��o��,
-�u���`�v( `attr.m_strFrom` ) �̃h���C�� ( `@` �ȍ~ ) �ƌ����v ( �E�����ׂē����� ) ���Ȃ����,
-�u���`�v( `attr.m_strFrom` ) �Ƃ͕ʂ́u���ۂ̑��M�ҁv������Ɣ��f����,
-`attr.m_strSender` �ɔ[�i.
+* 添えられている送信者のアドレスを抜き出し,
+「名義」( `attr.m_strFrom` ) のドメイン ( `@` 以降 ) と後方一致 ( 右から比べて同じか ) しなければ,
+「名義」( `attr.m_strFrom` ) とは別の「実際の送信者」が居ると判断して,
+`attr.m_strSender` に納品.
 
-`smtp.mailfrom=` ���Ȃ������ꍇ: ( RFC 5451 ���O )
+`smtp.mailfrom=` がなかった場合: ( RFC 5451 より前 )
 
-* [���[���w�b�_�[](https://www.dekyo.or.jp/soudan/contents/ihan/header.html)��
-`Received: ` ���� `from ` �ɓY�����Ă���A�h���X�𔲂��o�����Ƃ��J��Ԃ�,
-�Ō�̃A�h���X�� `attr.m_strSender` �ɔ[�i.
+* [メールヘッダー](https://www.dekyo.or.jp/soudan/contents/ihan/header.html)の
+`Received: ` から `from ` に添えられているアドレスを抜き出すことを繰り返し,
+最後のアドレスを `attr.m_strSender` に納品.
 
-��, �������� RFC 5451 ���O�̌Â����[���̌`���ɂ��Ή����āu���ۂ̑��M�ҁv�𔲂��o���Ă��܂�.
+と, いちおう RFC 5451 より前の古いメールの形式にも対応して「実際の送信者」を抜き出しています.
 
-������̏ꍇ��:
+いずれの場合も:
 
-* `attr.m_strSender` ���u�u���b�N���X�g�v( [Domain](../README.md#domain) ��&#x2611;���ꂽ�A�h���X )
-�Ɉ����������Ă��Ȃ��� [`CheckBlackList`](#checkblacklist) �ɂă`�F�b�N.
+* `attr.m_strSender` が「ブラックリスト」( [Domain](../README.md#domain) で&#x2611;されたアドレス )
+に引っかかっていないか [`CheckBlackList`](#checkblacklist) にてチェック.
 
-�Ƃ��ă`�F�b�N�̌���, �X�p���̒������������,
-���̔��藝�R�� `attr.m_strReason` �Ƃ��ĕ񍐂��グ�܂�.
+としてチェックの結果, スパムの兆候を見つけたら,
+その判定理由を `attr.m_strReason` として報告を上げます.
 
-�n��Ƃ��Ă� [`GetAttr`](#getattr) �P���ł���,
-[`OnGetSender`](#ongetsender) ����̎󒍂����Ȃ��Ă��܂�.
+系列としては [`GetAttr`](#getattr) 傘下ですが,
+[`OnGetSender`](#ongetsender) からの受注もこなしています.
 
 
 ## `GetType`
 
-[���[���w�b�_�[](https://www.dekyo.or.jp/soudan/contents/ihan/header.html)��
-`Content-Type:` �Ɋ�Â���, �ȉ��̏��𔲂��o���� `CAttr` �ɔ[�i���܂�.
+[メールヘッダー](https://www.dekyo.or.jp/soudan/contents/ihan/header.html)の
+`Content-Type:` に基づいて, 以下の情報を抜き出して `CAttr` に納品します.
 
-* [���f�B�A�^�C�v](https://ja.wikipedia.org/wiki/Multipurpose_Internet_Mail_Extensions#Content-Type)
-�� `text/plain` �� `text/html` ���邢�� `multipart` ��
-( ����ȊO�͖��� )
-* ���f�B�A�^�C�v�ɓY�����Ă��� `charset`
-* ���f�B�A�^�C�v�� `multipart` �̏ꍇ�� part �Ԃ������� `boundary`
+* [メディアタイプ](https://ja.wikipedia.org/wiki/Multipurpose_Internet_Mail_Extensions#Content-Type)
+が `text/plain` か `text/html` あるいは `multipart` か
+( それ以外は無視 )
+* メディアタイプに添えられている `charset`
+* メディアタイプが `multipart` の場合は part 間をしきる `boundary`
 
-�[�i���, ���ꂼ��
+納品先は, それぞれ
 
-* `attr.m_iType` �� `attr.m_iSubType`
+* `attr.m_iType` と `attr.m_iSubType`
 * `attr.m_iCharset`
 * `attr.m_strBoundary`
 
-�Ƃ��Ă��܂�.
+としています.
 
-�Ȃ�, `charset` �Ɋւ��Ă�, ���� [code page](https://ja.wikipedia.org/wiki/�R�[�h�y�[�W) �𓾂��Ƃ�
-[`GetCodePage`](#getcodepage) �ɑ������ŏo���Ă��܂�.
+なお, `charset` に関しては, その [code page](https://ja.wikipedia.org/wiki/コードページ) を得る作業を
+[`GetCodePage`](#getcodepage) に孫請けで出しています.
 
-�n��Ƃ��Ă� [`GetAttr`](#getattr) �P����, ������̎󒍂͐��������Ă��܂���.
+系列としては [`GetAttr`](#getattr) 傘下で, 他からの受注は請け負っていません.
 
 
 ## `GetEncode`
 
-[���[���w�b�_�[](https://www.dekyo.or.jp/soudan/contents/ihan/header.html)��
-`Content-Transfer-Encoding:` �ɂ���
-[�G���R�[�h����](https://ja.wikipedia.org/wiki/Multipurpose_Internet_Mail_Extensions#Content-Transfer-Encoding)
-�𔲂��o���� `CAttr` �ɔ[�i���܂�.
+[メールヘッダー](https://www.dekyo.or.jp/soudan/contents/ihan/header.html)の
+`Content-Transfer-Encoding:` にある
+[エンコード方式](https://ja.wikipedia.org/wiki/Multipurpose_Internet_Mail_Extensions#Content-Transfer-Encoding)
+を抜き出して `CAttr` に納品します.
 
-�n��Ƃ��Ă� [`GetAttr`](#getattr) �P����, ������̎󒍂͐��������Ă��܂���.
+系列としては [`GetAttr`](#getattr) 傘下で, 他からの受注は請け負っていません.
 
 
 ## `GetTime`
 
-[���[���w�b�_�[](https://www.dekyo.or.jp/soudan/contents/ihan/header.html)��
-`Date:` �ɂ��鑗�M�����𔲂��o���� `CAttr` �ɔ[�i���܂�.
+[メールヘッダー](https://www.dekyo.or.jp/soudan/contents/ihan/header.html)の
+`Date:` にある送信日時を抜き出して `CAttr` に納品します.
 
-�[�i�� `attr.m_time` ��
-[`CTime`](https://learn.microsoft.com/ja-jp/cpp/atl-mfc-shared/reference/ctime-class) class �ł���,
-`Date:` �̋L�q��
+納品先 `attr.m_time` は
+[`CTime`](https://learn.microsoft.com/ja-jp/cpp/atl-mfc-shared/reference/ctime-class) class ですが,
+`Date:` の記述は
 
 `Sun, 15 Dec 2024 13:35:14 +0800`
 
-�Ƃ������`���Ȃ̂�, ���Ȃ��J���ĕϊ����Ă��܂�.
+といった形式なので, かなり苦労して変換しています.
 
-�����, `attr.m_time` �� UTC �Ŋi�[���邱�Ƃɂ����̂� ( �������E������X�p�����[�����͂��̂� ),
-UTC �ւ̕ϊ����K�v�ł�.
-���̏����Ƃ��Ă�
+さらに, `attr.m_time` は UTC で格納することにしたので ( 何せ世界中からスパムメールが届くので ),
+UTC への変換も必要です.
+その処理としては
 
-1. `Date:` �L�q�̍Ō�ɂ���u���n���Ԃ� UTC ����ǂꂾ���}����Ă��邩�̋L�q�𔲂��o��.
-1. �����[���v�P�ʂ̐��l�ɕϊ�����.
-1. [`CTimeSpan`](https://learn.microsoft.com/ja-jp/cpp/atl-mfc-shared/reference/ctimespan-class) ������
-`attr.m_time` �Ɂ}����.
+1. `Date:` 記述の最後にある「現地時間が UTC からどれだけ±されているかの記述を抜き出す.
+1. それを[分」単位の数値に変換する.
+1. [`CTimeSpan`](https://learn.microsoft.com/ja-jp/cpp/atl-mfc-shared/reference/ctimespan-class) 化して
+`attr.m_time` に±する.
 
-�Ƃ������Ƃ�����Ă��܂�.
+ということをやっています.
 
-���܂� `+HHMM` �� `-HHMM` �`���ł͂Ȃ�, `GMT` �Ƃ� `PST` �Ƃ�,
-[�^�C���]�[��](https://ja.wikipedia.org/wiki/������) �̗��̂����Ō����Ă��鍑�ۋ������̂Ȃ���(�n��)������܂���,
-������
-[`CTimeZones`](CTimeZones.md) �� [`GetBias`](CTimeZones.md#getbias) �֐��Ő��l�����Ă�����Ă��܂�.
+たまに `+HHMM` や `-HHMM` 形式ではなく, `GMT` とか `PST` とか,
+[タイムゾーン](https://ja.wikipedia.org/wiki/等時帯) の略称だけで言ってくる国際協調性のない国(地域)がありますが,
+それらは
+[`CTimeZones`](CTimeZones.md) の [`GetBias`](CTimeZones.md#getbias) 関数で数値化してもらっています.
 
-�Ō��, `Date:` �̃^�C���]�[���� [Time Zone](../README.md#time-zone) ��&#x2611;����Ă��Ȃ����`�F�b�N��,
-�����������Ă����炻�̎|�� `attr.m_strReason` �ɏ����ĕ񍐂��グ�܂�.
+最後に, `Date:` のタイムゾーンが [Time Zone](../README.md#time-zone) で&#x2611;されていないかチェックし,
+引っかかっていたらその旨を `attr.m_strReason` に書いて報告を上げます.
 
-�n��Ƃ��Ă� [`GetAttr`](#getattr) �P����, ������̎󒍂͐��������Ă��܂���.
+系列としては [`GetAttr`](#getattr) 傘下で, 他からの受注は請け負っていません.
 
 
 ## `GetCodePage`
 
-[���[���w�b�_�[](https://www.dekyo.or.jp/soudan/contents/ihan/header.html)��
-`charset=` �ɂ��� [character set](https://ja.wikipedia.org/wiki/�����R�[�h#�ގ��̗p��)
-�� [code page](https://ja.wikipedia.org/wiki/�R�[�h�y�[�W)���ʎq�ɕϊ������l��Ԃ��܂�.
+[メールヘッダー](https://www.dekyo.or.jp/soudan/contents/ihan/header.html)の
+`charset=` にある [character set](https://ja.wikipedia.org/wiki/文字コード#類似の用語)
+を [code page](https://ja.wikipedia.org/wiki/コードページ)識別子に変換した値を返します.
 
-�Ȃ�[code page ���ʎq](https://learn.microsoft.com/ja-jp/windows/win32/intl/code-page-identifiers)�Ȃ̂��Ƃ�����,
-���Ƃ�
+なぜ[code page 識別子](https://learn.microsoft.com/ja-jp/windows/win32/intl/code-page-identifiers)なのかというと,
+あとで
 [`MultiByteToWideChar `](https://learn.microsoft.com/ja-jp/windows/win32/api/stringapiset/nf-stringapiset-multibytetowidechar)
-�� UNICODE �ϊ�����Ƃ��ɖʓ|���Ȃ�����ł�. ( [`StringFromCodePage`](#stringfromcodepage) �Q�� )
+で UNICODE 変換するときに面倒がないからです. ( [`StringFromCodePage`](#stringfromcodepage) 参照 )
 
-���Ƃ��� `"utf-8"` �Ƃ����������񂩂� code page `65001` �ւ̕ϊ����s���킯�ł���,
-�ǂ̕����񂪂ǂ� code page �Ȃ̂��ϊ��\�����̂��ʓ|�Ȃ̂�,
+たとえば `"utf-8"` といった文字列から code page `65001` への変換を行うわけですが,
+どの文字列がどの code page なのか変換表を作るのも面倒なので,
 
 `HKEY_CLASSES_ROOT\MIME\Database\Charset\`
 
-�̔z���ɕ���ł���e charset ���Q�Ƃ���, code page ���ʎq�̒l�ɕϊ����Ă��܂�.
+の配下に並んでいる各 charset を参照して, code page 識別子の値に変換しています.
 
-���ɂ͒��� code page �̒l�ɕϊ��ł��Ȃ� charset �́u�ʖ��v���Ă̂�����܂���
-( ��: `us-ascii` �� `iso-8859-1` ),
-���̏ꍇ�̓I���W�i���̖��O�Ŏ��g���ċN�Ăяo������ code page ���ʎq�̒l�ɕϊ����Ă��܂�.
+中には直接 code page の値に変換できない charset の「別名」ってのもありますが
+( 例: `us-ascii` → `iso-8859-1` ),
+その場合はオリジナルの名前で自身を再起呼び出しして code page 識別子の値に変換しています.
 
-�n��Ƃ��Ă� [`GetAttr`](#getattr) �P����[`GetType`](#gettype) �̑������ł���,
-���[���w�b�_�[�̃f�R�[�h�ɂ������d�����K�v�Ȃ���,
-[`StringFromHeader`](#stringfromheader) ����̔��������������Ă��܂�.
+系列としては [`GetAttr`](#getattr) 傘下の[`GetType`](#gettype) の孫請けですが,
+メールヘッダーのデコードにも同じ仕事が必要なため,
+[`StringFromHeader`](#stringfromheader) からの発注も請け負っています.
 
 
 ## `CheckMID`
 
-[���[���w�b�_�[](https://www.dekyo.or.jp/soudan/contents/ihan/header.html)��
-`Message-ID:` �ɂ��� Message ID
-���`�F�b�N�������ʂ� `CAttr` �ɔ[�i���܂�.
+[メールヘッダー](https://www.dekyo.or.jp/soudan/contents/ihan/header.html)の
+`Message-ID:` にある Message ID
+をチェックした結果を `CAttr` に納品します.
 
-�n��Ƃ��Ă� [`GetAttr`](#getattr) �P����, ������̎󒍂͐��������Ă��܂���.
+系列としては [`GetAttr`](#getattr) 傘下で, 他からの受注は請け負っていません.
 
 
 ## `CheckReceived`
 
-[���[���w�b�_�[](https://www.dekyo.or.jp/soudan/contents/ihan/header.html)��
-`Received:` �ɂ���^�C���]�[�����`�F�b�N�������ʂ� `CAttr` �ɔ[�i���܂�.
+[メールヘッダー](https://www.dekyo.or.jp/soudan/contents/ihan/header.html)の
+`Received:` にあるタイムゾーンをチェックした結果を `CAttr` に納品します.
 
-[`GetTime`](#gettime) �ł���Ă���`�F�b�N�Ɠ��l�ł���,
-`Date:` �����܂����Ă��鎖��ɑ��������̂�,
-`Received:` �Ń_�u���`�F�b�N����悤�ɂ��܂���.
+[`GetTime`](#gettime) でやっているチェックと同様ですが,
+`Date:` をごまかしている事例に遭遇したので,
+`Received:` でダブルチェックするようにしました.
 
-�����������Ă����炻�̎|�� `attr.m_strReason` �ɏ����ĕ񍐂��グ�܂�.
+引っかかっていたらその旨を `attr.m_strReason` に書いて報告を上げます.
 
 
-�n��Ƃ��Ă� [`GetAttr`](#getattr) �P����, ������̎󒍂͐��������Ă��܂���.
+系列としては [`GetAttr`](#getattr) 傘下で, 他からの受注は請け負っていません.
 
 
 ## `CheckBlackList`
 
-�u�u���b�N���X�g�v( [Domain](../README.md#domain) ��&#x2611;���ꂽ�A�h���X )
-�Ɉ����������Ă��邩�`�F�b�N���܂�.
+「ブラックリスト」( [Domain](../README.md#domain) で&#x2611;されたアドレス )
+に引っかかっているかチェックします.
 
-�Ăяo������, [`GetFrom`](#getfrom) �� [`GetSender`](#getsender) �� 2������,
-���ꂼ��u���`�v�Ɓu���ۂ̑��M�ҁv���u�u���b�N���X�g�v�Ɉ����������Ă��Ȃ������`�F�b�N���Ă��܂�.
-( ����[�ݒ�](../README.md#domain)�Ɋ�Â���[`CheckLink`](#checklink)�ł��Ǝ��Ƀ����N��̃`�F�b�N���s���Ă��܂�. )
+呼び出し元は, [`GetFrom`](#getfrom) と [`GetSender`](#getsender) の 2か所で,
+それぞれ「名義」と「実際の送信者」が「ブラックリスト」に引っかかっていないかをチェックしています.
+( 同じ[設定](../README.md#domain)に基づいて[`CheckLink`](#checklink)でも独自にリンク先のチェックを行っています. )
 
-�Ăяo������[`GetFrom`](#getfrom)��[`GetSender`](#getsender)��,
-���[���́u���`�v( `From:` ) �Ɓu���ۂ̑��M�ҁv�̗������������Ă��܂�.
+呼び出し元は[`GetFrom`](#getfrom)と[`GetSender`](#getsender)で,
+メールの「名義」( `From:` ) と「実際の送信者」の両方を見張っています.
 
 
 ## `MakeLog`
 
-���O�t�@�C���ɏ����o������������܂�.
+ログファイルに書き出す文字列を作ります.
 
-1�̃��[���̒��g�̕�����������Ƃ��Ď󂯎��, ���̒��g���f�R�[�h�������ʂ� UNICODE ������ŕԂ��܂�.
+1つのメールの中身の文字列を引数として受け取り, その中身をデコードした結果を UNICODE 文字列で返します.
 
-�����́u���g�̕�����v�̓��[���T�[�o�[�����M�����܂܂̕�����
-( [`.eml`](https://www.google.com/search?q=.eml+�t�@�C��)���� ) ��,
-�K�� 7bit �����R�[�h�L�q ( [UNICODE](https://ja.wikipedia.org/wiki/Unicode) �Ȃǂł͂Ȃ� ASCII ������ )
-�Ȃ̂ň����̌^�� `CStringA`�ł�.
-���, �Ԃ�������̌^�� `CString` �ł�.
+引数の「中身の文字列」はメールサーバーから受信したままの文字列
+( [`.eml`](https://www.google.com/search?q=.eml+ファイル)相当 ) で,
+必ず 7bit 文字コード記述 ( [UNICODE](https://ja.wikipedia.org/wiki/Unicode) などではなく ASCII 文字列 )
+なので引数の型は `CStringA`です.
+一方, 返す文字列の型は `CString` です.
 <br>
 <sup>
-`CStringW` �Ƃ��� `CString` �Ƃ��Ă���̂�, ���� project �͕K�� UNICODE �� build ���Ă�������.<br>
-( �Ƃ������Ă銄�ɂ� `_T()` �Ȃ�� multibyte �Ƃ̋�������̌ÏL���}�N����A�����Ă܂���. )
+`CStringW` とせず `CString` としてあるので, この project は必ず UNICODE で build してください.<br>
+( とか言ってる割には `_T()` なんて multibyte との共存時代の古臭いマクロを連発してますが. )
 </sup>
 
-�d���̓��e�́F
+仕事の内容は：
 
-1. �܂��^����ꂽ���[���̑S����,�u���[���w�b�_�[�v�Ɓu�{���v�ɕ�����.
-1. [`StringFromHeader`](#stringfromheader) �Łu���[���w�b�_�[�v���f�R�[�h.
-1. [`StringFromBody`](#stringfrombody) �Łu�{���v���f�R�[�h.
-1. �j�����R `attr.m_strReason` ������ꍇ��, ���̗��R�̕�����Ɩ��ߍ��܂�Ă��������N��`���ɋ���.
-1. �������Ċ��������������Ԃ�.
+1. まず与えられたメールの全文を,「メールヘッダー」と「本文」に分ける.
+1. [`StringFromHeader`](#stringfromheader) で「メールヘッダー」をデコード.
+1. [`StringFromBody`](#stringfrombody) で「本文」をデコード.
+1. 破棄理由 `attr.m_strReason` がある場合は, その理由の文字列と埋め込まれていたリンクを冒頭に挟む.
+1. そうして完成した文字列を返す.
 
-�ƂȂ��Ă��܂���, ���̂��� 3. �́u�{���v�̈����� `multipart` �̃��[���ɑ΂��Ă�, part ���Ƃɍs���܂�.
+となっていますが, このうち 3. の「本文」の扱いが `multipart` のメールに対しては, part ごとに行われます.
 
-���̎d���̌�,
-[`CheckWhiteList`](#checkwhitelist) �� [`Whitelist`](../README.md#whitelist) �ɓo�^����Ă������[���͋~�ς���܂���,
-���̎d���ŕt�����ꂽ�u�j�����R�v�̓��O�Ɏc�����܂܂ɂȂ�܂�.
-����́u�`�F�b�N�̕s���Ō������Ă��܂����v�̂��u[`Whitelist`](../README.md#whitelist)�Ō������Ă����������v�̂�,
-�������ɂ����Ȃ�̂�����邽��, �̈ӂɎc���Ă�����̂ł�.
+この仕事の後,
+[`CheckWhiteList`](#checkwhitelist) で [`Whitelist`](../README.md#whitelist) に登録されていたメールは救済されますが,
+この仕事で付加された「破棄理由」はログに残ったままになります.
+これは「チェックの不備で見逃してしまった」のか「[`Whitelist`](../README.md#whitelist)で見逃していただいた」のか,
+見分けにくくなるのを避けるため, 故意に残しているものです.
 
-[`ParseMail`](#parsemail) ����Ă΂�Ă��܂�.
+[`ParseMail`](#parsemail) から呼ばれています.
 
 
 ## `SaveLog`
 
-���O�t�@�C�����Z�[�u���܂�.
+ログファイルをセーブします.
 
-�u[`MakeLog`](#makelog) �ŏ������ޕ�������m�肵����, ���Ƃ̓t�@�C���ɏ������ނ����ł���?�v
-�Ǝv���邩������܂���, �ӊO�Ɩʓ|�Ȏd�����c���Ă��܂�.
+「[`MakeLog`](#makelog) で書き込む文字列も確定したし, あとはファイルに書き込むだけでしょ?」
+と思われるかもしれませんが, 意外と面倒な仕事が残っています.
 
-�d���̓��e�́F
+仕事の内容は：
 
-1. �Z�[�u��̃t�H���_�[�����݂��Ȃ��ꍇ��, ���̃t�H���_�[�����. ( �{�A�v����������� 1�����ł��傤��. )
-1. [���[���̑��M����](#gettime)�Ƀ��[�U�[�̌��n�������������� UTC �Ƃ���.
-1. �j�����R�̂��郁�[����������, �t�@�C�����̐擪�� `!` ������ł���.
-1. ���ʓI�ɓ��� `.eml` �t�@�C�����������Ƃ��Ă���̂���[���f](#isduplicated)��, �����Ȃ�Z�[�u����̂���߂Ă���.
-1. �K�v�ɉ����ăt�@�C�����ɃT�t�B�b�N�X ( ����t�@�C�����ɂ��� `(2)` �Ȃǂ̔ԍ� ) ��[�t�^](#addsuffix)����.
-1. [BOM](https://ja.wikipedia.org/wiki/�o�C�g���}�[�N) �̂Ȃ� ASCII �̃e�L�X�g�t�@�C���Ƃ��� `.eml` ����������.
-1. �t�@�C���̃^�C���X�^���v��, [���[���̔��M����](#gettime)�ɍ��킹��.
-1. �j�����R�̂��郁�[����������, �t�@�C�����̐擪�� `!` ������ł���.
-1. ���ʓI�ɓ��� `.txt` �t�@�C�����������Ƃ��Ă���̂���[���f](#isduplicated)��, �����Ȃ�Z�[�u����̂���߂Ă���.
-1. �K�v�ɉ����ăt�@�C�����ɃT�t�B�b�N�X ( ����t�@�C�����ɂ��� `(2)` �Ȃǂ̔ԍ� ) ��[�t�^](#addsuffix)����.
-1. [BOM](https://ja.wikipedia.org/wiki/�o�C�g���}�[�N) ��t���� UTF-8 �̃t�@�C���Ƃ��� `.txt` ����������.
-1. �t�@�C���̃^�C���X�^���v��, [���[���̔��M����](#gettime)�ɍ��킹��.
-1. [`TrimFiles`](#trimfiles) �� `*.eml` �� `*.txt` �̃t�@�C�����𒲐�����.
+1. セーブ先のフォルダーが存在しない場合は, そのフォルダーを作る. ( 本アプリ導入直後の 1回限りでしょうが. )
+1. [メールの送信日時](#gettime)にユーザーの現地時刻を加味して UTC とする.
+1. 破棄理由のあるメールだったら, ファイル名の先頭に `!` を挟んでおく.
+1. 結果的に同じ `.eml` ファイルを書こうとしているのかを[判断](#isduplicated)し, そうならセーブするのをやめておく.
+1. 必要に応じてファイル名にサフィックス ( 同一ファイル名につける `(2)` などの番号 ) を[付与](#addsuffix)する.
+1. [BOM](https://ja.wikipedia.org/wiki/バイト順マーク) のない ASCII のテキストファイルとして `.eml` を書き込む.
+1. ファイルのタイムスタンプを, [メールの発信日時](#gettime)に合わせる.
+1. 破棄理由のあるメールだったら, ファイル名の先頭に `!` を挟んでおく.
+1. 結果的に同じ `.txt` ファイルを書こうとしているのかを[判断](#isduplicated)し, そうならセーブするのをやめておく.
+1. 必要に応じてファイル名にサフィックス ( 同一ファイル名につける `(2)` などの番号 ) を[付与](#addsuffix)する.
+1. [BOM](https://ja.wikipedia.org/wiki/バイト順マーク) を付けた UTF-8 のファイルとして `.txt` を書き込む.
+1. ファイルのタイムスタンプを, [メールの発信日時](#gettime)に合わせる.
+1. [`TrimFiles`](#trimfiles) で `*.eml` と `*.txt` のファイル数を調整する.
 
-�Ƃ��Ă��܂�.
+としています.
 
-`.eml` �� `.txt` ��, ��������g���q�̑O�̃t�@�C������ `From:` ���甲���o�������[���A�h���X�ł�.
-�Ȃ̂œ������M�����畡���̃��[����������ƃt�@�C�������J�u��킯�ł���,
-[`AddSuffix`](#addsuffix) �̏������؂��, �J�u��Ȃ��悤�ɂ��Ă��܂�.
+`.eml` も `.txt` も, いずれも拡張子の前のファイル名は `From:` から抜き出したメールアドレスです.
+なので同じ送信元から複数のメールが送られるとファイル名がカブるわけですが,
+[`AddSuffix`](#addsuffix) の助けを借りて, カブらないようにしています.
 
-�������� 7. �� 12. �Ńt�@�C���̃^�C���X�^���v�����[���̑��M�����ɍ��킹�Ă������̂�,
-Windows&reg; ����Ȃ��ɂ��Ă��܂����Ƃ�[�`���̘A������](/README.md#�����g��-build-����-debug-�������ւ̘A������)�ł��`�������ʂ�ł�.
+せっかく 7. と 12. でファイルのタイムスタンプをメールの送信日時に合わせておいたのに,
+Windows&reg; が台なしにしてしまうことは[冒頭の連絡事項](/README.md#ご自身で-build-して-debug-される方への連絡事項)でお伝えした通りです.
 
-[`ParseMail`](#parsemail) ����Ă΂�Ă��܂�.
+[`ParseMail`](#parsemail) から呼ばれています.
 
 
 ## `IsDuplicated`
 
-���łɓ����t�@�C�������邩�ǂ����`�F�b�N���܂�.
+すでに同じファイルがあるかどうかチェックします.
 
-��{�I�ɂ́u�����t�@�C�����œ����^�C���X�^���v�̃t�@�C�������邩�ǂ����v���`�F�b�N����̂ł���,
-�{�A�v���ł͓������M�����畡����̑��M�������,
-2��ڂ� `(2)`, 3��ڂ� `(3)`�c�c��, �u�T�t�B�b�N�X�v���t�@�C�����ɕt���Ă��܂�.
-�����Ƃ��ƍ����K�v�Ȃ̂�, �t�H���_�����t�@�C���������Č��ʂ����߂Ă��܂�.
+基本的には「同じファイル名で同じタイムスタンプのファイルがあるかどうか」をチェックするのですが,
+本アプリでは同じ送信元から複数回の送信があると,
+2回目は `(2)`, 3回目は `(3)`……と, 「サフィックス」をファイル名に付けています.
+それらとも照合が必要なので, フォルダ中をファイル検索して結果を求めています.
 
-�߂�l�́u���łɓ����t�@�C��������v�ꍇ�� `true`, �u�����t�@�C���͂Ȃ��v�ꍇ�� `false` ��Ԃ��܂�.
+戻り値は「すでに同じファイルがある」場合は `true`, 「同じファイルはない」場合は `false` を返します.
 
-[`SaveLog`](#savelog) ����Ă΂�Ă��܂�.
+[`SaveLog`](#savelog) から呼ばれています.
 
 
 ## `AddSuffix`
 
-���łɓ������O�̃t�@�C��������ꍇ��, �t�@�C�����Ɂu�T�t�B�b�N�X�v��t���܂�.
+すでに同じ名前のファイルがある場合に, ファイル名に「サフィックス」を付けます.
 
-�����ł����u�T�t�B�b�N�X�v�Ƃ�, �t�@�C�����̖���, �g���q�̎�O�ɋ��� `(2)` �� `(3)` �Ȃǂ̔ԍ�������ł�.
-�t�H���_������������, �ł��傫�Ȕԍ��Ɂ{1�����u�T�t�B�b�N�X�v�����񂾃t�@�C������Ԃ��܂�.
-�������O�̃t�@�C�����Ȃ������ꍇ��, �I���W�i���̂܂܂̃t�@�C������Ԃ��܂�.
+ここでいう「サフィックス」とは, ファイル名の末尾, 拡張子の手前に挟む `(2)` や `(3)` などの番号文字列です.
+フォルダ中を検索して, 最も大きな番号に＋1した「サフィックス」を挟んだファイル名を返します.
+同じ名前のファイルがなかった場合は, オリジナルのままのファイル名を返します.
 
-[`SaveLog`](#savelog) ����Ă΂�Ă��܂�.
+[`SaveLog`](#savelog) から呼ばれています.
 
 
 ## `TrimFiles`
 
-���O�t�@�C���̐��𐧌����܂�.
+ログファイルの数を制限します.
 
-[`SaveLog`](#savelog) �ŃZ�[�u�������O�t�@�C���̌���
-[Setup](../README.md#setup) �Ŏw�肳��Ă���t�@�C�����ɗ}���܂�.
+[`SaveLog`](#savelog) でセーブしたログファイルの個数を
+[Setup](../README.md#setup) で指定されているファイル数に抑えます.
 
-�����𒴂�������, ���M�����̌Â�������t�@�C���������Ă����܂�.
-( ���̂��߂Ƀ��O�t�@�C���̃^�C���X�^���v�����[���́u���M�����v�ɍ��킹�Ă���Ƃ������܂�. )
+制限を超えた分は, 送信日時の古い方からファイルを消していきます.
+( そのためにログファイルのタイムスタンプをメールの「送信日時」に合わせてあるとも言えます. )
 
-���̊֐���, [`SaveLog`](#savelog) ����Ă΂�Ă���̂͂������,
-[`OnMenuSetup`](#onmenusetup) ������t�@�C���������炳�ꂽ�ꍇ�ɔ����ČĂ΂�Ă��܂�.
+この関数は, [`SaveLog`](#savelog) から呼ばれているのはもちろん,
+[`OnMenuSetup`](#onmenusetup) からもファイル数が減らされた場合に備えて呼ばれています.
 
 
 ## `MoveFiles`
 
-�w�肳�ꂽ�t�H���_�[�̒��g�������z���܂�.
+指定されたフォルダーの中身を引っ越します.
 
-�����Ƃ��ė^����ꂽ���t�H���_�[�ƐV�t�H���_�[�̊Ԃ�,
-�t�H���_�[�̉��̃t�@�C���������z���܂�.
-�����z�����I������狌�t�H���_�[���폜���悤�Ƃ��܂�.
+引数として与えられた旧フォルダーと新フォルダーの間で,
+フォルダーの下のファイルを引っ越します.
+引っ越しが終わったら旧フォルダーを削除しようとします.
 
-���O�t�@�C���̃t�H���_�[�p�̊֐��Ȃ̂�,
-���ɍċA�I����͂��Ă��܂���.
-�t�H���_�[�̒����Ɉڂ��ׂ��t�@�C���͑S�đ����Ă���Ƃ����O��ł�.
+ログファイルのフォルダー用の関数なので,
+特に再帰的動作はしていません.
+フォルダーの直下に移すべきファイルは全て揃っているという前提です.
 
-[`OnMenuSetup`](#onmenusetup)����,
-���O�����܂��Ă����t�H���_�[���ύX���ꂽ�ۂɌĂяo����܂�.
+[`OnMenuSetup`](#onmenusetup)から,
+ログをしまっておくフォルダーが変更された際に呼び出されます.
 
 
 ## `MakeSummary`
 
-[�T�}���[](../README.md#notification)�̂��߂̕�����𐶐����܂�.
+[サマリー](../README.md#notification)のための文字列を生成します.
 
-1�ʂ̃��[���̃��O�o�͗p������ ( �܂�f�R�[�h�ςݕ����� ) �� `CAttr` ��������,
-�T�}���[�Ƃ��ĕ\�����邽�߂ɘA�������������Ԃ��܂�.
+1通のメールのログ出力用文字列 ( つまりデコード済み文字列 ) と `CAttr` を引数に,
+サマリーとして表示するために連結した文字列を返します.
 
-`Date:` �̎����\����
+`Date:` の時刻表示は
 [`GetTimeZoneInformation`](https://learn.microsoft.com/ja-jp/windows/win32/api/timezoneapi/nf-timezoneapi-gettimezoneinformation)
-��p���ă��[�U�[�̌��n���Ԃɕϊ���,
-�����[�U�[�� Windows&reg; �ɐݒ肵�����t�̕\���t�H�[�}�b�g�ɉ����悤,
+を用いてユーザーの現地時間に変換し,
+かつユーザーが Windows&reg; に設定した日付の表示フォーマットに沿うよう,
 [`GetDateFormatEx`](https://learn.microsoft.com/ja-jp/windows/win32/api/datetimeapi/nf-datetimeapi-getdateformatex)
-��p���ē��t������𐶐����Ă��܂�.
+を用いて日付文字列を生成しています.
 
-���̌���, �ł������镶�����
+この結果, できあがる文字列は
 
 `"Subject:\nFrom:\n Date:\n\n"`
 
-�ƂȂ�܂�.
+となります.
 
-�Ăяo������ [`ParseMail`](#parsemail) ��,
-���[��1�ʂ��̃T�}���[�������S���[�����A�����Ă��܂�.
+呼び出し元は [`ParseMail`](#parsemail) で,
+メール1通ずつのサマリー文字列を全メール分連結しています.
 
 
 ## `ShowSummary`
 
-[�T�}���[](../README.md#notification)�������[�ʒm�p window](CNotifyWnd.md)�Ɏd���݂܂�.
+[サマリー](../README.md#notification)文字列を[通知用 window](CNotifyWnd.md)に仕込みます.
 
-�S�Ă̖��ǃ��[���̃T�}���[�����񂪘A���������̂�������,
-[�T�}���[�\��](../README.md#notification)���s���܂�.
+全ての未読メールのサマリー文字列が連結したものを引数に,
+[サマリー表示](../README.md#notification)を行います.
 
-�\�����鍀�ڂ͂��ꂼ��̃��[���� `Subject:`, `Date:`, `From:` �ł���,
-�������܂Ƃ߂ĂȂ�ׂ��R���p�N�g��, ���������₷���\�����邽��,
-���ꂼ��̕�����Ƃ��Ă̒��������L�̂悤�ɍl�@���ĕ\���ʒu�����߂܂���.
+表示する項目はそれぞれのメールの `Subject:`, `Date:`, `From:` ですが,
+これらをまとめてなるべくコンパクトに, しかし見やすく表示するため,
+それぞれの文字列としての長さを下記のように考察して表示位置を決めました.
 
-| ���� | ���� | �\���ʒu |
+| 項目 | 長さ | 表示位置 |
 | --- | --- | --- |
-| `Date:` | �Z�� | ��i�̍��� |
-| `From:` | ���Ԃ� `Subject:` ���͒Z�� | ��i�̉E�� |
-| `Subject:` | �������Ƃ����� | ���i�S�� |
+| `Date:` | 短い | 上段の左寄せ |
+| `From:` | たぶん `Subject:` よりは短い | 上段の右寄せ |
+| `Subject:` | 長いことが多い | 下段全域 |
 
-��L�̕\���ʒu�ƂȂ�悤, ���L�̂悤�Ɉ������������בւ��Ă��܂�.
+上記の表示位置となるよう, 下記のように引数文字列を並べ替えています.
 
 `"Date:1\t:From:1\nSubject:1\n\nDate:2\t:From:2\nSubject:2\n\n"`
 
-�������ĕ��בւ����������[�ʒm�p window](CNotifyWnd.md)��[`SetText`](#settext)�Ɉ����n���܂�.
-�����[�T�}���[�\��](../README.md#notification)�� window �������邱�ƂɂȂ�܂�.
+こうして並べ替えた文字列を[通知用 window](CNotifyWnd.md)の[`SetText`](#settext)に引き渡します.
+すると[サマリー表示](../README.md#notification)の window が現われることになります.
 
-�Ăяo������ [`ModNI`](#modni) ��,
-���� [`ModNI`](#modni) �͑S�ẴA�J�E���g�̃��[���`�F�b�N�����������Ƃ���
-[`RespondPOP`](#respondpop) ����Ă΂�Ă��܂�.
+呼び出し元は [`ModNI`](#modni) で,
+この [`ModNI`](#modni) は全てのアカウントのメールチェックが完了したときに
+[`RespondPOP`](#respondpop) から呼ばれています.
 
 
 ## `ShareSummary`
 
-[�T�}���[](../README.md#notification)���������񋤗L���܂�.
+[サマリー](../README.md#notification)文字列を情報共有します.
 
-�S�Ă̖��ǃ��[���̃T�}���[�����񂪘A���������̂����L�p
-[�t�@�C���}�b�s���O](https://learn.microsoft.com/ja-jp/windows/win32/memory/file-mapping)
-�Ɏd���݂܂�.
+全ての未読メールのサマリー文字列が連結したものを共有用
+[ファイルマッピング](https://learn.microsoft.com/ja-jp/windows/win32/memory/file-mapping)
+に仕込みます.
 
-���炩���ߌ����Ă����܂���,
-���̋@�\�̓f�t�H���g�� OFF �ɂȂ��Ă��܂�.
-ON �ɂ����i�͓��A�v���ł͒񋟂��Ă��炸,
-���[�U�[���珊��� registry �� Registry Editor ���g���� ON �ɏ��������邵������܂���.
-�ꕔ�̃}�j�A�b�N�ȃ��[�U�[�̂��߂̋@�\�ƌ����Ă����ł��傤.
-�ǂ������}�j�A�b�N�ȃ��[�U�[����̎��v���������ƌ�����:
+あらかじめ言っておきますが,
+この機能はデフォルトで OFF になっています.
+ON にする手段は当アプリでは提供しておらず,
+ユーザー自ら所定の registry を Registry Editor を使って ON に書き換えるしかありません.
+一部のマニアックなユーザーのための機能と言っていいでしょう.
+どういうマニアックなユーザーからの需要だったかと言うと:
 
-* ���[���̃`�F�b�N�͘A���^�]���Ă���T�[�o�[�ł���Ă���.
-* ���̃T�[�o�[�ɂ͕��i�� console ���Ȃ��ł��Ȃ�.
-* ���̑���ɏ����� USB ���j�^�[��t���Ă���.
-* USB ���j�^�[�̉�ʂ͏󋵕\���̂��߂̃A�v���Ő�L���Ă���.
+* メールのチェックは連続運転しているサーバーでやっている.
+* そのサーバーには普段は console をつないでいない.
+* その代わりに小さな USB モニターを付けている.
+* USB モニターの画面は状況表示のためのアプリで占有している.
 
-�Ƃ��������������[�U�[�ł���.
+といった環境を持つユーザーでした.
 
-��, ���́u��ʂ��L���Ă���A�v���v�ł����[���̓����󋵂�\������������,
-�{�A�v�����T�}���[�\�����Ă��镶���� process �Ԃœǂ߂�悤�ɂ��Ăق���,
-�Ƃ������v�ł�.
+で, その「画面を占有しているアプリ」でもメールの到着状況を表示したいから,
+本アプリがサマリー表示している文字列が process 間で読めるようにしてほしい,
+という需要です.
 
-ON �ɂ����,
-`"ChkMails Summary"` �Ƃ������O��
-[�t�@�C���}�b�s���O�I�u�W�F�N�g](https://learn.microsoft.com/ja-jp/windows/win32/memory/creating-a-file-mapping-object)
-�����, �T�}���[�����񂪎擾�ł���悤�ɂȂ�܂�.
+ON にすると,
+`"ChkMails Summary"` という名前の
+[ファイルマッピングオブジェクト](https://learn.microsoft.com/ja-jp/windows/win32/memory/creating-a-file-mapping-object)
+を介して, サマリー文字列が取得できるようになります.
 
-�Ăяo������[�uNI�O�Z��v](#addni)��, �T�}���[�̕����񂪕ύX�����ۂɌĂяo����Ă��܂�.
+呼び出し元は[「NI三兄弟」](#addni)で, サマリーの文字列が変更される際に呼び出されています.
 
 
 ## `StringFromHeader`
 
-[���[���w�b�_�[](https://www.dekyo.or.jp/soudan/contents/ihan/header.html)�̕�������f�R�[�h�����������Ԃ��܂�.
+[メールヘッダー](https://www.dekyo.or.jp/soudan/contents/ihan/header.html)の文字列をデコードした文字列を返します.
 
-���[���w�b�_�[�ɍڂ����Ă��邢�����̕������,
-ASCII �R�[�h�ŕ\���ł�����e�𒴂��������\���̂��߂ɃG���R�[�h����Ă���ꍇ������܂�.
+メールヘッダーに載せられているいくつかの文字列は,
+ASCII コードで表現できる範疇を超えた文字表現のためにエンコードされている場合があります.
 
-���Ƃ���
+たとえば
 ```
 From: =?utf-8?B?5LiJ5LqV5L2P5Y+L6YqA6KGM?= <admin@propertyagent.co.jp>
 To: <pochi.the.cat@provider.ne.jp>
@@ -1442,463 +1442,463 @@ Subject: =?utf-8?B?44CQ5LiJ5LqV5L2P5Y+L44CRU01CQ+OCq+ODvOODieOCouOCq+OCpuODs+ODi
 	=?utf-8?B?6KqN6Ki844GM5b+F6KaB44Gn44GZXyM3NzI3Nw==?=
 Message-ID: <20241202023811304176@moneylionkmp.top>
 ```
-�� Base64 �ŃG���R�[�h���ꂽ UTF-8 �̕������, ������f�R�[�h�����
+は Base64 でエンコードされた UTF-8 の文字列で, これをデコードすると
 ```
-From: �O��Z�F��s <admin@propertyagent.co.jp>
+From: 三井住友銀行 <admin@propertyagent.co.jp>
 To: <pochi.the.cat@provider.ne.jp>
-Subject: �y�O��Z�F�zSMBC�J�[�h�A�J�E���g�̍ĔF�؂��K�v�ł�_#77277
+Subject: 【三井住友】SMBCカードアカウントの再認証が必要です_#77277
 Message-ID: <20241202023811304176@moneylionkmp.top>
 ```
-�ƂȂ�܂�.
+となります.
 <sub>
 <br>
-����͎��ۂɓ����ɓ͂����X�p�����[���̗�ł���,
-`From:` �����S�ɂł����グ�Ȃ��Ƃ��������Ă�����̂ł�.
-`propertyagent.co.jp` �Ƃ������݂̊�Ƃ̃A�h���X���x���Ă���Ƃ��낪���f�Șb�ł���,
-`�O��Z�F��s` �̃A�h���X�ł͂Ȃ��̂���ڗđR�ȂƂ���͏΂��܂�.
+これは実際に当方に届いたスパムメールの例ですが,
+`From:` が完全にでっち上げなことが判明しているものです.
+`propertyagent.co.jp` という実在の企業のアドレスを騙っているところが迷惑な話ですが,
+`三井住友銀行` のアドレスではないのが一目瞭然なところは笑えます.
 </sub>
 
-���[���w�b�_�[���̗v�f�R�[�h������, ��ʌ`�ŕ\����
+メールヘッダー中の要デコード部分は, 一般形で表すと
 
 `=?<charset>?{B|Q}?<encoded string>?=`
 
-�Ƃ������[���� ASCII �����񉻂���Ă��܂�.<br>
-`=?` ���v�f�R�[�h�����̎n�܂������,<br>
-`<charset>` ��[character set](https://ja.wikipedia.org/wiki/�����R�[�h#�ގ��̗p��),<br>
-`{B|Q}` �� `B` ��
-[Base64](https://ja.wikipedia.org/wiki/Base64), `Q` ��
-[Quoted-printable](https://ja.wikipedia.org/wiki/Quoted-printable) �ŃG���R�[�h����Ă��邱�Ƃ�����, �ȍ~
-`?=` �܂ł��G���R�[�h���ꂽ character set �̕�����ł�.<br>
-�Ȃ̂�, ��̗���������:
+というルールで ASCII 文字列化されています.<br>
+`=?` が要デコード部分の始まりを示し,<br>
+`<charset>` は[character set](https://ja.wikipedia.org/wiki/文字コード#類似の用語),<br>
+`{B|Q}` は `B` で
+[Base64](https://ja.wikipedia.org/wiki/Base64), `Q` で
+[Quoted-printable](https://ja.wikipedia.org/wiki/Quoted-printable) でエンコードされていることを示し, 以降
+`?=` までがエンコードされた character set の文字列です.<br>
+なので, 具体例を挙げると:
 
-| �v�f�R�[�h�����̖`�� | �v�f�R�[�h�����̒��g |
+| 要デコード部分の冒頭 | 要デコード部分の中身 |
 | --- | --- |
-| `=?UTF-8?B?` | Base64 �ŃG���R�[�h���ꂽ [UTF-8](https://ja.wikipedia.org/wiki/UTF-8) �̕����� |
-| `=?utf-8?q?` | Quoted-printable �ŃG���R�[�h���ꂽ UTF-8 �̕����� |
-| `=?ISO-2022-JP?B?` | Base64 �ŃG���R�[�h���ꂽ [ISO-2022-JP](https://ja.wikipedia.org/wiki/ISO-2022-JP) �̕����� |
+| `=?UTF-8?B?` | Base64 でエンコードされた [UTF-8](https://ja.wikipedia.org/wiki/UTF-8) の文字列 |
+| `=?utf-8?q?` | Quoted-printable でエンコードされた UTF-8 の文字列 |
+| `=?ISO-2022-JP?B?` | Base64 でエンコードされた [ISO-2022-JP](https://ja.wikipedia.org/wiki/ISO-2022-JP) の文字列 |
 
-�ȂǂƂ��������ƂɂȂ�܂�.
+などといったことになります.
 
-�ȏ�̑O��𓥂܂��ď������e����������: <sub>�O�u������!</sub>
+以上の前提を踏まえて処理内容を説明すると: <sub>前置き長っ!</sub>
 
-1. �{���� character set ������ `attr.m_iCharset` ��ޔ�.
-1. `"=?"` ��������Ȃ������� 14. ��.
-1. `<charset>` �����𔲂��o��,
-1. [`GetCodePage`](#getcodepage)�� `<charset>` ����[code page](https://ja.wikipedia.org/wiki/�R�[�h�y�[�W)�l�𓾂�.
-1. `attr.m_iCharset` �𓾂�ꂽ code page �ŏ㏑��.
-1. ���ߕs���� `<charset>` ��������, [�ǂ߂Ȃ������Z�b�g](../README.md#coding)�Ƃ��ăG���[��.
-1. `<charset>` �̎��� `Q` ��������, �G���R�[�h������ Quoted-printable �Ƃ݂Ȃ�.
-1. `<charset>` �̎��� `Q` �ł͂Ȃ�������, �G���R�[�h������ Base64 �Ƃ݂Ȃ�.
-1. �r���ɋ��܂������s�͖�������, �v�f�R�[�h�����𔲂��o��.
-1. �G���R�[�h������ Quoted-printable ��������[`DecodeQuoted`](#decodequoted)�Ńf�R�[�h.
-1. �G���R�[�h������ Base64 ��������[`DecodeBase64`](#decodebase64)�Ńf�R�[�h.
-1. �f�R�[�h���ꂽ code page �̕������ [`StringFromCodePage`](#stringfromcodepage)��
-`CString` ( [UTF-16LE](https://ja.wikipedia.org/wiki/UTF-16) ) �ɕϊ�.
-1. �ȏ�� 2. �܂ŌJ��Ԃ�.
-1. �ޔ����Ă����� `attr.m_iCharset` �𕜋A.
-1. �ł��������������� ( `CString` ) ��Ԃ�.
+1. 本文の character set を示す `attr.m_iCharset` を退避.
+1. `"=?"` が見つからなかったら 14. へ.
+1. `<charset>` 部分を抜き出す,
+1. [`GetCodePage`](#getcodepage)で `<charset>` から[code page](https://ja.wikipedia.org/wiki/コードページ)値を得る.
+1. `attr.m_iCharset` を得られた code page で上書き.
+1. 解釈不明な `<charset>` だったら, [読めない文字セット](../README.md#coding)としてエラー報告.
+1. `<charset>` の次が `Q` だったら, エンコード方式は Quoted-printable とみなす.
+1. `<charset>` の次が `Q` ではなかったら, エンコード方式は Base64 とみなす.
+1. 途中に挟まった改行は無視して, 要デコード部分を抜き出す.
+1. エンコード方式が Quoted-printable だったら[`DecodeQuoted`](#decodequoted)でデコード.
+1. エンコード方式が Base64 だったら[`DecodeBase64`](#decodebase64)でデコード.
+1. デコードされた code page の文字列を [`StringFromCodePage`](#stringfromcodepage)で
+`CString` ( [UTF-16LE](https://ja.wikipedia.org/wiki/UTF-16) ) に変換.
+1. 以上を 2. まで繰り返す.
+1. 退避しておいた `attr.m_iCharset` を復帰.
+1. できあがった文字列 ( `CString` ) を返す.
 
-�Ƃ����i���ɂȂ��Ă��܂�.
+という段取りになっています.
 
-[`MakeLog`](#makelog)����Ăяo����Ă��܂�.
+[`MakeLog`](#makelog)から呼び出されています.
 
 
 ## `StringFromBody`
 
-���[���{���̕�������f�R�[�h�����������Ԃ��܂�.
+メール本文の文字列をデコードした文字列を返します.
 
-�������e��:
+処理内容は:
 
-1. �������� `attr.m_iType` ( [���f�B�A�^�C�v](https://ja.wikipedia.org/wiki/Multipurpose_Internet_Mail_Extensions#Content-Type)
-)�� `text/plain` �� `text/html` �łȂ���΋�̕������Ԃ��ďI���.<br>
-( `multipart` �̏ꍇ�� part ���ƂɌĂ΂��ʒu�t���̊֐��Ȃ̂� )
-1. `attr.m_iEncode` �� `���G���R�[�h` �� `Binary` �� `7bit` �� `8bit` �Ȃ�f�R�[�h���Ȃ�.
-1. `attr.m_iEncode` �� `Base64`�Ȃ�[`DecodeBase64`](#decodebase64)�Ńf�R�[�h.
-1. `attr.m_iEncode` �� `Quoted-printable`�Ȃ�[`DecodeQuoted`](#decodequoted)�Ńf�R�[�h.
-1. `attr.m_iEncode` ���f�R�[�h�ςݕ�����͋���ۂ̂܂܂ɂ��Ă���.
-1. [`StringFromCodePage`](#stringfromcodepage) �Ńf�R�[�h�ςݕ������
-`CString` ( [UTF-16LE](https://ja.wikipedia.org/wiki/UTF-16) ) �ɕϊ�.
-1. [`LFtoCRLF`](#lftocrlf) �� LF ���s�� CR/LF ���s�Ɉꊇ�ϊ�.
-1. `attr.m_iSubType` �� `HTML` �Ȃ�,<br>
-[`HexToUnicode`](#hextounicode) ��16�i���\�L�𕶎���.<br>
-1. [`CheckUnicode`](#checkunicode) �Ń��o�������R�[�h���܂܂�Ă��Ȃ����`�F�b�N.
-1. [`CheckLink`](#checklink) �Ŗ��ߍ��܂�Ă��郊���N�� URL ���`�F�b�N.
-1. �ł��������������� ( `CString` ) ��Ԃ�.
+1. そもそも `attr.m_iType` ( [メディアタイプ](https://ja.wikipedia.org/wiki/Multipurpose_Internet_Mail_Extensions#Content-Type)
+)が `text/plain` か `text/html` でなければ空の文字列を返して終わり.<br>
+( `multipart` の場合は part ごとに呼ばれる位置付けの関数なので )
+1. `attr.m_iEncode` が `未エンコード` や `Binary` や `7bit` や `8bit` ならデコードしない.
+1. `attr.m_iEncode` が `Base64`なら[`DecodeBase64`](#decodebase64)でデコード.
+1. `attr.m_iEncode` が `Quoted-printable`なら[`DecodeQuoted`](#decodequoted)でデコード.
+1. `attr.m_iEncode` がデコード済み文字列は空っぽのままにしておく.
+1. [`StringFromCodePage`](#stringfromcodepage) でデコード済み文字列を
+`CString` ( [UTF-16LE](https://ja.wikipedia.org/wiki/UTF-16) ) に変換.
+1. [`LFtoCRLF`](#lftocrlf) で LF 改行を CR/LF 改行に一括変換.
+1. `attr.m_iSubType` が `HTML` なら,<br>
+[`HexToUnicode`](#hextounicode) で16進数表記を文字化.<br>
+1. [`CheckUnicode`](#checkunicode) でヤバい文字コードが含まれていないかチェック.
+1. [`CheckLink`](#checklink) で埋め込まれているリンクの URL をチェック.
+1. できあがった文字列 ( `CString` ) を返す.
 
-�Ƃ����i���ɂȂ��Ă��܂�.
+という段取りになっています.
 
-[`MakeLog`](#makelog)����Ă΂�Ă��܂�.
+[`MakeLog`](#makelog)から呼ばれています.
 
 
 ## `DecodeBase64`
 
-[Base64](https://ja.wikipedia.org/wiki/Base64)�ŃG���R�[�h���ꂽ��������f�R�[�h���܂�.
+[Base64](https://ja.wikipedia.org/wiki/Base64)でエンコードされた文字列をデコードします.
 
-�߂�l�� `CStringA` �ł���,
-������[�}���`�o�C�g������](https://ja.wikipedia.org/wiki/�}���`�o�C�g����)�Ƃ��Ĉ����܂�.
-7bit �����Ƃ͌���܂���. MSB �������������R�[�h���܂܂꓾�邱�ƂɂȂ�܂�.
+戻り値は `CStringA` ですが,
+いわゆる[マルチバイト文字列](https://ja.wikipedia.org/wiki/マルチバイト文字)として扱われます.
+7bit 文字とは限りません. MSB が立った文字コードも含まれ得ることになります.
 
-�������e�Ƃ��Ă�,
-�u6bit x 4���� ( 6 x 4 = 24 bits ) �� 8bit x 3bytes ( 8 x 3 = 24 bits ) ��\���v�Ƃ���
-[Base64](https://ja.wikipedia.org/wiki/Base64)�̗��V�ɑ�����,
-�f�R�[�h���Ă��邾���ł�.
-�Ȃ񂩂��ɂ傲�ɂ����Ă܂���, ��[������Ƃ������ꂾ���̏������Ƃ������Ƃ������肢��������Ǝv���܂�.
+処理内容としては,
+「6bit x 4文字 ( 6 x 4 = 24 bits ) で 8bit x 3bytes ( 8 x 3 = 24 bits ) を表す」という
+[Base64](https://ja.wikipedia.org/wiki/Base64)の流儀に則って,
+デコードしているだけです.
+なんかごにょごにょやってますが, よーく見るとただそれだけの処理だということがお解りいただけると思います.
 
-[`StringFromHeader`](#stringfromheader) �� [`StringFromBody`](#stringfrombody) ����Ă΂�Ă��܂�.
+[`StringFromHeader`](#stringfromheader) と [`StringFromBody`](#stringfrombody) から呼ばれています.
 
 
 ## `DecodeQuoted`
 
-[Quoted-printable](https://ja.wikipedia.org/wiki/Quoted-printable) �ŃG���R�[�h���ꂽ��������f�R�[�h���܂�.
+[Quoted-printable](https://ja.wikipedia.org/wiki/Quoted-printable) でエンコードされた文字列をデコードします.
 
-�߂�l�� `CStringA` �ł���,
-������[�}���`�o�C�g������](https://ja.wikipedia.org/wiki/�}���`�o�C�g����)�Ƃ��Ĉ����܂�.
-7bit �����Ƃ͌���܂���. MSB �������������R�[�h���܂܂꓾�邱�ƂɂȂ�܂�.
+戻り値は `CStringA` ですが,
+いわゆる[マルチバイト文字列](https://ja.wikipedia.org/wiki/マルチバイト文字)として扱われます.
+7bit 文字とは限りません. MSB が立った文字コードも含まれ得ることになります.
 
-�������e�Ƃ��Ă�,
+処理内容としては,
 
-* `=` ����������, ���ꂪ�s���łȂ�����㑱��16�i���\�L�𐔒l�ϊ����ăf�R�[�h�ςݕ�����ɒǉ�
-* `=` �ȊO�̕�����, ���̂܂܃f�R�[�h�ςݕ�����ɒǉ�
+* `=` があったら, それが行末でない限り後続の16進数表記を数値変換してデコード済み文字列に追加
+* `=` 以外の文字は, そのままデコード済み文字列に追加
 
-�Ƃ��Ă��邾���ł�.
+としているだけです.
 
-[`StringFromHeader`](#stringfromheader) �� [`StringFromBody`](#stringfrombody) ����Ă΂�Ă��܂�.
+[`StringFromHeader`](#stringfromheader) と [`StringFromBody`](#stringfrombody) から呼ばれています.
 
 
 ## `StringFromCodePage`
 
-�w��
-[code page ���ʎq](https://learn.microsoft.com/ja-jp/windows/win32/intl/code-page-identifiers)
-��
-[�}���`�o�C�g������](https://ja.wikipedia.org/wiki/�}���`�o�C�g����)����
-`CStringW` ( [UTF-16LE](https://ja.wikipedia.org/wiki/UTF-16) ) �ɕϊ������������Ԃ��܂�.
+指定
+[code page 識別子](https://learn.microsoft.com/ja-jp/windows/win32/intl/code-page-identifiers)
+の
+[マルチバイト文字列](https://ja.wikipedia.org/wiki/マルチバイト文字)から
+`CStringW` ( [UTF-16LE](https://ja.wikipedia.org/wiki/UTF-16) ) に変換した文字列を返します.
 
-�v��
+要は
 [`MultiByteToWideChar`](https://learn.microsoft.com/ja-jp/windows/win32/api/stringapiset/nf-stringapiset-multibytetowidechar)
-���g����,
-[�}���`�o�C�g������](https://ja.wikipedia.org/wiki/�}���`�o�C�g����)��
-`CStringW` ( [UTF-16LE](https://ja.wikipedia.org/wiki/UTF-16) ) �ɕϊ����Ă��邾���ł���,<br>
-�O�����Ƃ���:
+を使って,
+[マルチバイト文字列](https://ja.wikipedia.org/wiki/マルチバイト文字)を
+`CStringW` ( [UTF-16LE](https://ja.wikipedia.org/wiki/UTF-16) ) に変換しているだけですが,<br>
+前処理として:
 
-* code page �� [`ISO_2022_JP`](https://ja.wikipedia.org/wiki/ISO-2022-JP) ��������,
-[`EscapeFromJIS`](#escapefromjis)�ɂ�
-[�G�X�P�[�v�V�[�P���X](https://ja.wikipedia.org/wiki/�G�X�P�[�v�V�[�P���X)�̑O�������s���Ă���.
+* code page が [`ISO_2022_JP`](https://ja.wikipedia.org/wiki/ISO-2022-JP) だったら,
+[`EscapeFromJIS`](#escapefromjis)にて
+[エスケープシーケンス](https://ja.wikipedia.org/wiki/エスケープシーケンス)の前処理を行っておく.
 
-�܂�,
-�ϊ��Ɏ��s�����ꍇ�� `CAttr` �Ɂu�j�����R�v�������ĕ񍐂��グ�邱�Ƃɂ��������Ȃ��Ă��܂�.
+また,
+変換に失敗した場合は `CAttr` に「破棄理由」を書いて報告を上げることにいちおうなっています.
 
-[`StringFromHeader`](#stringfromheader) �� [`StringFromBody`](#stringfrombody) ����Ă΂�Ă��܂�.
+[`StringFromHeader`](#stringfromheader) と [`StringFromBody`](#stringfrombody) から呼ばれています.
 
 
 ## `EscapeFromJIS`
 
-[�G�X�P�[�v�V�[�P���X](https://ja.wikipedia.org/wiki/�G�X�P�[�v�V�[�P���X)�ŏC�����ꂽ
-JIS ��������G�X�P�[�v�V�[�P���X�̂Ȃ� Shift-JIS ������ɕϊ����܂�.
+[エスケープシーケンス](https://ja.wikipedia.org/wiki/エスケープシーケンス)で修飾された
+JIS 文字列をエスケープシーケンスのない Shift-JIS 文字列に変換します.
 
-* ���p�J�i�͑S�p�J�i�ɕϊ����Ă��܂�.<br>( ���łɔ��p���_����������΂悩������ł�����, �����܂ł��C���c�c )
-* ������ [`_mbcjistojms`](https://learn.microsoft.com/ja-jp/cpp/c-runtime-library/reference/mbcjistojms-mbcjistojms-l-mbcjmstojis-mbcjmstojis-l)
-���g���� Shift-JIS ������ɕϊ����Ă��܂�.
+* 半角カナは全角カナに変換しています.<br>( ついでに半角濁点も統合すればよかったんですけど, そこまでやる気が…… )
+* 漢字は [`_mbcjistojms`](https://learn.microsoft.com/ja-jp/cpp/c-runtime-library/reference/mbcjistojms-mbcjistojms-l-mbcjmstojis-mbcjmstojis-l)
+を使って Shift-JIS 文字列に変換しています.
 
-`CString` ( [UTF-16LE](https://ja.wikipedia.org/wiki/UTF-16) ) �ɕϊ�����̂ł͂Ȃ�,
-��U Shift-JIS ���o�R���Ă��܂�.
+`CString` ( [UTF-16LE](https://ja.wikipedia.org/wiki/UTF-16) ) に変換するのではなく,
+一旦 Shift-JIS を経由しています.
 [`_mbcjistojms`](https://learn.microsoft.com/ja-jp/cpp/c-runtime-library/reference/mbcjistojms-mbcjistojms-l-mbcjmstojis-mbcjmstojis-l)
-�Ƃ��� API �𗘗p���邽��, �Ƃ����̂�����܂���,
-���������\�[�X�R�[�h���̃J�i�����e�[�u���� Shift-JIS �ŋL�q����Ă���̂�,
-�ǂ����Ă� Shift-JIS �o�R�ɂȂ炴��𓾂܂���.
+という API を利用するため, というのもありますが,
+そもそもソースコード中のカナ文字テーブルが Shift-JIS で記述されているので,
+どうしても Shift-JIS 経由にならざるを得ません.
 <br>
 <sup>
-( �\�[�X�R�[�h�� UTF-16LE �ŏ����΂悩�����̂�? �ł�, ����Ȃ��Ƃ�������t�@�C���T�C�Y���c�c)
+( ソースコードを UTF-16LE で書けばよかったのか? でも, そんなことをしたらファイルサイズが……)
 </sup>
 
-[`StringFromCodePage`](#stringfromcodepage) �݂̂���Ă΂�Ă��܂�.
+[`StringFromCodePage`](#stringfromcodepage) のみから呼ばれています.
 
 
 ## `StringToUTF8`
 
-`CString` ( [UTF-16LE](https://ja.wikipedia.org/wiki/UTF-16) ) ��
-[UTF-8](https://ja.wikipedia.org/wiki/UTF-8) ������ɕϊ����܂�.
+`CString` ( [UTF-16LE](https://ja.wikipedia.org/wiki/UTF-16) ) を
+[UTF-8](https://ja.wikipedia.org/wiki/UTF-8) 文字列に変換します.
 
 [`WideCharToMultiByte`](https://learn.microsoft.com/ja-jp/windows/win32/api/stringapiset/nf-stringapiset-widechartomultibyte)
-���g����,
-`CString` ( [UTF-16LE](https://ja.wikipedia.org/wiki/UTF-16) ) ��
-[�}���`�o�C�g������](https://ja.wikipedia.org/wiki/�}���`�o�C�g����)�ɕϊ����Ă��邾���ł���,
-�ϊ���� code page �� [`StringFromCodePage`](#stringfromcodepage) �̂悤�Ɏw��ł���킯�ł��Ȃ�, UTF-8 �Œ�ł�.
-�Ȃ��Ȃ� UTF-8 �ɂ����p���Ȃ�����ł�.
+を使って,
+`CString` ( [UTF-16LE](https://ja.wikipedia.org/wiki/UTF-16) ) を
+[マルチバイト文字列](https://ja.wikipedia.org/wiki/マルチバイト文字)に変換しているだけですが,
+変換先の code page が [`StringFromCodePage`](#stringfromcodepage) のように指定できるわけでもなく, UTF-8 固定です.
+なぜなら UTF-8 にしか用がないからです.
 
-[`SaveLog`](#savelog) �݂̂���Ă΂�Ă��܂�.
+[`SaveLog`](#savelog) のみから呼ばれています.
 
 
 ## `LFtoCRLF`
 
-LF���s��CR/LF���s�ɓ���ւ��܂�.
+LF改行をCR/LF改行に入れ替えます.
 
-���[���{�����f�R�[�h���Ă݂��� LF���s������, �Ƃ�������ɑ��������̂�,
-���O�̉��s�`�������ꂳ���悤�ɓ���Ă݂܂���.
+メール本文をデコードしてみたら LF改行だった, という事例に遭遇したので,
+ログの改行形式が統一されるように入れてみました.
 
-[`StringFromBody`](#stringfrombody) �݂̂���Ă΂�Ă��܂�.
+[`StringFromBody`](#stringfrombody) のみから呼ばれています.
 
 
 ## `HexToASCII`
 
-`%xx` �`����16�i�\�L�� ASCII �����ɕϊ����܂�.
+`%xx` 形式の16進表記を ASCII 文字に変換します.
 
-���[���{�����f�R�[�h���Ă݂���u`%2e%63%6e`�v�̂悤�Ɍ�������Ǝv��������ɑ��������̂�,
-���O���ǂ݂₷���Ȃ�悤�ɓ���Ă݂܂���.
+メール本文をデコードしてみたら「`%2e%63%6e`」のように検索逃れと思しき事例に遭遇したので,
+ログが読みやすくなるように入れてみました.
 
-[`CheckLink`](#checklink) �݂̂���Ă΂�Ă��܂�.
+[`CheckLink`](#checklink) のみから呼ばれています.
 
 
 ## `HexToUnicode`
 
-`&#xXXXX` �`����16�i�\�L�� UNICODE ( [UTF-16LE](https://ja.wikipedia.org/wiki/UTF-16) ) �����ɕϊ����܂�.
+`&#xXXXX` 形式の16進表記を UNICODE ( [UTF-16LE](https://ja.wikipedia.org/wiki/UTF-16) ) 文字に変換します.
 
-���[���{�����f�R�[�h���Ă݂���u`&#x002e&#x0063&#x006e`�v�̂悤�Ɍ�������Ǝv��������ɑ��������̂�,
-���O���ǂ݂₷���Ȃ�悤�ɓ���Ă݂܂���.
+メール本文をデコードしてみたら「`&#x002e&#x0063&#x006e`」のように検索逃れと思しき事例に遭遇したので,
+ログが読みやすくなるように入れてみました.
 
-[`StringFromBody`](#stringfrombody) ����̂݌Ă΂�Ă��܂�.
+[`StringFromBody`](#stringfrombody) からのみ呼ばれています.
 
 
 ## `CheckUnicode`
 
-UNICODE ( [UTF-16LE](https://ja.wikipedia.org/wiki/UTF-16) ) ��������`�F�b�N���܂�.
+UNICODE ( [UTF-16LE](https://ja.wikipedia.org/wiki/UTF-16) ) 文字列をチェックします.
 
-[`StringFromBody`](#stringfrombody) ����̂݌Ă΂�Ă��܂�.
+[`StringFromBody`](#stringfrombody) からのみ呼ばれています.
 
-[Coding](../README.md#coding) �ɋ�����
-�u�^�킵�����䕶���v�̗L�����`�F�b�N���Ă��܂�.
-�Y�����镶�����������ꍇ�� `CAttr` �Ɂu�j�����R�v�Ƃ��Ă��̎|�������ĕ񍐂��グ�܂�.
+[Coding](../README.md#coding) に挙げた
+「疑わしい制御文字」の有無をチェックしています.
+該当する文字を見つけた場合は `CAttr` に「破棄理由」としてその旨を書いて報告を上げます.
 
-����, ���O��ł́u�^�킵�����䕶���v�͎�菜����������,
-`&#x202b;` �̂悤�Ȍ`���łǂ��ɂǂ��������䕶�������܂��Ă����̂����Ղ��c���悤�ɂ��܂���.
-���䕶�������̂܂܂ɂ��Ă�����, ���O���������ŊJ�����Ƃ��ɉ��L�̂悤�Ƀn�}��P�[�X������������ł�.
+あと, ログ上では「疑わしい制御文字」は取り除いたうえで,
+`&#x202b;` のような形式でどこにどういう制御文字が挟まっていたのか痕跡を残すようにしました.
+制御文字をそのままにしておくと, ログをメモ帳で開いたときに下記のようにハマるケースがあったからです.
 
 ![](../pics/ControlCode.png)
 
-<sup>�� ����R�[�h `U+202b` ( Right-To-Left Embedding ) �Ńn�}���Ă��܂����������̗�: ���x `OK` �{�^���������Ă��܂��o�Ă���̂� close ���Â炢.</sup>
+<sup>▲ 制御コード `U+202b` ( Right-To-Left Embedding ) でハマってしまったメモ帳の例: 何度 `OK` ボタンを押してもまた出てくるので close しづらい.</sup>
 
 ## `CheckAlias`
 
-Alias �U�� ( [Sender](../README.md#sender) �́uAlias ( �ʖ� )�v�֌W )
-�Ɉ����������Ă��邩�`�F�b�N���܂�.
+Alias 偽装 ( [Sender](../README.md#sender) の「Alias ( 別名 )」関係 )
+に引っかかっているかチェックします.
 
-���̊֐����
+この関数一つで
 
-* �ʖ� ( Alias ) ���x�������[���A�h���X
-* ���ʂȕʖ� ( Alias ) �ŌĂт����Ă��郁�[��
+* 別名 ( Alias ) を騙ったメールアドレス
+* 無駄な別名 ( Alias ) で呼びかけてくるメール
 
-�̗������`�F�b�N���Ă��܂�.
+の両方をチェックしています.
 
-�Ăяo������, [`MakeLog`](#makelog) ��,
-[`GetAttr`](#getattr) �P���ł͂���܂���.
-[`MakeLog`](#makelog) �P���Ńf�R�[�h���ς񂾃��[���w�b�_�[����
-`From:` �� `To:` �𔲂��o���ă`�F�b�N���܂�.
+呼び出し元は, [`MakeLog`](#makelog) で,
+[`GetAttr`](#getattr) 傘下ではありません.
+[`MakeLog`](#makelog) 傘下でデコードが済んだメールヘッダーから
+`From:` や `To:` を抜き出してチェックします.
 
 
 ## `CheckSubject`
 
-Subject �U�� ( [Sender](../README.md#sender) �́uSubject ���x�������[���v�Q�� )
-�Ɉ����������Ă��邩�`�F�b�N���܂�.
+Subject 偽装 ( [Sender](../README.md#sender) の「Subject を騙ったメール」参照 )
+に引っかかっているかチェックします.
 
-�Ăяo������, [`MakeLog`](#makelog) ��,
-[`GetAttr`](#getattr) �P���ł͂���܂���.
-[`MakeLog`](#makelog) �P���Ńf�R�[�h���ς񂾃��[���w�b�_�[����
-`Subject:` �� `From:` �𔲂��o���ă`�F�b�N���܂�.
+呼び出し元は, [`MakeLog`](#makelog) で,
+[`GetAttr`](#getattr) 傘下ではありません.
+[`MakeLog`](#makelog) 傘下でデコードが済んだメールヘッダーから
+`Subject:` や `From:` を抜き出してチェックします.
 
 
 ## `NormalizeAlias`
 
-�u�ʖ��v( [Sender](../README.md#sender) �́u�ʖ� ( Alias )�v�֌W ) ���r���₷���悤�Ɂu���K���v���܂�.
+「別名」( [Sender](../README.md#sender) の「別名 ( Alias )」関係 ) を比較しやすいように「正規化」します.
 
-�����ł���Ă���u���K���v�Ƃ�
+ここでやっている「正規化」とは
 
-* �ʖ��̒��̃_�u���N�I�[�g `"` ���󔒂ɕϊ�
-* �ʖ��̒��̃_�u���N�I�[�g `'` ���󔒂ɕϊ�
-* �ʖ��̒��̒��� `�E` ���폜
-* �ʖ��̒��̃A���_�[�X�R�A `_` ���󔒂ɕϊ�
-* �ʖ��̒��̋󔒂��폜
+* 別名の中のダブルクオート `"` を空白に変換
+* 別名の中のダブルクオート `'` を空白に変換
+* 別名の中の中黒 `・` を削除
+* 別名の中のアンダースコア `_` を空白に変換
+* 別名の中の空白を削除
 
-�Ƃ������Ƃ��s���Ă��܂�.
+ということを行っています.
 
-�܂�,
-�X�p�����[���̕ʖ��ɑ����u�l�Ԃ̖ڂŌ���ƃA���t�@�x�b�g�Ɍ����邪�����R�[�h�I�ɂ� ASCII �ł͂Ȃ�������v��,
-�Y������ ASCII �R�[�h�ɕϊ����܂�.
-( �g&#x24B8;&#x24C4;&#x24C2;�h���gCOM�h�� )
+また,
+スパムメールの別名に多い「人間の目で見るとアルファベットに見えるが文字コード的には ASCII ではない文字列」を,
+該当する ASCII コードに変換します.
+( “&#x24B8;&#x24C4;&#x24C2;”→“COM”等 )
 
-[`CheckAlias`](#checkalias) �� [`CheckSubject`](#checksubject) ����Ă΂�Ă��܂�.
+[`CheckAlias`](#checkalias) と [`CheckSubject`](#checksubject) から呼ばれています.
 
 
 ## `CheckWhiteList`
 
-�u�z���C�g���X�g�v( [Whitelist](../README.md#whitelist) �ɓo�^���ꂽ�u���`�v�Ɓu���M�ҁv )
-�Ɋ܂܂�Ă��邩�`�F�b�N���܂�.
+「ホワイトリスト」( [Whitelist](../README.md#whitelist) に登録された「名義」と「送信者」 )
+に含まれているかチェックします.
 
-�܂܂�Ă����ꍇ�� `attr.m_dwReason` ����ɂ��܂�. ����ɂ��ȍ~�̏����ł́u�X�p�����[���v�������ꂸ,
-�������Ă��炦��悤�ɂȂ�܂�.
+含まれていた場合は `attr.m_dwReason` を空にします. それにより以降の処理では「スパムメール」扱いされず,
+見逃してもらえるようになります.
 
-�Ăяo������[`ParseMail`](#parsemail) �݂̂ł�.
+呼び出し元は[`ParseMail`](#parsemail) のみです.
 
 
 ## `CheckLink`
 
-���ߍ��܂�Ă��郊���N�� URL ���`�F�b�N���܂�.
+埋め込まれているリンクの URL をチェックします.
 
-�`�F�b�N�̓��e��
+チェックの内容は
 
-* URL �L�q�Ɂu���I�ȕ����R�[�h�v���܂܂�Ă��Ȃ���.
-* URL �� [Domain](../README.md#domain) ��&#x2611;���ꂽ�h���C���ɑ����Ă��Ȃ���.
+* URL 記述に「回避的な文字コード」が含まれていないか.
+* URL は [Domain](../README.md#domain) で&#x2611;されたドメインに属していないか.
 
-�ƂȂ��Ă��܂�.
-�`�F�b�N�Ɉ������������ꍇ�� `CAttr` �Ɂu�j�����R�v�Ƃ��Ă��̎|�������ĕ񍐂��グ�܂�.
+となっています.
+チェックに引っかかった場合は `CAttr` に「破棄理由」としてその旨を書いて報告を上げます.
 
-[`StringFromBody`](#stringfrombody) �݂̂���Ă΂�Ă��܂�.
+[`StringFromBody`](#stringfrombody) のみから呼ばれています.
 
 
 ## `GetLinkInHTML`
 
-�^����ꂽ URL ������, HTML ���ɖ��ߍ��܂ꂽ�����N���ۂ����m�F���܂�.
+与えられた URL 文字列が, HTML 中に埋め込まれたリンクか否かを確認します.
 
-[`CheckLink`](#checklink) �̉������֐���,
-�������������� `http://` �܂��� `https://` �� `<a` �� `</a` �Ɉ͂܂�,
-����� `href` ���܂񂾐����ȃ����N���ۂ����m�F���܂�.
+[`CheckLink`](#checklink) の下請け関数で,
+発注元が見つけた `http://` または `https://` が `<a` と `</a` に囲まれ,
+さらに `href` を含んだ正当なリンクか否かを確認します.
 
-�����N���ۂ��� `true` `false` �ŕԂ��܂�.
-�����N�ł������ꍇ��, URL ������� URL �̑���ɕ\������镶������Ԃ��܂�.
+リンクか否かを `true` `false` で返します.
+リンクであった場合は, URL 文字列と URL の代わりに表示される文字列も返します.
 
-HTML �L�q�̏ꍇ, ���ߍ��܂ꂽ�����N��
+HTML 記述の場合, 埋め込まれたリンクは
 
 `<a href="https://phishing.com/">https://*****.amazon.com</a>`
 
-�̂悤�ȕ\������x��������̂�, ���̃`�F�b�N�p�̔��f�ޗ����Ԃ��Ă���킯�ł�.
+のような表示上の騙りも多いので, そのチェック用の判断材料も返しているわけです.
 
 
 ## `GetLinkInText`
 
-�^����ꂽ URL ������, �v���[���e�L�X�g���ɖ��ߍ��܂ꂽ�����N���ۂ����m�F���܂�.
+与えられた URL 文字列が, プレーンテキスト中に埋め込まれたリンクか否かを確認します.
 
-[`CheckLink`](#checklink) �̉������֐���,
-�������������� `http://` �܂��� `https://` �̂��Ƃɑ��� URL ������������N�Ƃ��Đ؂�o���܂�.
+[`CheckLink`](#checklink) の下請け関数で,
+発注元が見つけた `http://` または `https://` のあとに続く URL 文字列をリンクとして切り出します.
 
-������, ���[���[��ł̓����N�Ƃ��ėL���ł͂Ȃ� ( ��������Ȃ� )
-�u�l�Ԃ̖ڂŌ���ƃA���t�@�x�b�g�Ɍ����邪�����R�[�h�I�ɂ� ASCII �ł͂Ȃ�������v
-( �g&#x24B8;&#x24C4;&#x24C2;�h�� ) ���܂߂Đ؂�o���܂�.
-�X�p�}�[�����������������̂���\�����邽�߂ł�.
+ただし, メーラー上ではリンクとして有効ではない ( かもしれない )
+「人間の目で見るとアルファベットに見えるが文字コード的には ASCII ではない文字列」
+( “&#x24B8;&#x24C4;&#x24C2;”等 ) も含めて切り出します.
+スパマーが何をしたかったのかを表現するためです.
 
 
 ## `IsEvasiveCode`
 
-�^����ꂽ������, �u���I�����R�[�h�v���ۂ���Ԃ��܂�.
+与えられた文字が, 「回避的文字コード」か否かを返します.
 
-�����ł����u���I�����R�[�h�v�Ƃ�,
-�u�l�Ԃ̖ڂŌ���ƃA���t�@�x�b�g�Ɍ����邪�����R�[�h�I�ɂ� ASCII �ł͂Ȃ�������v
-( �g&#x24B8;&#x24C4;&#x24C2;�h�� ) �̂��Ƃł�.
+ここでいう「回避的文字コード」とは,
+「人間の目で見るとアルファベットに見えるが文字コード的には ASCII ではない文字列」
+( “&#x24B8;&#x24C4;&#x24C2;”等 ) のことです.
 
-1�����̊m�F�Ȃ̂�, �����R�[�h 1�������ɓn���΍ς݂����Ȃ��̂ł���,
-���̊֐��͕�����Ƃ��Ă� `CString` �Ƃ��̉��Ԗڂ̕����������� `int&` �������Ƃ��Ď󂯎��܂�.
+1文字の確認なので, 文字コード 1つを引数に渡せば済みそうなものですが,
+この関数は文字列としての `CString` とその何番目の文字かを示す `int&` を引数として受け取ります.
 
-�����, 1�������R�[�h�ł͕\���Ȃ�����
-( [�T���Q�[�g�y�A](https://ja.wikipedia.org/wiki/Unicode#�T���Q�[�g�y�A): 2�R�[�h�� 1������\�� )
-���m�F�ΏۂɊ܂�ł��邩��ł�.
+これは, 1つも文字コードでは表せない文字
+( [サロゲートペア](https://ja.wikipedia.org/wiki/Unicode#サロゲートペア): 2コードで 1文字を表現 )
+も確認対象に含んでいるからです.
 
 
 ## `SetLinkVisible`
 
-�^����ꂽ URL ������Ɏc���Ă���G���R�[�h�������f�R�[�h���܂�.
+与えられた URL 文字列に残っているエンコード成分をデコードします.
 
-�X�p�}�[�ɂ���Ă�, �f�R�[�h����������̒��ɂ���ɗv�f�R�[�h�ȕ�������c���悤�Ȍ�����G���R�[�h������҂����܂���.
-���̊֐��͂������������������Ƀf�R�[�h��, �X�p�}�[��������肽�������̂������o�I�ɔ���₷���������ɂ��܂�.
+スパマーによっては, デコードした文字列の中にさらに要デコードな文字列を残すような誤ったエンコードをする者も居ました.
+この関数はそうした文字列をさらにデコードし, スパマーが何をやりたかったのかを視覚的に判りやすいかたちにします.
 
-�����N�Ƃ��Ă͖����Ȃ��̂Ȃ̂łق��Ƃ��Ă����Q�͂Ȃ��̂ł���,
-�u����������������? �����v�Ƃ����^�₪�c���ċC���I�ɂ������肵�Ȃ��̂�,
-���������ăf�R�[�h����悤�ɂ��܂���.
+リンクとしては無効なものなのでほっといても実害はないのですが,
+「何がしたかったんだ? こいつ」という疑問が残って気分的にすっきりしないので,
+いちいち再デコードするようにしました.
 
-[`CheckLink`](#checklink) �̐ꑮ�������֐��ł�.
+[`CheckLink`](#checklink) の専属下請け関数です.
 
 
 ## `FilterError`
 
-�^����ꂽ�u�j�����R�v�����[���̔j���ɑ������邩���肵�܂�.
+与えられた「破棄理由」がメールの破棄に相当するか判定します.
 
-[Filter](../README.md#filter) �̊e��ݒ�������Ƃ��ė^����ꂽ�u�j�����R�v�̃R�[�h�ŎQ�Ƃ�,
-���ۂɃ��[����j�����邩�ǂ����𔻒肵�܂�.
+[Filter](../README.md#filter) の各種設定を引数として与えられた「破棄理由」のコードで参照し,
+実際にメールを破棄するかどうかを判定します.
 
-�j�����ׂ��Ƃ̔��肪�������ꍇ�́u�j�����R�v�̃R�[�h�𕶎��񉻂�,
-���̕�������u�j�����R�v��ێ����Ă��� `attr.m_strReason` �ɒǋL���܂�.
-�u�ǋL���܂��v�ƌ����Ă���悤��, 1�̃��[���������́u�j�����R�v�Ɉ��������邱�Ƃ�����܂�.
+破棄すべきとの判定が下った場合は「破棄理由」のコードを文字列化し,
+その文字列を「破棄理由」を保持している `attr.m_strReason` に追記します.
+「追記します」と言っているように, 1つのメールが複数の「破棄理由」に引っかかることもあります.
 
-���̊֐��͖{ class �̂�����������Ă΂�Ă��܂�.
+この関数は本 class のあちこちから呼ばれています.
 
 
 ## `ConnectPOP`
 
-[POP3](https://ja.wikipedia.org/wiki/Post_Office_Protocol)�ڑ����J�n���܂�.
+[POP3](https://ja.wikipedia.org/wiki/Post_Office_Protocol)接続を開始します.
 
-�u�ڑ����܂��v�ł͂Ȃ��u�ڑ����J�n���܂��v���x�̎d���������܂���.
+「接続します」ではなく「接続を開始します」程度の仕事しかしません.
 
-�ڑ�����������܂Ō��͂��悤�Ƃ����C���Ȃ��̂ł�.
-���� Windows&reg; �A�v���P�[�V�����́u�񓯊��v�Ƃ�����
-�u[event driven](https://ja.wikipedia.org/wiki/�C�x���g�쓮�^�v���O���~���O)�v�Ƃ�����
-�u*Window Message* driven�v�Ȃ��̂ł���,
-�� class ���ڑ��ɗp���Ă��� [`CParaSocket`](CParaSocket.md) ��
+接続が完了するまで見届けようという気がないのです.
+大抵の Windows&reg; アプリケーションは「非同期」というか
+「[event driven](https://ja.wikipedia.org/wiki/イベント駆動型プログラミング)」というか
+「*Window Message* driven」なものですが,
+当 class が接続に用いている [`CParaSocket`](CParaSocket.md) も
 [`CAsyncSocket`](https://learn.microsoft.com/ja-jp/cpp/mfc/reference/casyncsocket-class)
-����h�������񓯊��ȃ\�P�b�g
-( �\�P�b�g�ƊE�p��Ō����Ɓu[�m���u���b�L���O](https://ja.wikipedia.org/wiki/�\�P�b�g_(BSD)#�u���b�L���O�ƃm���u���b�L���O)�v) �Ȃ̂�,
-�� class �̍\�������񓯊��ł�.
-�u�ڑ�����悤���񂾂񂾂���A���̂����ڑ��ł����Ƃ��ł��Ȃ������Ƃ��A�Ȃ񂩌����Ă��邾��B�v
-���炢�̍\�����ł�.
+から派生した非同期なソケット
+( ソケット業界用語で言うと「[ノンブロッキング](https://ja.wikipedia.org/wiki/ソケット_(BSD)#ブロッキングとノンブロッキング)」) なので,
+当 class の構え方も非同期です.
+「接続するよう頼んだんだから、そのうち接続できたとかできなかったとか、なんか言ってくるだろ。」
+ぐらいの構え方です.
 
-��, ���́u�Ȃ񂩌����Ă���v�̂�҂��󂯂Ă���̂�,
-[`OnSocketNotify`](#onsocketnotify) �ł�.
-[`CParaSocket`](CParaSocket.md) ����オ���Ă����񍐂��L���b�`����,
-���̕񍐂ɉ������A�N�V�������N�����܂�.
+で, その「なんか言ってくる」のを待ち受けているのが,
+[`OnSocketNotify`](#onsocketnotify) です.
+[`CParaSocket`](CParaSocket.md) から上がってきた報告をキャッチして,
+その報告に応じたアクションを起こします.
 
-�Ƃ����킯��, �񓯊��ȃ\�P�b�g��p���Ă���A�v���ł�,
-�ڑ�������������͐ڑ������̒ʒm���󂯂Ă���Ȃ񂩎n�߂�̂����ʂł�.
-���ʂȂ�ł���, �����ōs���Ă���ʐM��[POP3](https://ja.wikipedia.org/wiki/Post_Office_Protocol)�ł�.
-[POP3](https://ja.wikipedia.org/wiki/Post_Office_Protocol)�̒ʐM�̏ꍇ,
-�N���C�A���g���T�[�o�[�ɐڑ������, �N���C�A���g�����������o���O�ɃT�[�o�[�̕����爥�A����z���Ă����ł�.
-�Ȃ̂�, ���A�v���̒ʐM�������u�Ȃ������v�Ƃ����񍐂𕷂����Ⴂ�܂���.
-�ꑫ��тɁu�Ȃ񂩎�M�����v�̂��m�点��҂��Ă܂�.
+というわけで, 非同期なソケットを用いているアプリでは,
+接続をしかけた後は接続完了の通知を受けてからなんか始めるのが普通です.
+普通なんですが, ここで行っている通信は[POP3](https://ja.wikipedia.org/wiki/Post_Office_Protocol)です.
+[POP3](https://ja.wikipedia.org/wiki/Post_Office_Protocol)の通信の場合,
+クライアントがサーバーに接続すると, クライアントが何か言い出す前にサーバーの方から挨拶を寄越してくるんです.
+なので, 当アプリの通信処理も「つながった」という報告を聞いちゃいません.
+一足飛びに「なんか受信した」のお知らせを待ってます.
 
-�ȏ�, ���������ȒP�ł͂���܂���, �w�i��������̂����A�ɑウ�����Ă��������܂�.
+以上, いささか簡単ではありますが, 背景事情説明のご挨拶に代えさせていただきます.
 
-����, �����̒i���ł���:
+さて, 処理の段取りですが:
 
-1. [`FeedDebug`](#feeddebug) ���f�o�b�O�p ( �e�X�g�p ) �̃f�[�^���d���܂�Ă���ƌ����Ă�����,<br>
-���̃f�[�^�����������Ƃɂ��ă}�W���ɒʐM����̂Ƃ���߂�.
-1. ���[���A�J�E���g�� 1���ݒ肳��Ă��Ȃ��悤�Ȃ�, ����ς�ʐM�Ƃ����Ȃ��ł�߂�.
-1. [`ModNI`](#modni) �ŃA�C�R���Ɂu�ʐM���J�n�����v�ƍ���������.
-1. [`CParaSocket`](CParaSocket.md) �� 1�݂���.
-1. �ʐM�Ǘ��p�̕ϐ�������������.<br>
-`m_iPhase`: �ʐM�菇��̒i�����u�܂��������ĂȂ��v��.<br>
-`m_iMessage`: ���ʖڂ̃��[�������u�ŏ��́v��.<br>
-`m_nMessage`: ���ʂ̃��[�����͂��Ă��邩���u�����͂��Ă��Ȃ��v��.<br>
-1. [`CParaSocket`](CParaSocket.md) �����.<br>
-���Ȃ��������߂�.
-1. `m_iUser`�Ԗڂ�[���[���A�J�E���g](../README.md#accounts)�� [`CParaSocket`](CParaSocket.md) ��ڑ�����.<br>
-�ڑ��ł�����OK.<br>
-�ڑ��ł��Ȃ��Ă��u�񓯊��Ȃ񂾂��炷���ɂ̓����v�Ȃ�OK.<br>
-1. ���ǐڑ��� OK �łȂ�������<br>
-�u�����_���������̂��v�� [`CParaSocket`](CParaSocket.md) �ɖ₢���킹��,<br>
-�u�����������P�ŕ��܂��v�� [`CParaSocket`](CParaSocket.md) �����.<br>
-1. ���ǐڑ��� OK ��������<br>
-`m_iPhase`: �ʐM�菇��̒i�����u��1�i�K�v��.<br>
+1. [`FeedDebug`](#feeddebug) がデバッグ用 ( テスト用 ) のデータが仕込まれていると言ってきたら,<br>
+そのデータだけ扱うことにしてマジメに通信するのとかやめる.
+1. メールアカウントが 1つも設定されていないようなら, やっぱり通信とかしないでやめる.
+1. [`ModNI`](#modni) でアイコンに「通信を開始した」と告げさせる.
+1. [`CParaSocket`](CParaSocket.md) を 1つ設ける.
+1. 通信管理用の変数を初期化する.<br>
+`m_iPhase`: 通信手順上の段取りを「まだ何もしてない」に.<br>
+`m_iMessage`: 何通目のメールかを「最初の」に.<br>
+`m_nMessage`: 何通のメールが届いているかを「何も届いていない」に.<br>
+1. [`CParaSocket`](CParaSocket.md) を作る.<br>
+作れなかったらやめる.
+1. `m_iUser`番目の[メールアカウント](../README.md#accounts)で [`CParaSocket`](CParaSocket.md) を接続する.<br>
+接続できたらOK.<br>
+接続できなくても「非同期なんだからすぐにはムリ」ならOK.<br>
+1. 結局接続が OK でなかったら<br>
+「何がダメだったのか」を [`CParaSocket`](CParaSocket.md) に問い合わせて,<br>
+「こういうワケで閉じます」と [`CParaSocket`](CParaSocket.md) を閉じる.<br>
+1. 結局接続が OK だったら<br>
+`m_iPhase`: 通信手順上の段取りを「第1段階」に.<br>
 
-��, ���ꂾ������Ă��̊֐��̎d���͏I����, �Ăяo������<br>
-[`PollMails`](#pollmails) ( �ŏ��̃A�J�E���g�ɐڑ�����ꍇ ) ��<br>
-[`RespondPOP`](#respondpop) ( 2�Ԗڈȍ~�̃A�J�E���g�ɐڑ�����ꍇ ) �ɋA��܂�.
+と, これだけやってこの関数の仕事は終わりで, 呼び出し元の<br>
+[`PollMails`](#pollmails) ( 最初のアカウントに接続する場合 ) か<br>
+[`RespondPOP`](#respondpop) ( 2番目以降のアカウントに接続する場合 ) に帰ります.
 
 
 ## `RespondPOP`
 
-[POP3](https://ja.wikipedia.org/wiki/Post_Office_Protocol)�̎�M���b�Z�[�W�ɉ������܂�.
+[POP3](https://ja.wikipedia.org/wiki/Post_Office_Protocol)の受信メッセージに応答します.
 
-�u��M���܂��v�ł͂Ȃ��u��M���b�Z�[�W�ɉ������܂��v�Ƃ����d�����e�ł�.
-���ۂ̎�M��[`OnSocketNotify`](#onsocketnotify) �̒��ōς܂���Ă���,
-�u����Ȃ񗈂�����?�v�Ɠn���ꂽ��M���b�Z�[�W��ǂ��,
-�ǂ����A�N�V�������悤�����߂Ă���Ƃ����̂�, ���̊֐��̗���ł�.
+「受信します」ではなく「受信メッセージに応答します」という仕事内容です.
+実際の受信は[`OnSocketNotify`](#onsocketnotify) の中で済まされており,
+「こんなん来たけど?」と渡された受信メッセージを読んで,
+どうリアクションしようか決めているというのが, この関数の立場です.
 
-��ʓI��[POP3](https://ja.wikipedia.org/wiki/Post_Office_Protocol)�ł̂�����,
-���L�̂悤�ɍs���܂�.
+一般的に[POP3](https://ja.wikipedia.org/wiki/Post_Office_Protocol)でのやり取りは,
+下記のように行われます.
 
 ```
 > +OK provider.ne.jp POP3 server ready.
@@ -1910,32 +1910,32 @@ HTML �L�q�̏ꍇ, ���ߍ��܂ꂽ�����N��
 > +OK 3 19864
 < RETR 1
 > +OK 4444 octets
-Return-Path: <����>
+Return-Path: <中略>
 .
 < RETR 2
 > +OK 12210 octets
-Return-Path: <����>
+Return-Path: <中略>
 .
 < DELE 2
 > +OK messege 2 deleted
 < RETR 3
 > +OK 3210 octets
-Return-Path: <����>
+Return-Path: <中略>
 .
 < QUIT
 > +OK pochi.the.cat@provider.ne.jp POP3 server signing off.
 ```
 
-���[�� `>` �� `<` �͑���̕������������߂ɉ��������̂��Ƃ�������������. `>` ����M���b�Z�[�W, `<` �����M���b�Z�[�W�ł�.
-�u�񓯊��v(
-�Łu[event driven](https://ja.wikipedia.org/wiki/�C�x���g�쓮�^�v���O���~���O)�v�Ƃ������umessage driven�v)
-�Ȃ̂�, ���̂�������C�ɍs���킯�ł͂���܂���.
-�u�Ȃ񂩎�M������Ȃ񂩑��M����v���Ȃ񂩎�M���邽�тɍא؂�ɍs���Ă��܂�.
+左端の `>` と `<` は送受の方向を示すために加えたものだとご理解ください. `>` が受信メッセージ, `<` が送信メッセージです.
+「非同期」(
+で「[event driven](https://ja.wikipedia.org/wiki/イベント駆動型プログラミング)」というか「message driven」)
+なので, このやり取りを一気に行うわけではありません.
+「なんか受信したらなんか送信する」をなんか受信するたびに細切れに行っています.
 
-��, �ǂ��܂ł���肵�����������Ă�������, `m_iPhase` �ɏ����Ă����܂�.
-���� `m_iPhase` �Ƃ����̊֌W��:
+で, どこまでやり取りしたかを憶えておくため, `m_iPhase` に書いておきます.
+その `m_iPhase` とやり取りの関係は:
 
-| `m_iPhase` | ���� | ���b�Z�[�W |
+| `m_iPhase` | 送受 | メッセージ |
 | :-: | --: | --- |
 | `1` | `>` | `+OK provider.ne.jp POP3 server ready.                    ` |
 | `1` | `<` | `USER pochi.the.cat@provider.ne.jp                        ` |
@@ -1946,114 +1946,114 @@ Return-Path: <����>
 | `4` | `>` | `+OK 3 19864                                              ` |
 | `5` | `<` | `RETR 1                                                   ` |
 | `6` | `>` | `+OK 4444 octets                                          ` |
-| `6` | `>` | `Return-Path: <����>                                      ` |
+| `6` | `>` | `Return-Path: <中略>                                      ` |
 | `6` | `>` | `.                                                        ` |
 | `7` | `<` | `RETR 2                                                   ` |
 | `6` | `>` | `+OK 12210 octets                                         ` |
-| `6` | `>` | `Return-Path: <����>                                      ` |
+| `6` | `>` | `Return-Path: <中略>                                      ` |
 | `6` | `>` | `.                                                        ` |
 | `6` | `<` | `DELE 2                                                   ` |
 | `7` | `>` | `+OK messege 2 deleted                                    ` |
 | `7` | `<` | `RETR 3                                                   ` |
 | `6` | `>` | `+OK 12210 octets                                         ` |
-| `6` | `>` | `Return-Path: <����>                                      ` |
+| `6` | `>` | `Return-Path: <中略>                                      ` |
 | `6` | `>` | `.                                                        ` |
 | `7` | `<` | `QUIT                                                     ` |
 | `8` | `>` | `+OK pochi.the.cat@provider.ne.jp POP3 server signing off.` |
 
-�Ƃ������ƂɂȂ�܂�.
+ということになります.
 
-�O�u���������Ȃ�܂�����, �����菇�͈ȉ��̂悤�ɂȂ��Ă��܂�.
+前置きが長くなりましたが, 処理手順は以下のようになっています.
 
-1. �T�[�o�[����̈��A���󂯂�, `USER` �R�}���h�𑗂�.
-1. `+OK` �ƌ���ꂽ��, `PASS` �R�}���h�𑗂�.<br>
-���������Ȃ������� `QUIT` ����.
-1. `+OK` �ƌ���ꂽ��, `STAT` �R�}���h�𑗂�.<br>
-���������Ȃ������� `QUIT` ����.
-1. `+OK` �ƌ���ꂽ��, �S���ǂނ���ł܂� 1�ʖڂ���n�߂�.
-1. `RETR` �R�}���h�Ŏ擾.
-1. `���[���̒��g` ���Ԃ��Ă����̂�,<br>
-���g���o������Ă����� [`ParseMail`](#paasemail) �Œ��g���`�F�b�N. �j�����ׂ����[���Ȃ� `DELE` ����.<br>
-���g���o������Ă��Ȃ�������, ���̎�M��҂�.
-1. �S�Ẵ��[����ǂݏI������Ȃ� `QUIT`, �܂��Ȃ玟�̃��[���� `RETR` ����.
-1. `���ʂ�̈��A` ���Ԃ��Ă����̂ŒʐM���I������.
-1. ���̃A�J�E���g������Ȃ� [`ConnectPOP`](#connectpop) ��, �Ō�̃A�J�E���g�Ȃ猋�ʂ� [`ModNI`](#modni) ����.
-1. �ʐM���������Ȃ�������, [`ClosePOP`](#closepop) ����.
+1. サーバーからの挨拶を受けて, `USER` コマンドを送る.
+1. `+OK` と言われたら, `PASS` コマンドを送る.<br>
+そう言われなかったら `QUIT` する.
+1. `+OK` と言われたら, `STAT` コマンドを送る.<br>
+そう言われなかったら `QUIT` する.
+1. `+OK` と言われたら, 全部読むつもりでまず 1通目から始める.
+1. `RETR` コマンドで取得.
+1. `メールの中身` が返ってきたので,<br>
+中身が出そろっていたら [`ParseMail`](#paasemail) で中身をチェック. 破棄すべきメールなら `DELE` する.<br>
+中身が出そろっていなかったら, 次の受信を待つ.
+1. 全てのメールを読み終わったなら `QUIT`, まだなら次のメールを `RETR` する.
+1. `お別れの挨拶` が返ってきたので通信を終了する.
+1. 次のアカウントがあるなら [`ConnectPOP`](#connectpop) し, 最後のアカウントなら結果を [`ModNI`](#modni) する.
+1. 通信が成功しなかったら, [`ClosePOP`](#closepop) する.
 
-���̒i���� `switch ( m_iPhase )` �Ɋ�Â��� `case` �œ������Ă��܂���,
-�ꕔ�� `case` �ł� `break` �����Ɏ��� `case` �ɗ��Ƃ��Ă���ꍇ������̂ł��������Ȃ��悤.<br>
-( ���ǃ��[�����������ꍇ�� `4` �� `5` ��, 1�ʕ��ǂݐ؂������Ɣj�����Ȃ������ꍇ�� `6` �� `7` )
+この段取りを `switch ( m_iPhase )` に基づいて `case` で動かしていますが,
+一部の `case` では `break` せずに次の `case` に落としている場合があるのでお見逃しなきよう.<br>
+( 未読メールがあった場合の `4` → `5` と, 1通分読み切ったあと破棄しなかった場合の `6` → `7` )
 
-`m_iPhase` ���Ƃ̏������e�ł܂Ƃ߂��:
+`m_iPhase` ごとの処理内容でまとめると:
 
 
-| `m_iPhase` | �i�K | �������e |
+| `m_iPhase` | 段階 | 処理内容 |
 | :-: | --- | --- |
-| `1` | �ڑ����� | `USER` �𑗂�. |
-| `2` | `USER` ���M�� | `PASS` �𑗐M. ( `+OK` ��M�� )<br>`QUIT` �𑗐M. ( ���̑���M�� ) |
-| `3` | `PASS` ���M�� | `STAT` �𑗐M. ( `+OK` ��M�� )<br>`QUIT` �𑗐M. ( ���̑���M�� ) |
-| `4` | `STAT` ���M�� | `QUIT` �𑗐M. ( `+OK` ��M���Ŗ��ǃ��[�����Ȃ������ꍇ )<br>`m_iPhase` `5` ��. ( `+OK` ��M���Ŗ��ǃ��[�����������ꍇ )<br> `QUIT` �𑗐M. ( ���̑���M�� ) |
-| `5` | `STAT` ���M��<br>(���ǃ��[������̏ꍇ) | `RETR` �𑗐M. |
-| `6` | `RETR` �̉�����M�� | ���[���{���`���̏ꍇ��, �{���̑O�ɂ��� `+OK` ���폜.<br>��M���b�Z�[�W��{���ɒǉ�.<br>�{�������� `"/r/n./r/n"` �Ȃ�{����M�����Ȃ̂�, [`ParseMail`](#parsemail) ���Ă�.<br>�߂�l���u�j���v�Ȃ� `DELE` �𑗐M.�u�ێ��v�Ȃ� `m_iPhase` `7` ��. |
-| `7` | `RETR` �̉�����M��<br>(���[���ێ��̏ꍇ)<br>`DELE` �̉�����M�� | `QUIT` �𑗂�. ( �S���ǃ��[���m�F������ )<br>���̃��[���� `RETR` �𑗐M. ( ���m�F�̃��[�����c���Ă���ꍇ ) |
-| `8` | `QUIT` ���M�� | [`ClosePOP`](#closepop) ���Ă�� POP3 ���I��.<br>`TID_CLOSE` ����������. |
-| `9` | `TID_CLOSE` ������ | �S�A�J�E���g�����Ȃ� [`ModNI`](#modni)���Ă�Ō��ʕ\��.<br>���̃A�J�E���g�������, [`ConnectPOP`](#connectpop) ����ĊJ. |
-| `10` | �T�C���C�����s�� | [`ClosePOP`](#closepop) ������ `-1` �ŌĂ��, �T�C���C�����s����Еt��. |
+| `1` | 接続直後 | `USER` を送る. |
+| `2` | `USER` 送信後 | `PASS` を送信. ( `+OK` 受信時 )<br>`QUIT` を送信. ( その他受信時 ) |
+| `3` | `PASS` 送信後 | `STAT` を送信. ( `+OK` 受信時 )<br>`QUIT` を送信. ( その他受信時 ) |
+| `4` | `STAT` 送信後 | `QUIT` を送信. ( `+OK` 受信時で未読メールがなかった場合 )<br>`m_iPhase` `5` へ. ( `+OK` 受信時で未読メールがあった場合 )<br> `QUIT` を送信. ( その他受信時 ) |
+| `5` | `STAT` 送信後<br>(未読メールありの場合) | `RETR` を送信. |
+| `6` | `RETR` の応答受信後 | メール本文冒頭の場合は, 本文の前にある `+OK` を削除.<br>受信メッセージを本文に追加.<br>本文末尾が `"/r/n./r/n"` なら本文受信完了なので, [`ParseMail`](#parsemail) を呼ぶ.<br>戻り値が「破棄」なら `DELE` を送信.「保持」なら `m_iPhase` `7` へ. |
+| `7` | `RETR` の応答受信後<br>(メール保持の場合)<br>`DELE` の応答受信後 | `QUIT` を送る. ( 全未読メール確認完了時 )<br>次のメールの `RETR` を送信. ( 未確認のメールが残っている場合 ) |
+| `8` | `QUIT` 送信後 | [`ClosePOP`](#closepop) を呼んで POP3 を終了.<br>`TID_CLOSE` をしかける. |
+| `9` | `TID_CLOSE` 満了後 | 全アカウント完了なら [`ModNI`](#modni)を呼んで結果表示.<br>次のアカウントがあれば, [`ConnectPOP`](#connectpop) から再開. |
+| `10` | サインイン失敗後 | [`ClosePOP`](#closepop) を引数 `-1` で呼んで, サインイン失敗を後片付け. |
 
-### Debug build �ł��̂����𒭂߂Ă�����ւ̘A������
+### Debug build でこのやり取りを眺めている方への連絡事項
 
-`#define DBGOUTPUT` �ƂƂ����, ���̂����̗l�q�����߂���悤�ɂȂ��Ă��܂���,
-�u�Ō�� `.` �܂Ŏ�M�����C�z���Ȃ��̂ɂǂ����Ď��̃��[���� `RETR` �����?�v
-�ƍl�����ނ͎̂��Ԃ̃��_�ł�.
-������čŌ�� `.` �܂� `OutputDebugStringA` ���؂�ĂȂ������ł�.
-[`OutputDebugStringA` �ɂ͏o�͂ł��镶�����Ɍ��E������](http://www.unixwiz.net/techtips/outputdebugstring.html)��ł�.
+`#define DBGOUTPUT` ととすると, このやり取りの様子が眺められるようになっていますが,
+「最後の `.` まで受信した気配がないのにどうして次のメールを `RETR` するんだ?」
+と考え込むのは時間のムダです.
+それって最後の `.` まで `OutputDebugStringA` し切れてないだけです.
+[`OutputDebugStringA` には出力できる文字数に限界がある](http://www.unixwiz.net/techtips/outputdebugstring.html)んです.
 
 
 ## `ClosePOP`
 
-[POP3](https://ja.wikipedia.org/wiki/Post_Office_Protocol)�̐ڑ����I�����܂�.
+[POP3](https://ja.wikipedia.org/wiki/Post_Office_Protocol)の接続を終了します.
 
-���� `nError` �͉��L�̂悤�ɂȂ��Ă��܂�.
+引数 `nError` は下記のようになっています.
 
-| `nError` | �Ӗ� |
+| `nError` | 意味 |
 | --: | --- |
-| `0` | ���Ȃ���������. |  |
-| `-1` | [POP3](https://ja.wikipedia.org/wiki/Post_Office_Protocol) �ŋ��ۂ�ꂽ. |
-| ���̑� | [`CParaSocket`](CParaSocket.md) ���G���[��Ԃ��Ă���. |
+| `0` | 問題なく完了した. |  |
+| `-1` | [POP3](https://ja.wikipedia.org/wiki/Post_Office_Protocol) で拒否られた. |
+| その他 | [`CParaSocket`](CParaSocket.md) がエラーを返してきた. |
 
-������肪�������ꍇ��, [`ModNI`](#modni) �ɂĖ�肪���������Ƃ����m�点���܂�.
-���Ȃ����������ꍇ��, �P�� [`CParaSocket`](CParaSocket.md) ��Еt���܂�.
+何か問題があった場合は, [`ModNI`](#modni) にて問題が生じたことをお知らせします.
+問題なく完了した場合は, 単に [`CParaSocket`](CParaSocket.md) を片付けます.
 
 
 ## `ReadFromEML`
 
-EML �t�@�C�����ĕ]�����܂�.
+EML ファイルを再評価します.
 
-`ChkMails.exe` �̒u���Ă���t�H���_�[�� `Mails` �Ƃ����T�u�t�H���_�[��������,
-���̃T�u�t�H���_�[�� `.eml` �t�@�C���� 1�ȏ�����Ă����,
-�e `.eml` �̒��g��[POP3](https://ja.wikipedia.org/wiki/Post_Office_Protocol)�ʐM�œ������̂悤��,
-�{�N���X�ɋ������܂�.
+`ChkMails.exe` の置いてあるフォルダーに `Mails` というサブフォルダーがあって,
+そのサブフォルダーに `.eml` ファイルが 1つ以上入っていると,
+各 `.eml` の中身を[POP3](https://ja.wikipedia.org/wiki/Post_Office_Protocol)通信で得たかのように,
+本クラスに供給します.
 
-�������e�Ƃ��Ă�:
+処理内容としては:
 
-1. `Mails` �T�u�t�H���_�[���� `*.eml` ����������.
-1. �������ʂ�������ɕ��ׂ�.
-1. 1�Â� [`ReadEML`](#reademl) �œǂݍ���.
-1. �ǂݍ��� `.eml` ���������� [`ModNI`](#modni) �Ō��ʂ����m�点����.
-1. 1�ł��ǂ񂾎��т�����Ȃ� `true` ��, �����łȂ���� `false` ��Ԃ�.
+1. `Mails` サブフォルダーから `*.eml` を検索する.
+1. 検索結果を日時順に並べる.
+1. 1つづつ [`ReadEML`](#reademl) で読み込む.
+1. 読み込んだ `.eml` があったら [`ModNI`](#modni) で結果をお知らせする.
+1. 1つでも読んだ実績があるなら `true` を, そうでなければ `false` を返す.
 
-�Ƃ��Ă��܂�.
+としています.
 
-���ۂ̉^�p�Ńn�l��ꂽ�������͒ʉ߂��Ă��܂������[���� `*.eml` ���g����,
-[Filter](../README.md#filter) �̏������ĕ]������̂���ړI�ł���,
-�{ class �̎������f�o�b�O����Ƃ��ɂ��L�p�ł�.
+実際の運用でハネられたもしくは通過してしまったメールの `*.eml` を使って,
+[Filter](../README.md#filter) の条件を再評価するのが主目的ですが,
+本 class の実装をデバッグするときにも有用です.
 
 
 ## `ReadEML`
 
-EML �t�@�C������ǂݍ��݂܂�.
+EML ファイルをを読み込みます.
 
-�P�Ɉ����Ƃ��ė^����ꂽ�t�@�C�� ( `.eml` ) ��ǂ�ł��邾���ł���,
-�ǂݏI���������, �ǂݎ����������� [`ParseMail`](#parsemail) �Ɉ����n����,
-�X�p�����[�����ۂ��̔��蓮��������܂�.
+単に引数として与えられたファイル ( `.eml` ) を読んでいるだけですが,
+読み終わったあと, 読み取った文字列を [`ParseMail`](#parsemail) に引き渡して,
+スパムメールか否かの判定動作をさせます.
  
