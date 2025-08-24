@@ -127,6 +127,7 @@
 
 [`CheckUnicode`](#checkunicode)
 [`CheckAlias`](#checkalias)
+[`CheckSubject`](#checksubject)
 [`NormalizeAlias`](#normalizealias)
 [`CheckWhiteList`](#checkwhitelist)<br>
 [`CheckLink`](#checklink)
@@ -1677,7 +1678,7 @@ UNICODE ( [UTF-16LE](https://ja.wikipedia.org/wiki/UTF-16) ) •¶—ρ‚πƒ`ƒFƒbƒN‚µ‚
 
 ## `CheckAlias`
 
-uAliasv( [Sender](../README.md#sender) ‚ΜuAlias ( •Κ–Ό )vΦW )
+Alias ‹U‘• ( [Sender](../README.md#sender) ‚ΜuAlias ( •Κ–Ό )vΦW )
 ‚Ιψ‚Α‚©‚©‚Α‚Δ‚Ά‚ι‚©ƒ`ƒFƒbƒN‚µ‚ά‚·.
 
 ‚±‚ΜΦ”κ‚Β‚Ε
@@ -1691,6 +1692,17 @@ UNICODE ( [UTF-16LE](https://ja.wikipedia.org/wiki/UTF-16) ) •¶—ρ‚πƒ`ƒFƒbƒN‚µ‚
 [`GetAttr`](#getattr) P‰Ί‚Ε‚Ν‚ ‚θ‚ά‚Ή‚ρ.
 [`MakeLog`](#makelog) P‰Ί‚ΕƒfƒR[ƒh‚ªΟ‚ρ‚Ύƒ[ƒ‹ƒwƒbƒ_[‚©‚η
 `From:` ‚β `To:` ‚π”²‚«o‚µ‚Δƒ`ƒFƒbƒN‚µ‚ά‚·.
+
+
+## `CheckSubject`
+
+Subject ‹U‘• ( [Sender](../README.md#sender) ‚ΜuSubject ‚πιx‚Α‚½ƒ[ƒ‹vQΖ )
+‚Ιψ‚Α‚©‚©‚Α‚Δ‚Ά‚ι‚©ƒ`ƒFƒbƒN‚µ‚ά‚·.
+
+Δ‚Ρo‚µ³‚Ν, [`MakeLog`](#makelog) ‚Ε,
+[`GetAttr`](#getattr) P‰Ί‚Ε‚Ν‚ ‚θ‚ά‚Ή‚ρ.
+[`MakeLog`](#makelog) P‰Ί‚ΕƒfƒR[ƒh‚ªΟ‚ρ‚Ύƒ[ƒ‹ƒwƒbƒ_[‚©‚η
+`Subject:` ‚β `From:` ‚π”²‚«o‚µ‚Δƒ`ƒFƒbƒN‚µ‚ά‚·.
 
 
 ## `NormalizeAlias`
@@ -1712,7 +1724,7 @@ UNICODE ( [UTF-16LE](https://ja.wikipedia.org/wiki/UTF-16) ) •¶—ρ‚πƒ`ƒFƒbƒN‚µ‚
 Y“–‚·‚ι ASCII ƒR[ƒh‚Ι•Ο·‚µ‚ά‚·.
 ( g&#x24B8;&#x24C4;&#x24C2;h¨gCOMh“™ )
 
-[`CheckAlias`](#checkalias) ‚©‚ηΔ‚Ξ‚κ‚Δ‚Ά‚ά‚·.
+[`CheckAlias`](#checkalias) ‚Ζ [`CheckSubject`](#checksubject) ‚©‚ηΔ‚Ξ‚κ‚Δ‚Ά‚ά‚·.
 
 
 ## `CheckWhiteList`
@@ -2044,3 +2056,4 @@ EML ƒtƒ@ƒCƒ‹‚π‚π“Η‚έ‚έ‚ά‚·.
 ’P‚Ιψ”‚Ζ‚µ‚Δ—^‚¦‚η‚κ‚½ƒtƒ@ƒCƒ‹ ( `.eml` ) ‚π“Η‚ρ‚Ε‚Ά‚ι‚Ύ‚―‚Ε‚·‚ª,
 “Η‚έI‚ν‚Α‚½‚ ‚Ζ, “Η‚έζ‚Α‚½•¶—ρ‚π [`ParseMail`](#parsemail) ‚Ιψ‚«“n‚µ‚Δ,
 ƒXƒpƒ€ƒ[ƒ‹‚©”Ϋ‚©‚Μ”»’θ“®μ‚π‚³‚Ή‚ά‚·.
+ 
