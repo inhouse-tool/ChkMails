@@ -1,362 +1,362 @@
-# �C���X�g�[���菇
+﻿# インストール手順
 
 [`Releases`](https://github.com/inhouse-tool/ChkMails/releases)
-�̉��ɂ���ŐV�ł��}�E�X�ŃN���b�N�����,
-���̍ŐV�ł��\������t�@�C���̃y�[�W���J���܂�.
+の下にある最新版をマウスでクリックすると,
+その最新版を構成するファイルのページが開きます.
 
-���̒����� `ChkMails.msi` ���N���b�N����, �C���X�g�[���t�@�C���̃_�E�����[�h���J�n���܂�.
+その中から `ChkMails.msi` をクリックして, インストールファイルのダウンロードを開始します.
 
 > [!IMPORTANT]
-�K�����T�C�g�� [`Releases`](https://github.com/inhouse-tool/ChkMails/releases)
-���炲���g�Œ��ڃ_�E�����[�h����
-`ChkMails.msi` �����g����������.
-�l���� USB �������[�� SD �J�[�h�Ȃǂɓ������t�@�C���œn���ꂽ���̂���,
-���ꂪ���K�i�ł���Ƃ͕ۏ؂ł��܂���.
-�܂�, ���K�i��񋟂��Ă���͓̂��T�C�g�݂̂ł�.
-�ǂ��ɂ��~���[�����O�����Ă���܂���̂�,
-���T�C�g�ȊO����̃_�E�����[�h�͂�߂Ă����܂��傤.
+必ず当サイトの [`Releases`](https://github.com/inhouse-tool/ChkMails/releases)
+からご自身で直接ダウンロードした
+`ChkMails.msi` をお使いください.
+人から USB メモリーや SD カードなどに入ったファイルで渡されたものだと,
+それが正規品であるとは保証できません.
+また, 正規品を提供しているのは当サイトのみです.
+どこにもミラーリング等しておりませんので,
+当サイト以外からのダウンロードはやめておきましょう.
 
 
-## Microsoft Edge �̏ꍇ
+## Microsoft Edge の場合
 
-### Windows11 ( 2025�N1������ )
+### Windows11 ( 2025年1月現在 )
 
-`ChkMails.msi` ���N���b�N�����
-`�J��` (`Open`) �� `���O��t���ĕۑ�` (`Save as`) �� `�ۑ�` ( `Save` ) ���̎O���𔗂��܂�.
+`ChkMails.msi` をクリックすると
+`開く` (`Open`) か `名前を付けて保存` (`Save as`) か `保存` ( `Save` ) かの三択を迫られます.
 
 ![](pics/Downloads.png)
 
-#### `�J��` (`Open`) ��I�Ԃ�:
+#### `開く` (`Open`) を選ぶと:
 
-�Ȃ񂩐Ԃ�&#x26a0;�}�[�N�t���ŁA���ʂ͂���Ȃ��̂̓_�E�����[�h�Ƃ����܂���B�ƌx�������o�܂�.
+なんか赤い&#x26a0;マーク付きで、普通はそんなものはダウンロードとかしません。と警告文が出ます.
 
 ![](pics/Downloads2.png)
 
-�ł�, ���̌x�����Ƀ}�E�X�J�[�\�������Ă����ƉE���� `...` ������܂�.
+でも, その警告文にマウスカーソルをあてがうと右側に `...` が現れます.
 
 ![](pics/Downloads3.png)
 
-���� `...` ���N���b�N�����, ���}�̂悤�Ƀ|�b�v�A�b�v���j���[�������܂�.
+その `...` をクリックすると, 下図のようにポップアップメニューが現われます.
 
 ![](pics/Downloads4.png)
 
-�|�b�v�A�b�v���j���[�̕��т͉��L�̂悤�ɂȂ��Ă��܂���,
+ポップアップメニューの並びは下記のようになっていますが,
 
-| ���{�� | English |
+| 日本語 | English |
 | --- | --- |
-| `�폜` | `Delete` |
-| `�ۑ�` | `Keep` |
-| `���̃A�v���͈��S�ł��邱�Ƃ�񍐂���` | `Report this app as safe` |
-| `�ڍ׏��` | `Learn more` |
-| `�_�E�����[�h �����N�̃R�s�[` | `Copy download link` |
+| `削除` | `Delete` |
+| `保存` | `Keep` |
+| `このアプリは安全であることを報告する` | `Report this app as safe` |
+| `詳細情報` | `Learn more` |
+| `ダウンロード リンクのコピー` | `Copy download link` |
 
-������ `�ۑ�` (`Keep`) ��I�Ԃƍ��x�̓_�C�A���O��������,
+ここで `保存` (`Keep`) を選ぶと今度はダイアログが現われて,
 
 ![](pics/Downloads5.png)
 
-| ���{�� | English |
+| 日本語 | English |
 | --- | --- |
-| `�L�����Z��` | `Cancel` |
-| `�폜` | `Delete` |
+| `キャンセル` | `Cancel` |
+| `削除` | `Delete` |
 
-�Ƃ����������ȓ���𔗂��Ă��܂�.
+という後ろ向きな二択を迫ってきます.
 
-��, �����ɂ�������܂�� `�ڍ׏��` (`Show more`) �Ƃ�����O�̑I�������񎦂���Ă���̂�, ���������:
+が, ここにもこじんまりと `詳細情報` (`Show more`) という第三の選択肢が提示されているので, それをつつくと:
 
 ![](pics/Downloads6.png)
 
-| ���{�� | English |
+| 日本語 | English |
 | --- | --- |
-| `�ێ�����` | `Keep anyway` |
-| `���̃A�v���͈��S�ł��邱�Ƃ�񍐂���` | `Report this app as safe` |
-| `�ڍ׏��` | `Learn more` |
+| `保持する` | `Keep anyway` |
+| `このアプリは安全であることを報告する` | `Report this app as safe` |
+| `詳細情報` | `Learn more` |
 
-�Ƃ���ɎO�̑I�������񎦂���܂�.
-������ `�ێ�����` (`Keep anyway`) ��I�Ԃ�, �悤�₭ `ChkMails.msi` ���_�E�����[�h����,
-�����ŃE�C���X�`�F�b�N�ł����Ă���̂�, �܂Â��悤�Ȏ��Ԃ��󂢂���,
-�悤�₭���}�̂悤�ɃC���X�g�[���[�������o���܂�.
+とさらに三つの選択肢が提示されます.
+ここで `保持する` (`Keep anyway`) を選ぶと, ようやく `ChkMails.msi` がダウンロードされ,
+自動でウイルスチェックでもしているのか, つまづくような時間が空いた後,
+ようやく下図のようにインストーラーが動き出します.
 
 ![](pics/Installer.png)
 
 
-#### `�ۑ�` (`Save`) ��I�Ԃ�:
+#### `保存` (`Save`) を選ぶと:
 
-�������Ɖ������Z�[�u�����悤�ȓ�������������̂�,<br>
-����ς�Ԃ�&#x26a0;�}�[�N�t���ŁA���ʂ͂���Ȃ��̂̓_�E�����[�h�Ƃ����܂���B�ƌx�������o�܂�.
+ちょろっと何かをセーブしたような動きを見せるものの,<br>
+やっぱり赤い&#x26a0;マーク付きで、普通はそんなものはダウンロードとかしません。と警告文が出ます.
 
 ![](pics/Downloads2.png)
 
-�ł�, ���̌x�����Ƀ}�E�X�J�[�\�������Ă����ƉE���� `...` ������܂�.
+でも, その警告文にマウスカーソルをあてがうと右側に `...` が現れます.
 
 ![](pics/Downloads3.png)
 
-���� `...` ���N���b�N�����, ���}�̂悤�Ƀ|�b�v�A�b�v���j���[�������܂�.
+その `...` をクリックすると, 下図のようにポップアップメニューが現われます.
 
 ![](pics/Downloads4.png)
 
-�|�b�v�A�b�v���j���[�̕��т͉��L�̂悤�ɂȂ��Ă��܂���,
+ポップアップメニューの並びは下記のようになっていますが,
 
-| ���{�� | English |
+| 日本語 | English |
 | --- | --- |
-| `�폜` | `Delete` |
-| `�ۑ�` | `Keep` |
-| `���̃A�v���͈��S�ł��邱�Ƃ�񍐂���` | `Report this app as safe` |
-| `�ڍ׏��` | `Learn more` |
-| `�_�E�����[�h �����N�̃R�s�[` | `Copy download link` |
+| `削除` | `Delete` |
+| `保存` | `Keep` |
+| `このアプリは安全であることを報告する` | `Report this app as safe` |
+| `詳細情報` | `Learn more` |
+| `ダウンロード リンクのコピー` | `Copy download link` |
 
-������ `�ۑ�` (`Keep`) ��I�Ԃƍ��x�̓_�C�A���O��������,
+ここで `保存` (`Keep`) を選ぶと今度はダイアログが現われて,
 
 ![](pics/Downloads5.png)
 
-| ���{�� | English |
+| 日本語 | English |
 | --- | --- |
-| `�L�����Z��` | `Cancel` |
-| `�폜` | `Delete` |
+| `キャンセル` | `Cancel` |
+| `削除` | `Delete` |
 
-�Ƃ����������ȓ���𔗂��Ă��܂�.
+という後ろ向きな二択を迫ってきます.
 
-��, �����ɂ�������܂�� `�ڍ׏��` (`Show more`) �Ƃ�����O�̑I�������񎦂���Ă���̂�, ���������:
+が, ここにもこじんまりと `詳細情報` (`Show more`) という第三の選択肢が提示されているので, それをつつくと:
 
 ![](pics/Downloads6.png)
 
-| ���{�� | English |
+| 日本語 | English |
 | --- | --- |
-| `�ێ�����` | `Keep anyway` |
-| `���̃A�v���͈��S�ł��邱�Ƃ�񍐂���` | `Report this app as safe` |
-| `�ڍ׏��` | `Learn more` |
+| `保持する` | `Keep anyway` |
+| `このアプリは安全であることを報告する` | `Report this app as safe` |
+| `詳細情報` | `Learn more` |
 
-�Ƃ���ɎO�̑I�������񎦂���܂�.
-������ `�ێ�����` (`Keep anyway`) ��I�Ԃ�, �悤�₭ `ChkMails.msi` ���_�E�����[�h����܂�.
+とさらに三つの選択肢が提示されます.
+ここで `保持する` (`Keep anyway`) を選ぶと, ようやく `ChkMails.msi` がダウンロードされます.
 
 ![](pics/Downloads7.png)
 
-�Ƃ����, �ǂ��Ƀ_�E�����[�h���ꂽ��ł��傤��?<br>
-��L��ʂ̃t�H���_�[���J���Ă���悤�ȊG�������ƃ_�E�����[�h��t�H���_�[�ɂ��ǂ蒅���܂�.
+ところで, どこにダウンロードされたんでしょうね?<br>
+上記画面のフォルダーが開いているような絵柄をつつくとダウンロード先フォルダーにたどり着けます.
 
-| ���{�� | English |
+| 日本語 | English |
 | --- | --- |
-| `C:\���[�U�[\<���[�U�[��>\Downloads\` | `C:\Users\<User Name>\Downloads\` |
+| `C:\ユーザー\<ユーザー名>\Downloads\` | `C:\Users\<User Name>\Downloads\` |
 
-�ɂ���͂��ł�.
+にあるはずです.
 
-�����܂Ō}���ɍs����, �����ɋ��� `ChkMails.msi` ���_�u���N���b�N�����,
-�悤�₭��}�̂悤�ɃC���X�g�[���[�������o���܂�.
+そこまで迎えに行って, そこに居た `ChkMails.msi` をダブルクリックすると,
+ようやく上図のようにインストーラーが動き出します.
 
-#### `���O��t���ĕۑ�` (`Save as`) ��I�Ԃ�:
+#### `名前を付けて保存` (`Save as`) を選ぶと:
 
-�ǂ��Ƀ_�E�����[�h���ꂽ�����͂����肵�Ă���ȊO, `�ۑ�` (`Save`) �Ƃ�������ł�.
+どこにダウンロードされたかがはっきりしている以外, `保存` (`Save`) といっしょです.
 
 
-���[��, `ChkMails.msi` �����}���ɍs����Ԃ��Ȃ���, `�J��` (`Open`) �̏�������?
+うーん, `ChkMails.msi` をお迎えに行く手間がない分, `開く` (`Open`) の勝ちかな?
 <br>
-�_�E�����[�h��t�H���_�[�� `ChkMails.msi` ���c���Ȃ��̂�,
-���Ƃ����ꂪ�Ȃ���.
+ダウンロード先フォルダーに `ChkMails.msi` を残さないので,
+あとくされがないし.
 
-�ł�, ��U `�ۑ�` (`Save`) ��������,
-�t�@�C�����R�����������̂��ǂ����̊m�F���ł��܂���.
+でも, 一旦 `保存` (`Save`) した方が,
+ファイルが由緒正しいものかどうかの確認ができますね.
 
-���K�i�ŐV�ł� `ChkMails.msi` ��, �v���p�e�B�\�������,
-���L�̂悤�� `2025�N 8��24�� 16:39:15` �t���̃f�W�^���������t���Ă��܂�
-( �C���X�g�[����� `ChkMails.exe` �� `2025�N 8��24�� 16:39:12` ).
+正規品最新版の `ChkMails.msi` は, プロパティ―を見ると,
+下記のように `2025年 8月24日 16:39:15` 付けのデジタル署名が付いています
+( インストール後の `ChkMails.exe` は `2025年 8月24日 16:39:12` ).
 
 ![](pics/MSI.png) ![](pics/Signature.png)
 
-�܂�, ����͂�����u���ȏ����v(�u�������܂����B�v) �Ƃ������̂�,
-�����Ƃ����F�؋ǂ����s�������� (�u���̐l�����܂����B�v) �Ɣ�ׂđS�R�����͂��Ȃ��̂ł���,
-���̏����̓��t�͋U�����������̂�, ����, ������x�̋U���h�~���ʂ�����Ǝv���܂�.
-( �܂�, �󂯎�����l�������̓��t�܂ŋC�ɂ��Ă�����, �ł���. )
+まあ, これはいわゆる「自己署名」(「私がやりました。」) というもので,
+ちゃんとした認証局が発行した署名 (「あの人がやりました。」) と比べて全然説得力がないのですが,
+その署名の日付は偽造しがたいので, 結果, ある程度の偽造防止効果があると思います.
+( まあ, 受け取った人が署名の日付まで気にしてくれれば, ですが. )
 
 
-### Windows10 ( 2025�N1������ )
+### Windows10 ( 2025年1月現在 )
 
-`ChkMails.msi` ���N���b�N�����
-�Ȃ񂩃I�����W�F��&#x26a0;�}�[�N�t���ŁA���ʂ͂���Ȃ��̂̓_�E�����[�h�Ƃ����܂���B�ƌx�������o�܂�.
+`ChkMails.msi` をクリックすると
+なんかオレンジ色の&#x26a0;マーク付きで、普通はそんなものはダウンロードとかしません。と警告文が出ます.
 
 ![](pics/Downloads10.1.png)
 
 
-�ł�, ���̌x�����Ƀ}�E�X�J�[�\�������Ă����ƉE���� `...` �������܂�.
+でも, その警告文にマウスカーソルをあてがうと右側に `...` が現われます.
 
 ![](pics/Downloads10.2.png)
 
-����`...` ������,
+その`...` をつつくと,
 
-| ���{�� | English |
+| 日本語 | English |
 | --- | --- |
-| `�폜` | `Delete` |
-| `�ۑ�` | `Keep` |
-| `���̃A�v���͈��S�ł��邱�Ƃ�񍐂���` | `Report this app as safe` |
-| `�ڍ׏��` | `Learn more` |
-| `�_�E�����[�h �����N�̃R�s�[` | `Copy download link` |
+| `削除` | `Delete` |
+| `保存` | `Keep` |
+| `このアプリは安全であることを報告する` | `Report this app as safe` |
+| `詳細情報` | `Learn more` |
+| `ダウンロード リンクのコピー` | `Copy download link` |
 
-�ƕ��񂾃|�b�v�A�b�v���j���[���o�܂�.
-������ `�ۑ�` (`Keep`) ��I�Ԃƍ��x�̓_�C�A���O��������,
+と並んだポップアップメニューが出ます.
+ここで `保存` (`Keep`) を選ぶと今度はダイアログが現われて,
 
 ![](pics/Downloads10.3.png)
 
-| ���{�� | English |
+| 日本語 | English |
 | --- | --- |
-| `�L�����Z��` | `Cancel` |
-| `�폜` | `Delete` |
+| `キャンセル` | `Cancel` |
+| `削除` | `Delete` |
 
-�Ƃ����������ȓ�� ( �f�t�H���g�� (`Delete`) ) �𔗂��Ă��܂�.
+という後ろ向きな二択 ( デフォルトは (`Delete`) ) を迫ってきます.
 
-��, �����ɂ�������܂�� `�ڍ׏��` (`Show more`) �Ƃ�����O�̑I�������񎦂���Ă���̂�, ���������:
+が, ここにもこじんまりと `詳細情報` (`Show more`) という第三の選択肢が提示されているので, それをつつくと:
 
 ![](pics/Downloads10.4.png)
 
-| ���{�� | English |
+| 日本語 | English |
 | --- | --- |
-| `�ێ�����` | `Keep anyway` |
-| `���̃A�v���͈��S�ł��邱�Ƃ�񍐂���` | `Report this app as safe` |
-| `�ڍ׏��` | `Learn more` |
+| `保持する` | `Keep anyway` |
+| `このアプリは安全であることを報告する` | `Report this app as safe` |
+| `詳細情報` | `Learn more` |
 
-�Ƃ���ɎO�̑I�������񎦂���܂�.
+とさらに三つの選択肢が提示されます.
 
-������ `�ێ�����` (`Keep anyway`) ��I�Ԃ�,
-�悤�₭ `ChkMails.msi` ���_�E�����[�h����܂���,
-�Ȃ񂩂��̂܂܂����Ƃ��Ă��܂�.
-�悭����� `�t�@�C�����J��` (`Open file`) �Ƃ��������񂪏o�Ă���̂ł�������Ă݂��,
-�����Ȃ艺�}�̂悤�ȃ_�C�A���O�����Ȃ��̑O�ɗ����ǂ���܂�.
+ここで `保持する` (`Keep anyway`) を選ぶと,
+ようやく `ChkMails.msi` がダウンロードされますが,
+なんかそのままじっとしています.
+よく見ると `ファイルを開く` (`Open file`) という文字列が出ているのでそれをつついてみると,
+いきなり下図のようなダイアログがあなたの前に立ち塞がります.
 
-| ���{�� | English |
+| 日本語 | English |
 | --- | --- |
 | ![](pics/DefenderJ.png) | ![](pics/Defender.png) |
 
-�悭�����, `�ڍ׏��` (`More info`) �Ƃ��������񂪏o�Ă���̂ł�������Ă݂��,
+よく見ると, `詳細情報` (`More info`) という文字列が出ているのでそれをつついてみると,
 
 
-`���s` (`Run anyway`) �Ƃ����{�^����������̂�,
-����������Ƃ悤�₭���}�̂悤�ɃC���X�g�[���[�������o���܂�.
+`実行` (`Run anyway`) というボタンが現われるので,
+それを押すとようやく下図のようにインストーラーが動き出します.
 
 ![](pics/Installer10.png)
 
 
-## Microsoft Edge �ȊO�̃u���E�U�[�̏ꍇ
+## Microsoft Edge 以外のブラウザーの場合
 
-���݂܂���.
-�����������Ƃ������n�߂�ƃL�����Ȃ��̂ŏȗ��ł�.
+すみません.
+そういうことを言い始めるとキリがないので省略です.
 <br>
 <sub>
-( �h���_���̌��ɂȂ�܂������.
-�u�Ȃ�&#x2588;&#x2588;&#x2588;&#x2588;&#x2588;&#x2588;&#x2588;���Љ�Ƃ��ĉ��̍D����&#x2588;&#x2588;&#x2588;&#x2588;&#x2588;���Ȃ��񂾁I�v�Ƃ�. )
+( 派閥論争の元になりますからね.
+「なぜ&#x2588;&#x2588;&#x2588;&#x2588;&#x2588;&#x2588;&#x2588;を紹介しといて俺の好きな&#x2588;&#x2588;&#x2588;&#x2588;&#x2588;がないんだ！」とか. )
 </sub>
 
-## �C���X�g�[���[�̑�����@
+## インストーラーの操作方法
 
-�܂�, �ŏ��ɏo�Ă���̂����}�̏�Ԃł�.
+まず, 最初に出てくるのが下図の状態です.
 
 ![](pics/Installer.png)
 
-���ɂǂ������悤���Ȃ��̂�, ���Ȃ��� `Next >` �������܂��傤.
-����Ɖ��}�̂悤�ɂȂ�܂�.
+特にどうもしようがないので, すなおに `Next >` を押しましょう.
+すると下図のようになります.
 
 ![](pics/Installer2.png)
 
-���A�v�����C���X�g�[�������̃t�H���_�[���w�肷��i�K�ł�.
+当アプリをインストールする先のフォルダーを指定する段階です.
 
-�f�t�H���g�Œ񎦂���Ă���t�H���_�[���Ȃ񂩋C�ɓ���Ȃ�����,
-���ڃt�H���_�[����ł����ނȂ�, `Browse...` �{�^���������ăt�H���_�[��I�ԃ_�C�A���O���o���đ��삷��Ȃ�,
-���D�݂̃t�H���_�[���w�肵�܂�.
+デフォルトで提示されているフォルダーがなんか気に入らない方は,
+直接フォルダー名を打ち込むなり, `Browse...` ボタンを押してフォルダーを選ぶダイアログを出して操作するなり,
+お好みのフォルダーを指定します.
 
-������, `Next >` �������܂�.
-����Ɖ��}�̂悤�ɂȂ�܂�.
+そして, `Next >` を押します.
+すると下図のようになります.
 
 ![](pics/Installer3.png)
 
-�u�C���X�g�[�����n�߂�ɂ� `"Next"` �������Ă��������B�v�I�Ȃ��Ƃ������Ă���̂�,
- `Next >` �������܂�.
-����ƃC���X�g�[���[�������o��, �ˑR
+「インストールを始めるには `"Next"` を押してください。」的なことを言っているので,
+ `Next >` を押します.
+するとインストーラーが動き出し, 突然
 [UAC](https://learn.microsoft.com/ja-jp/windows/security/application-security/application-control/user-account-control/)
-�������Ă��Ȃ����т����肳���܂���,
-���������� `Yes` (`�͂�`) �������܂��傤.
+が現われてあなたをびっくりさせますが,
+くじけずに `Yes` (`はい`) を押しましょう.
 
-����ƍĂуC���X�g�[���[�������o���܂���,
-�����ɏI����ĉ��L�̂悤�ȕ\���ɗ��������܂�.
+すると再びインストーラーが動き出しますが,
+すぐに終わって下記のような表示に落ち着きます.
 
 ![](pics/Installer5.png)
 
-���낢��Ƃ��萔�����������܂���.
-����� `Close` �{�^����������, �C���X�g�[���͊����ł�.
+いろいろとお手数をおかけしました.
+これで `Close` ボタンを押せば, インストールは完了です.
 
-�X�^�[�g���j���[�� **������C** �̂Ƃ���������,
-���L�̂悤�� `ChkMails` �����ꍞ��ł���͂��ł�.
+スタートメニューの **頭文字C** のところを見ると,
+下記のように `ChkMails` が紛れ込んでいるはずです.
 
 ![](pics/StartMenu.png)
 
 
-## �N�����Ă݂���umfc140u.dll ��������Ȃ��v�Ƃ�����ꂽ�ꍇ
+## 起動してみたら「mfc140u.dll が見つからない」とか言われた場合
 
-�u�悵�A�C���X�g�[���ł����I�v�ƗE��ŋN�����Ă݂��,
-�l�ɂ���Ă� ( ���m�ɂ� PC �ɂ���Ă� ), ���}�̂悤�ȃ_�C�A���O��������,
-�����[���Ȗ�肪�N�����悤�Ȃ��Ƃ������Ă��܂�.
+「よし、インストールできた！」と勇んで起動してみると,
+人によっては ( 正確には PC によっては ), 下図のようなダイアログが現われて,
+何か深刻な問題が起きたようなことを告げてきます.
 
 ![](pics/MissingRuntime.png)
 <br>
 <sub>
-(�u�V�X�e���G���[�v�ł������.
-�u�V�X�e���v�Łu�G���[�v�Ƃ�����ꂽ��, �����p�j�b�N�ł���. ���̌�����, �ǂ��ɂ��Ȃ�܂���? )
+(「システムエラー」ですもんね.
+「システム」で「エラー」とか言われたら, そりゃパニックですよ. この言い方, どうにかなりません? )
 </sub>
 
-�ł��������,
-[�悭����b](https://www.google.com/search?q=mfc140u.dll+%E3%81%8C%E8%A6%8B%E3%81%A4%E3%81%8B%E3%82%89%E3%81%AA%E3%81%84)�Ȃ�ł���.
+でもこれって,
+[よくある話](https://www.google.com/search?q=mfc140u.dll+%E3%81%8C%E8%A6%8B%E3%81%A4%E3%81%8B%E3%82%89%E3%81%AA%E3%81%84)なんですよ.
 
-�Ȃ�ł悭����b�Ȃ̂��Ƃ�����,
-�݂Ȃ���u`.dll` �Ƃ��Đ؂藣������̂� `.exe` ����؂藣���āv�񋟂��Ă��邩��ł�.
-�Ȃ�ł���ȁu�O�t���� `.dll` ���v�� `.exe`�v�Ȃ�ĈӒn���ȍ\���ɂ���̂��Ƃ�����, ���L�̗��_�����邩��ł�.
+なんでよくある話なのかというと,
+みなさん「`.dll` として切り離せるものは `.exe` から切り離して」提供しているからです.
+なんでそんな「外付けの `.dll` が要る `.exe`」なんて意地悪な構成にするのかというと, 下記の利点があるからです.
 
-* �I�u�W�F�N�g�T�C�Y���������Ȃ�̂�, SSD ( HDD ) �̗e�ʐߖ�ɂȂ�.
-* ���� DLL ���g�������̃v���Z�X������ꍇ�� DLL �����L�����̂�, �������[�̐ߖ�ɂ��Ȃ�.
-* Microsoft&reg; ����� DLL �ɂ� Microsoft&reg; ���񂪃Z�L�����e�B�[�X�V�������Ă����̂�, ��������S.
+* オブジェクトサイズが小さくなるので, SSD ( HDD ) の容量節約になる.
+* 同じ DLL を使う複数のプロセスが居る場合は DLL が共有されるので, メモリーの節約にもなる.
+* Microsoft&reg; さんの DLL には Microsoft&reg; さんがセキュリティー更新をかけてくれるので, 今後も安心.
 
-�Ƃ����킯��, ���� DLL ������� Microsoft&reg; ����̃T�C�g��
-[������](https://learn.microsoft.com/ja-jp/cpp/windows/latest-supported-vc-redist?view=msvc-170)�ł�.
-�Ȃɂ�炵���߂�ǂ��������Ȃ��Ƃ������Ⴒ����Ə����Ă���܂���,
-���A�v���̏ꍇ, ����Ȃ� DLL ��₤�̂�,
-[`�ŐV�� Microsoft Visual C++ �ĔЕz�\�p�b�P�[�W �o�[�W����`](https://learn.microsoft.com/ja-jp/cpp/windows/latest-supported-vc-redist?view=msvc-170#latest-microsoft-visual-c-redistributable-version)
- �̂Ƃ���ɂ���
+というわけで, その DLL をくれる Microsoft&reg; さんのサイトは
+[こちら](https://learn.microsoft.com/ja-jp/cpp/windows/latest-supported-vc-redist?view=msvc-170)です.
+なにやらしちめんどくさそうなことがごちゃごちゃと書いてありますが,
+当アプリの場合, 足りない DLL を補うのは,
+[`最新の Microsoft Visual C++ 再頒布可能パッケージ バージョン`](https://learn.microsoft.com/ja-jp/cpp/windows/latest-supported-vc-redist?view=msvc-170#latest-microsoft-visual-c-redistributable-version)
+ のところにある
 [https://aka.ms/vs/17/release/vc_redist.x64.exe](https://aka.ms/vs/17/release/vc_redist.x64.exe)
-�ł�.
+です.
 <br>
-( `X86` �̂���Ȃ��ł���. `X64` �̂ł������. )
+( `X86` のじゃないですよ. `X64` のですからね. )
 
-���̃����N������, 
-��ɂ���ă_�E�����[�h�̎葱�����n�܂�܂���,
-���A�v���̂悤�ɃA���������̂ł͂Ȃ��̂�, ���Ƃ��Ȃ��� `Open` �ł��܂�.
-����Ɖ��}�̂悤�ɂȂ񂾂��{�^���̈ʒu���Y�����_�C�A���O���o�Ă��āu�������傤�Ԃ��A������?�v�Ǝv�킹�Ȃ����Ȃ��ł���,
-�������傤�ԂȂ�ł�.
+このリンクをつつくと, 
+例によってダウンロードの手続きが始まりますが,
+当アプリのようにアヤしいものではないので, わりとすなおに `Open` できます.
+すると下図のようになんだかボタンの位置がズレたダイアログが出てきて「だいじょうぶか、こいつ?」と思わせなくもないですが,
+だいじょうぶなんです.
 
 ![](pics/Redistributable.png)
 
-���ɏ����Ă���u���C�Z���X�����v�Ƃ��Ɉꉞ�ڂ�ʂ��Ă݂܂��傤��.
+中に書いてある「ライセンス条項」とやらに一応目を通してみましょうか.
 <br>
-<sub>( ����ɂ��Ă��������ēǂ݂Â炢�ł���.
-�܂���, �킴�Ɠǂ݂Â炢�悤�Ɏd���ĂĂ�����, ���o�������̑��݂�����Ȃ��悤�ɂ��Ă���Ƃ��c�c )
+<sub>( それにしても小さくて読みづらいですね.
+まさか, わざと読みづらいように仕立てておいて, ヤバい条項の存在を悟られないようにしているとか…… )
 </sub>
 <br>
-<sup>( �������Ă΂��肢�Ȃ��ŏЉ�҂Ƃ��Ă̐ӔC���ʂ����ׂ�,
-�ꉞ�S���ǂ�ł݂܂�����, ���Ƀ��o�������͂Ȃ������ł�. 2025�N1������ )
+<sup>( 茶化してばかりいないで紹介者としての責任を果たすべく,
+一応全文読んでみましたが, 特にヤバい条項はなかったです. 2025年1月現在 )
 </sup>
 <br>
-<sup>( �ł�, �a�󂪃r�~���[��, �u�Ȃ񂩃p�`����L���ȁA�����B�v�Ǝv�킹�Ȃ����Ȃ������ł�. 2025�N1������ )
+<sup>( でも, 和訳がビミョーで, 「なんかパチもん臭いな、こいつ。」と思わせなくもなかったです. 2025年1月現在 )
 </sup>
 
-`���C�Z���X��������юg�p�����ɓ���` ��&#x2611;����Ɖ�����悤�ɂȂ� `�C���X�g�[��` �{�^����������,
-����Ȃ��, �������^�_��, ����Ȃ����� `mfc140u.dll` �Ƃ�炪, ���Ȃ��� PC �ɂ��C���X�g�[������܂�.
+`ライセンス条項および使用条件に同意` に&#x2611;すると押せるようになる `インストール` ボタンを押すと,
+すんなりと, しかもタダで, 足りなかった `mfc140u.dll` とやらが, あなたの PC にもインストールされます.
 
-���萔�����������܂���, ���t��������������. �ǂ���炱�ꂪ�őP�̒񋟌`�Ԃ̂悤�Ȃ�ł�.
+お手数をおかけしますが, お付き合いください. どうやらこれが最善の提供形態のようなんです.
 
-���́uDLL �̃C���X�g�[���v�������I�������,
-�Ă� `ChkMails` ���N�����Ă݂Ă�������.
-����ǂ��������͂��ł�.
-�Ȃ񂩂����Ȃ艺�}�̂悤�ȃ_�C�A���O��, ��ʂ̒[�����̕��ɏo�Ă��ċ�������܂���,
-���ꂪ���퓮��Ȃ�ł�.
+この「DLL のインストール」が無事終わったら,
+再び `ChkMails` を起動してみてください.
+こんどこそ動くはずです.
+なんかいきなり下図のようなダイアログが, 画面の端っこの方に出てきて驚かされますが,
+それが正常動作なんです.
 
 ![](pics/Intro.png)
 
-���̌�ǂ�����΂����̂��Ɋւ��Ă�, [�{�҂̐���](README.md)�����Q�Ƃ�������.
+その後どうすればいいのかに関しては, [本編の説明](README.md)をご参照ください.
 
 <div style="text-align: right;">
-In-house Tool / �ƒ� �O
+In-house Tool / 家中 徹
 </div>
  
