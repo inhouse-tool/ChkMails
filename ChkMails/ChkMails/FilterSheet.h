@@ -8,6 +8,7 @@
 #include "CodePage.h"
 #include "DomainPage.h"
 #include "NamePage.h"
+#include "RecipientPage.h"
 #include "SenderPage.h"
 #include "ZonePage.h"
 #include "WhitePage.h"
@@ -23,6 +24,7 @@ public:
 	CCodePage	m_pageCode;
 	CDomainPage	m_pageDomain;
 	CNamePage	m_pageName;
+	CRecipientPage	m_pageRecipient;
 	CSenderPage	m_pageSender;
 	CZonePage	m_pageZone;
 	CWhitePage	m_pageWhite;

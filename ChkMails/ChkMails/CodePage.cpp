@@ -39,9 +39,9 @@ CCodePage::OnInitDialog( void )
 void
 CCodePage::OnOK( void )
 {
-	m_dwFlags = 0;
+	m_dwFlags = 0xffff;
 	for	( int i = 0; i < 3; i++ )
 		if	( ((CButton*)GetDlgItem( IDC_CHECK_CODE_CHARSET+i ))->
-				GetCheck() == BST_CHECKED )
-			m_dwFlags |= ( 1 << i );
+				GetCheck() != BST_CHECKED )
+			m_dwFlags &= ~( 1 << i );
 }

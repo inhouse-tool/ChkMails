@@ -16,18 +16,27 @@
 #define	WM_SHOW_HELP		(WM_APP+5)
 
 #define	NotifyPopup( hWnd )		AfxGetMainWnd()->PostMessage( WM_POPUP_NOTIFY, 0, (LPARAM)(hWnd) )
-#define	GetCommonFont()			(CFont*)AfxGetMainWnd()->SendMessage( WM_GET_COMMONFONT, 0, 0 )
+#define	GetCommonFont()		(CFont*)AfxGetMainWnd()->SendMessage( WM_GET_COMMONFONT, 0, 0 )
 #define	ShowHelp( hWnd )		AfxGetMainWnd()->PostMessage( WM_SHOW_HELP, 0, (LPARAM)(hWnd) )
 
 class CChkMailsApp : public CWinApp
 {
 public:
 		BOOL	DeleteProfileValue( CString strSection, CString strName );
+		void	WriteProfileCode( LPCTSTR lpszSection, LPCTSTR lpszEntry, LPCTSTR lpszCode );
+		CString	GetProfileCode( LPCTSTR lpszSection, LPCTSTR lpszEntry, LPCTSTR lpDefault );
 		CString	GetVersionInfo( TCHAR* pchQuery, LPCTSTR pszExe = NULL );
+
 protected:
 	virtual	BOOL	InitInstance( void );
 	virtual	BOOL	PreTranslateMessage( MSG* pMsg );
 	virtual	int	DoMessageBox( LPCTSTR lpszPrompt, UINT nType, UINT nIDPrompt );
+
+		BYTE*	m_pbBlob;
+		UINT	m_cbBlob;
+
+		void	MakeBlob( void );
+		DWORD	EnDecrypt( BYTE*& lpszPlain, BYTE*& pbCoded, DWORD& cbCoded, bool bEncode = false );
 };
 
 extern	CChkMailsApp	theApp;

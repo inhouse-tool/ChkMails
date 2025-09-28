@@ -281,6 +281,8 @@ CNamePage::AddNames( CString strNames )
 	GetDlgItem( IDC_EDIT_NAME_DOMAIN )->SetWindowText( _T("") );
 }
 
+#define	CP_SHIFT_JIS	  932
+
 CString
 CNamePage::LoadText( CString strFile )
 {
@@ -301,9 +303,10 @@ CNamePage::LoadText( CString strFile )
 	CFile	f;
 	if	( f.Open( strFile, CFile::modeRead | CFile::shareExclusive ) ){
 		DWORD	cbData = (DWORD)f.GetLength();
-		BYTE*	pbData = new BYTE[cbData+1];
+		BYTE*	pbData = new BYTE[cbData+2];
 		f.Read( pbData, cbData );
-		pbData[cbData] = '\0';
+		pbData[cbData+0] = '\0';
+		pbData[cbData+1] = '\0';
 
 		BYTE*	pb = pbData;
 
@@ -399,11 +402,20 @@ CNamePage::LoadText( CString strFile )
 
 		CHAR*	pbText = (CHAR*)( pbData + cbBOM );
 
-		if	( eEncode == ASCII || eEncode == ShiftJIS ){
+		if	( eEncode == ASCII ){
 			int	cwch =
-			MultiByteToWideChar( CP_ACP, 0, (char*)pbData, -1, NULL, 0 );
+			MultiByteToWideChar( CP_ACP, 0, pbText, -1, NULL, 0 );
 			WCHAR*	pwch = new WCHAR[cwch+1];
-			MultiByteToWideChar( CP_ACP, 0, (char*)pbData, -1, pwch, cwch );
+			MultiByteToWideChar( CP_ACP, 0, pbText, -1, pwch, cwch );
+			pwch[cwch] = '\0';
+			strLines = pwch;
+			delete	[]pwch;
+		}
+		else if	( eEncode == ShiftJIS ){
+			int	cwch =
+			MultiByteToWideChar( CP_SHIFT_JIS, 0, pbText, -1, NULL, 0 );
+			WCHAR*	pwch = new WCHAR[cwch+1];
+			MultiByteToWideChar( CP_SHIFT_JIS, 0, pbText, -1, pwch, cwch );
 			pwch[cwch] = '\0';
 			strLines = pwch;
 			delete	[]pwch;

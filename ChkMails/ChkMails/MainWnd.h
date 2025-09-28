@@ -91,6 +91,8 @@ protected:
 		DWORD	m_dwCode;
 		CString	m_strDomains;
 		CString	m_strNames;
+		CString	m_strRecipients;
+		CString	m_strSenders;
 		DWORD	m_dwSender;
 		CString	m_strTimes;
 		CString	m_strWhites;
@@ -102,9 +104,6 @@ protected:
 		CFont	m_fontProp,
 			m_fontFix;
 		CWnd*	m_pWndModal;
-
-		BYTE*	m_pbBlob;
-		UINT	m_cbBlob;
 
 	   CParaSocket*	m_pSocket;
 	   CNotifyWnd*	m_pWndNotify;
@@ -160,11 +159,8 @@ protected:
 		void	LoadTLDs( void );
 		void	SaveTLDs( void );
 
-		void	MakeBlob( void );
-		DWORD	EnDecrypt( char*& lpszPlain, BYTE*& pbCoded, DWORD& cbCoded, bool bEncode = false );
-
 		HANDLE	m_hPower;
-		int	m_nWakeDealy;
+		int	m_nWakeDelay;
 	static	ULONG	CALLBACK
 			OnPower( void* pContext, ULONG uType, void* pSetting );
 
@@ -178,11 +174,14 @@ protected:
 		void	GetSender( CStringA strMail, CAttr& attr );
 		void	GetType(   CStringA strMail, CAttr& attr );
 		void	GetEncode( CStringA strMail, CAttr& attr );
-		void	GetTime(   CStringA strMail, CAttr& attr );
+		void	GetDate(   CStringA strMail, CAttr& attr );
+		CTime	GetTime(   CStringA strDate, CAttr& attr );
 		int	GetCodePage(   CStringA strMail );
+		void	CheckToCc(     CStringA strMail, CAttr& attr );
 		void	CheckMID(      CStringA strMail, CAttr& attr );
 		void	CheckReceived( CStringA strMail, CAttr& attr );
 		void	CheckBlackList( CStringA strSender, CAttr& attr );
+	       CStringA	GetHeaderField( CStringA strMail, int iField );
 
 		CString	MakeLog( CStringA strMail, CAttr& attr );
 		void	SaveLog( CStringA strMail, CString strLog, CAttr& attr );
@@ -207,8 +206,10 @@ protected:
 
 		void	CheckUnicode(   CString& strLog,   CAttr& attr );
 		void	CheckAlias(     CString  strLog,   CAttr& attr );
+		void	CheckSubject(   CString  strLog,   CAttr& attr );
 		int	CompareWild( CString strWild, CString strName );
 		void	NormalizeAlias( CString& strName );
+		TCHAR	EvasiveToASCII( TCHAR ch );
 		void	CheckWhiteList( CString  strLog,   CAttr& attr );
 		void	CheckLink(      CString& strLog,   CAttr& attr );
 		bool	GetLinkInHTML(  CString  strLog, int& xLines, CString& strLink, CString& strDisplay );

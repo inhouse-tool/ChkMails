@@ -29,8 +29,6 @@ CMainWnd::CMainWnd( void )
 	LoadFilters();
 	LoadTLDs();
 
-	MakeBlob();
-
 	m_pWndModal = NULL;
 
 	m_pSocket  = NULL;
@@ -45,15 +43,13 @@ CMainWnd::CMainWnd( void )
 	m_hSummary = NULL;
 
 	m_hPower     = NULL;
-	m_nWakeDealy = 0;
+	m_nWakeDelay = 0;
 }
 
 CMainWnd::~CMainWnd( void )
 {
 	if	( m_hSummary )
 		CloseHandle( m_hSummary );
-
-	delete[] m_pbBlob;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -130,7 +126,7 @@ CMainWnd::OnCreate( LPCREATESTRUCT lpCreateStruct )
 
 	m_pWndNotify = new CNotifyWnd;
 
-	m_nWakeDealy = AfxGetApp()->GetProfileInt( _T("Settings"), _T("WakeDelay"),   5 );
+	m_nWakeDelay = AfxGetApp()->GetProfileInt( _T("Settings"), _T("WakeDelay"),   5 );
 	DEVICE_NOTIFY_SUBSCRIBE_PARAMETERS	dnsp = { OnPower, this };
 	PowerRegisterSuspendResumeNotification( DEVICE_NOTIFY_CALLBACK, &dnsp, &m_hPower );
 
@@ -358,7 +354,7 @@ CMainWnd::OnShowHelp( WPARAM wParam, LPARAM lParam )
 	strURL.MakeLower();
 	strURL.Replace( ' ', '-' );
 
-	CString	strPath = _T("https://github.com/inhouse-tool/ChkMails/blob/main/README.md");
+	CString	strPath = _T("https://github.com/inhouse-tool/chkmails");
 	strURL.Insert( 0, _T("#") );
 	strURL.Insert( 0, strPath );
 	ShellExecute( NULL, _T("open"), strURL, NULL, NULL, SW_SHOWNORMAL );
@@ -369,7 +365,7 @@ CMainWnd::OnShowHelp( WPARAM wParam, LPARAM lParam )
 void
 CMainWnd::OnMenuWeb( void )
 {
-	CString	strPath = _T("https://github.com/inhouse-tool/ChkMails/blob/main/README.md");
+	CString	strPath = _T("https://github.com/inhouse-tool/chkmails");
 	ShellExecute( NULL, _T("open"), strPath, NULL, NULL, SW_SHOWNORMAL );
 }
 
@@ -468,15 +464,17 @@ CMainWnd::OnMenuFilter( void )
 {
 	CFilterSheet	sheet( IDS_CAPT_FILTER, this, 0 );
 
-	sheet.m_pageAuth  .m_nAuth       = m_nAuth;
-	sheet.m_pageAuth  .m_dwFlags     = m_dwAuthCache;
-	sheet.m_pageCode  .m_dwFlags     = m_dwCode;
-	sheet.m_pageDomain.m_strDomains  = m_strDomains;
-	sheet.m_pageDomain.m_strTLDCache = m_strTLDCache;
-	sheet.m_pageName  .m_strNames    = m_strNames;
-	sheet.m_pageSender.m_dwFlags     = m_dwSender;
-	sheet.m_pageZone  .m_strTimes    = m_strTimes;
-	sheet.m_pageWhite .m_strWhites   = m_strWhites;
+	sheet.m_pageAuth     .m_nAuth         = m_nAuth;
+	sheet.m_pageAuth     .m_dwFlags       = m_dwAuthCache;
+	sheet.m_pageCode     .m_dwFlags       = m_dwCode;
+	sheet.m_pageDomain   .m_strDomains    = m_strDomains;
+	sheet.m_pageDomain   .m_strTLDCache   = m_strTLDCache;
+	sheet.m_pageName     .m_strNames      = m_strNames;
+	sheet.m_pageRecipient.m_strRecipients = m_strRecipients;
+	sheet.m_pageRecipient.m_strSenders    = m_strSenders;
+	sheet.m_pageSender   .m_dwFlags       = m_dwSender;
+	sheet.m_pageZone     .m_strTimes      = m_strTimes;
+	sheet.m_pageWhite    .m_strWhites     = m_strWhites;
 
 	sheet.SetOwner( this );
 
@@ -485,43 +483,54 @@ CMainWnd::OnMenuFilter( void )
 
 	bool	bUpdate = false;
 
-	if	( sheet.m_pageAuth  .m_nAuth       != m_nAuth ){
-		m_nAuth    = sheet.m_pageAuth        .m_nAuth;
+	if	( sheet.m_pageAuth  .m_nAuth            != m_nAuth ){
+		m_nAuth         = sheet.m_pageAuth        .m_nAuth;
 		bUpdate = true;
 	}
-	if	( sheet.m_pageCode  .m_dwFlags     != m_dwCode ){
-		m_dwCode   = sheet.m_pageCode        .m_dwFlags;
+	if	( sheet.m_pageCode  .m_dwFlags          != m_dwCode ){
+		m_dwCode        = sheet.m_pageCode        .m_dwFlags;
 		bUpdate = true;
 	}
-	if	( sheet.m_pageDomain.m_strDomains  != m_strDomains ){
-		m_strDomains  = sheet.m_pageDomain   .m_strDomains;
+	if	( sheet.m_pageDomain.m_strDomains       != m_strDomains ){
+		m_strDomains    = sheet.m_pageDomain      .m_strDomains;
 		bUpdate = true;
 	}
-	if	( sheet.m_pageDomain.m_strTLDCache != m_strTLDCache ){
-		m_strTLDCache  = sheet.m_pageDomain  .m_strTLDCache;
+	if	( sheet.m_pageDomain.m_strTLDCache      != m_strTLDCache ){
+		m_strTLDCache   = sheet.m_pageDomain      .m_strTLDCache;
 		SaveTLDs();
 	}
-	if	( sheet.m_pageName  .m_strNames    != m_strNames ){
-		m_strNames  = sheet.m_pageName       .m_strNames;
+	if	( sheet.m_pageName  .m_strNames         != m_strNames ){
+		m_strNames      = sheet.m_pageName        .m_strNames;
 		bUpdate = true;
 	}
-	if	( sheet.m_pageSender.m_dwFlags     != m_dwSender ){
-		m_dwSender = sheet.m_pageSender      .m_dwFlags;
+	if	( sheet.m_pageRecipient.m_strRecipients != m_strRecipients ){
+		m_strRecipients = sheet.m_pageRecipient   .m_strRecipients;
 		bUpdate = true;
 	}
-	if	( sheet.m_pageZone  .m_strTimes    != m_strTimes ){
-		m_strTimes = sheet.m_pageZone        .m_strTimes;
+	if	( sheet.m_pageRecipient.m_strSenders    != m_strSenders ){
+		m_strSenders    = sheet.m_pageRecipient   .m_strSenders;
 		bUpdate = true;
 	}
-	if	( sheet.m_pageWhite .m_strWhites   != m_strWhites ){
-		m_strWhites = sheet.m_pageWhite      .m_strWhites;
+	if	( sheet.m_pageSender.m_dwFlags          != m_dwSender ){
+		m_dwSender      = sheet.m_pageSender      .m_dwFlags;
+		bUpdate = true;
+	}
+	if	( sheet.m_pageZone  .m_strTimes         != m_strTimes ){
+		m_strTimes      = sheet.m_pageZone        .m_strTimes;
+		bUpdate = true;
+	}
+	if	( sheet.m_pageWhite .m_strWhites        != m_strWhites ){
+		m_strWhites     = sheet.m_pageWhite       .m_strWhites;
 		bUpdate = true;
 	}
 
 	if	( bUpdate ){
 		SaveFilters();
-		if	( AfxMessageBox( IDS_MB_REEVAL, MB_YESNO | MB_ICONQUESTION ) == IDYES )
+		if	( AfxMessageBox( IDS_MB_REEVAL, MB_YESNO | MB_ICONQUESTION ) == IDYES ){
+			KillTimer( TID_POLL );
 			ReadFromEML( m_strLogPath );
+			PollNow();
+		}
 	}
 }
 
@@ -647,8 +656,9 @@ CMainWnd::ModNI( UINT uIcon, CString strTip )
 			m_strSummaryLast = m_strSummary;
 			if	( m_bSummary )
 				ShowSummary( m_strSummary );
-			if	( m_bTone )
-				PlaySound( m_strToneFile, NULL, SND_FILENAME | SND_ASYNC );
+			if	( !m_strSummary.IsEmpty() )
+				if	( m_bTone )
+					PlaySound( m_strToneFile, NULL, SND_FILENAME | SND_ASYNC );
 		}
 	}
 
@@ -713,27 +723,18 @@ CMainWnd::LoadAccounts( void )
 	CChkMailsApp*	pApp = (CChkMailsApp*)AfxGetApp();
 
 	for	( int i = 0; ; i++ ){
-		BYTE*	pbRecord = NULL;
-		DWORD	cbRecord = 0;
 		CString	strEntry;
 		strEntry.Format( _T("Entry%d"), i );
-		pApp->GetProfileBinary( _T("Records"), strEntry, &pbRecord, (UINT*)&cbRecord );
-		if	( !pbRecord )
+		CString strRecord = pApp->GetProfileCode( _T("Records"), strEntry, _T("") );
+		if	( strRecord.IsEmpty() )
 			break;
 
-		char*	pszRecord = NULL;
-		DWORD	dwError = EnDecrypt( pszRecord, pbRecord, cbRecord, false );
-		CStringA strRecord = pszRecord;
-		delete[] pszRecord;
-		delete[] pbRecord;
-
 		CAccount	account;
-		CStringA str;
 		int	x = 0;
-		account.m_strHost = strRecord.Tokenize( "\n", x );
-		account.m_strUser = strRecord.Tokenize( "\n", x );
-		account.m_strPass = strRecord.Tokenize( "\n", x );
-		account.m_nPort   = atoi( strRecord.Tokenize( "\n", x ) );
+		account.m_strHost = strRecord.Tokenize( _T("\n"), x );
+		account.m_strUser = strRecord.Tokenize( _T("\n"), x );
+		account.m_strPass = strRecord.Tokenize( _T("\n"), x );
+		account.m_nPort   = _wtoi( strRecord.Tokenize( _T("\n"), x ) );
 		m_aAccount.Add( account );
 	}
 }
@@ -746,7 +747,7 @@ CMainWnd::SaveAccounts( void )
 	INT_PTR	n = m_aAccount.GetCount();
 	int	i;
 	for	( i = 0; i < n; i++ ){
-		CStringA	strRecord;
+		CString	strRecord;
 		strRecord += m_aAccount[i].m_strHost;
 		strRecord += "\n";
 		strRecord += m_aAccount[i].m_strUser;
@@ -757,14 +758,9 @@ CMainWnd::SaveAccounts( void )
 		str.Format( "%d\n", m_aAccount[i].m_nPort );
 		strRecord += str;
 
-		BYTE*	pbRecord = NULL;
-		DWORD	cbRecord = 0;
-		char*	pszRecord = strRecord.GetBuffer();
-		DWORD	dwError = EnDecrypt( pszRecord, pbRecord, cbRecord, true );
 		CString	strEntry;
 		strEntry.Format( _T("Entry%d"), i );
-		pApp->WriteProfileBinary( _T("Records"), strEntry, pbRecord, (UINT)cbRecord );
-		delete[] pbRecord;
+		pApp->WriteProfileCode( _T("Records"), strEntry, strRecord );
 	}
 	for	( ;; i++ ){
 		CString	strEntry;
@@ -814,14 +810,16 @@ CMainWnd::LoadFilters( void )
 {
 	CChkMailsApp*	pApp = (CChkMailsApp*)AfxGetApp();
 
-	m_nAuth       = pApp->GetProfileInt(    _T("Filters"), _T("AuthFail"), 2 );
-	m_dwAuthCache = pApp->GetProfileInt(    _T("Filters"), _T("AuthBits"), 0x0000 );
-	m_dwCode      = pApp->GetProfileInt(    _T("Filters"), _T("Code"),     0xffff );
-	m_strDomains  = pApp->GetProfileString( _T("Filters"), _T("Drop"),     _T("") );
-	m_strNames    = pApp->GetProfileString( _T("Filters"), _T("Name"),     _T("") );
-	m_dwSender    = pApp->GetProfileInt(    _T("Filters"), _T("Sender"),   0xffff );
-	m_strTimes    = pApp->GetProfileString( _T("Filters"), _T("TimeZone"), _T("") );
-	m_strWhites   = pApp->GetProfileString( _T("Filters"), _T("White"),    _T("") );
+	m_nAuth         = pApp->GetProfileInt(    _T("Filters"), _T("AuthFail"),   2 );
+	m_dwAuthCache   = pApp->GetProfileInt(    _T("Filters"), _T("AuthBits"),   0x0000 );
+	m_dwCode        = pApp->GetProfileInt(    _T("Filters"), _T("Code"),       0xffff );
+	m_strDomains    = pApp->GetProfileString( _T("Filters"), _T("Drop"),       _T("") );
+	m_strNames      = pApp->GetProfileString( _T("Filters"), _T("Name"),       _T("") );
+	m_strRecipients = pApp->GetProfileCode(   _T("Filters"), _T("Recipients"), _T("") );
+	m_strSenders    = pApp->GetProfileCode(   _T("Filters"), _T("Senders"),    _T("") );
+	m_dwSender      = pApp->GetProfileInt(    _T("Filters"), _T("Sender"),     0xffff );
+	m_strTimes      = pApp->GetProfileString( _T("Filters"), _T("TimeZone"),   _T("") );
+	m_strWhites     = pApp->GetProfileString( _T("Filters"), _T("White"),      _T("") );
 }
 
 void
@@ -829,14 +827,16 @@ CMainWnd::SaveFilters( void )
 {
 	CChkMailsApp*	pApp = (CChkMailsApp*)AfxGetApp();
 
-	pApp->WriteProfileInt(    _T("Filters"), _T("AuthFail"), m_nAuth );
-	pApp->WriteProfileInt(    _T("Filters"), _T("AuthBits"), m_dwAuthCache );
-	pApp->WriteProfileInt(    _T("Filters"), _T("Code"),     m_dwCode );
-	pApp->WriteProfileString( _T("Filters"), _T("Drop"),     m_strDomains );
-	pApp->WriteProfileString( _T("Filters"), _T("Name"),     m_strNames );
-	pApp->WriteProfileInt(    _T("Filters"), _T("Sender"),   m_dwSender );
-	pApp->WriteProfileString( _T("Filters"), _T("TimeZone"), m_strTimes );
-	pApp->WriteProfileString( _T("Filters"), _T("White"),    m_strWhites );
+	pApp->WriteProfileInt(    _T("Filters"), _T("AuthFail"),   m_nAuth );
+	pApp->WriteProfileInt(    _T("Filters"), _T("AuthBits"),   m_dwAuthCache );
+	pApp->WriteProfileInt(    _T("Filters"), _T("Code"),       m_dwCode );
+	pApp->WriteProfileString( _T("Filters"), _T("Drop"),       m_strDomains );
+	pApp->WriteProfileString( _T("Filters"), _T("Name"),       m_strNames );
+	pApp->WriteProfileCode(   _T("Filters"), _T("Recipients"), m_strRecipients );
+	pApp->WriteProfileCode(   _T("Filters"), _T("Senders"),    m_strSenders );
+	pApp->WriteProfileInt(    _T("Filters"), _T("Sender"),     m_dwSender );
+	pApp->WriteProfileString( _T("Filters"), _T("TimeZone"),   m_strTimes );
+	pApp->WriteProfileString( _T("Filters"), _T("White"),      m_strWhites );
 }
 
 void
@@ -855,140 +855,12 @@ CMainWnd::SaveTLDs( void )
 	pApp->WriteProfileString( _T("Filters"), _T("TLDs"), m_strTLDCache );
 }
 
-#include <bcrypt.h>
-#pragma comment( lib, "Bcrypt.lib" )
-
-void
-CMainWnd::MakeBlob( void )
-{
-	m_pbBlob = NULL;
-	m_cbBlob = 0;
-	AfxGetApp()->GetProfileBinary( _T("Data"), _T("Blob"), &m_pbBlob, &m_cbBlob );
-	if	( !m_pbBlob ){
-		m_cbBlob = 192;
-		m_pbBlob = new BYTE[m_cbBlob];
-		(void)BCryptGenRandom( NULL, m_pbBlob, m_cbBlob, BCRYPT_USE_SYSTEM_PREFERRED_RNG );
-		AfxGetApp()->WriteProfileBinary( _T("Data"), _T("Blob"), m_pbBlob, m_cbBlob );
-	}
-}
-
-#define	OFS_IV	 64
-#define	OFS_SK	128
-
-DWORD
-CMainWnd::EnDecrypt( char*& lpszPlain, BYTE*& pbCoded, DWORD& cbCoded, bool bEncode )
-{
-	BCRYPT_ALG_HANDLE	hAlgorithm = NULL;
-	BCRYPT_KEY_HANDLE	hKey = NULL;
-	BYTE*	pbObject = NULL;
-	BYTE*	pbBlock = NULL;
-	BYTE*	pbPlain = NULL;
-
-	do{
-		// Initialize CNG for AES algorithm. ( CNG: Cryptography API Next Generation )
-
-		NTSTATUS	status;
-		status = BCryptOpenAlgorithmProvider( &hAlgorithm, BCRYPT_AES_ALGORITHM, NULL, 0 );
-		if	( status < 0 )
-			break;
-
-		// Get the size of the subobject.
-
-		DWORD	cbData = 0;
-		DWORD	cbObject = 0;
-		status = BCryptGetProperty( hAlgorithm, BCRYPT_OBJECT_LENGTH, (BYTE*)&cbObject, sizeof( cbObject ), &cbData, 0 );
-		if	( status < 0 )
-			break;
-
-		// Get the size of cipher block for the algorithm.
-
-		pbObject = new BYTE[cbObject];
-		DWORD	cbBlock = 0;
-		status = BCryptGetProperty( hAlgorithm, BCRYPT_BLOCK_LENGTH, (BYTE*)&cbBlock, sizeof( cbBlock ), &cbData, 0 );
-		if	( status < 0 )
-			break;
-
-		// Allocate a cipher block and fill it with initial vector.
-
-		pbBlock = new BYTE[cbBlock];
-		memcpy( pbBlock, m_pbBlob+OFS_IV, cbBlock );
-
-		// Set the chaining mode as 'CBC'.
-
-		status = BCryptSetProperty( hAlgorithm, BCRYPT_CHAINING_MODE, (BYTE*)BCRYPT_CHAIN_MODE_CBC, sizeof( BCRYPT_CHAIN_MODE_CBC ), 0 );
-		if	( status < 0 )
-			break;
-
-		// Create a key.
-
-		status = BCryptGenerateSymmetricKey( hAlgorithm, &hKey, pbObject, cbObject, m_pbBlob+OFS_SK, cbBlock, 0 );
-		if	( status < 0 )
-			break;
-
-		DWORD	dwFlags = BCRYPT_BLOCK_PADDING;
-		if	( bEncode ){
-			// Encode the given plain text.
-
-			DWORD	cbPlain = (DWORD)strlen( lpszPlain );
-			pbPlain = new BYTE[cbPlain];
-			memcpy( pbPlain, lpszPlain, cbPlain );
-
-			status = BCryptEncrypt( hKey, pbPlain, cbPlain, NULL, pbBlock, cbBlock, NULL, 0, &cbCoded, dwFlags );
-			if	( status < 0 )
-				break;
-
-			SetLastError( 0 );
-			pbCoded = new BYTE[cbCoded];
-			status = BCryptEncrypt( hKey, pbPlain, cbPlain, NULL, pbBlock, cbBlock, pbCoded, cbCoded, &cbData, dwFlags );
-			if	( status < 0 ){
-				delete[] pbCoded;
-				pbCoded = NULL;
-				cbCoded = 0;
-				break;
-			}
-		}
-		else{
-			// Decode the given code.
-
-			DWORD	cbPlain = 0;
-			status = BCryptDecrypt( hKey, pbCoded, cbCoded, NULL, pbBlock, cbBlock, NULL, 0, &cbPlain, dwFlags );
-			if	( status < 0 )
-				break;
-
-			SetLastError( 0 );
-			pbPlain = new BYTE[cbPlain+1];
-			status = BCryptDecrypt( hKey, pbCoded, cbCoded, NULL, pbBlock, cbBlock, pbPlain, cbPlain, &cbPlain, dwFlags );
-			if	( status < 0 ){
-				lpszPlain = NULL;
-				break;
-			}
-
-			pbPlain[cbPlain] = '\0';
-			lpszPlain = new char[cbPlain+1];
-			memcpy( lpszPlain, pbPlain, cbPlain+1 );
-		}
-	}while	( 0 );
-
-	if	( hAlgorithm )
-		BCryptCloseAlgorithmProvider( hAlgorithm, 0 );
-	if	( hKey )
-		BCryptDestroyKey( hKey );
-	if	( pbObject )
-		delete[] pbObject;
-	if	( pbBlock )
-		delete[] pbBlock;
-	if	( pbPlain )
-		delete[] pbPlain;
-
-	return	GetLastError();
-}
-
 ULONG
 CMainWnd::OnPower( void* pContext, ULONG uType, void* pSetting )
 {
 	if	( uType == PBT_APMRESUMESUSPEND ){
 		CMainWnd*	pWnd = (CMainWnd*)pContext;
-		pWnd->SetTimer( TID_START, pWnd->m_nWakeDealy*1000, NULL );
+		pWnd->SetTimer( TID_START, pWnd->m_nWakeDelay*1000, NULL );
 	}
 
 	return	0;
@@ -1060,7 +932,8 @@ CMainWnd::GetAttr( CStringA strMail )
 	GetSender( strMail, attr );
 	GetType(   strMail, attr );
 	GetEncode( strMail, attr );
-	GetTime(   strMail, attr );
+	GetDate(   strMail, attr );
+	CheckToCc(     strMail, attr );
 	CheckMID(      strMail, attr );
 	CheckReceived( strMail, attr );
 
@@ -1085,9 +958,9 @@ CMainWnd::GetAuth( CStringA strMail, CAttr& attr )
 	DWORD	dwAuth = 0x0;
 
 	if	( x >= 0 ){
-		xIn  = strMail.Find( ": ", x );
-		xOut = strMail.Find( "\r\n\r\n", xIn+2 );
-		CStringA str = strMail.Mid( xIn+2, xOut-(xIn+2) );
+		xIn  = strMail.Find( ": ", x ) +2;
+		xOut = strMail.Find( "\r\n\r\n", xIn );
+		CStringA str = strMail.Mid( xIn, xOut-xIn );
 		str.TrimRight();
 		str.MakeLower();
 
@@ -1135,7 +1008,7 @@ CMainWnd::GetAuth( CStringA strMail, CAttr& attr )
 void
 CMainWnd::GetFrom( CStringA strMail, CAttr& attr )
 {
-	int	x, xIn, xOut;
+	int	x;
 
 	// Get nominal sender.
 
@@ -1144,28 +1017,16 @@ CMainWnd::GetFrom( CStringA strMail, CAttr& attr )
 		x = strMail.Find( "from: " );
 	if	( x >= 0 ){
 
+		int	xIn, xOut;
+
 		// Extract sender address.
 
-		CStringA strFrom;
-		xIn  = x + 6;
-		x = xIn;
-		while	( true ){
-			xOut = strMail.Find( ':', x );
-			strFrom = strMail.Mid( xIn, xOut-xIn );
-			if	( strFrom.Find( '\r' ) >= 0 )
-				break;
-			x = xOut+1;
-		}
+		CStringA strFrom = GetHeaderField( strMail, x );
 
-		xIn  = strFrom.Find( '<', 0 );
-		xOut = strFrom.Find( '>', xIn+1 );
-		if	( xIn >= 0 && xOut >= xIn ){
-			strFrom = strFrom.Mid( xIn+1, xOut-(xIn+1) );
-		}
-		else{
-			xOut = strFrom.Find( '\r' );
-			strFrom = strFrom.Left( xOut );
-		}
+		xIn  = strFrom.Find( '<', 0 )+1;
+		xOut = strFrom.Find( '>', xIn );
+		if	( xIn >= 0 && xOut >= xIn )
+			strFrom = strFrom.Mid( xIn, xOut-xIn );
 		strFrom.Trim();
 		attr.m_strFrom = strFrom;
 
@@ -1223,9 +1084,9 @@ CMainWnd::GetSender( CStringA strMail, CAttr& attr )
 
 	x = strMail.Find( "smtp.mailfrom=" );
 	if	( x >= 0 ){
-		xIn  = strMail.Find( '=', x );
-		xOut = strMail.Find( ';', xIn+1 );
-		CStringA strSender = strMail.Mid( xIn+1, xOut-(xIn+1) );
+		xIn  = strMail.Find( '=', x )+1;
+		xOut = strMail.Find( ';', xIn );
+		CStringA strSender = strMail.Mid( xIn, xOut-xIn );
 		x = strSender.FindOneOf( " \t\r\n" );
 		if	( x >= 0 )
 			strSender = strSender.Left( x );
@@ -1290,7 +1151,7 @@ CMainWnd::GetSender( CStringA strMail, CAttr& attr )
 void
 CMainWnd::GetType( CStringA strMail, CAttr& attr )
 {
-	int	x, xIn, xOut;
+	int	x;
 
 	do{
 		x = strMail.Find( "Content-Type: " );
@@ -1303,15 +1164,7 @@ CMainWnd::GetType( CStringA strMail, CAttr& attr )
 	}while	( 0 );
 
 	if	( x >= 0 ){
-		xIn  = strMail.Find( ": ", x );
-		xOut = strMail.Find( ": ", xIn+2 );
-		if	( xOut < 0 )
-			xOut = strMail.GetLength();
-		CStringA str = strMail.Mid( xIn+2, xOut-(xIn+2) );
-		x = str.ReverseFind( '\r' );
-		if	( x >= 0 )
-			str = str.Left( x );
-		str.Trim();
+		CStringA str = GetHeaderField( strMail, x );
 
 		if	( str.Left( 4 ) == "text" ){
 			attr.m_iType = CAttr::Text;
@@ -1367,7 +1220,7 @@ CMainWnd::GetType( CStringA strMail, CAttr& attr )
 void
 CMainWnd::GetEncode( CStringA strMail, CAttr& attr )
 {
-	int	x, xIn, xOut;
+	int	x;
 
 	do{
 		x = strMail.Find( "Content-Transfer-Encoding: " );
@@ -1379,9 +1232,7 @@ CMainWnd::GetEncode( CStringA strMail, CAttr& attr )
 		x = strMail.Find( "content-transfer-encoding: " );
 	}while	( 0 );
 	if	( x >= 0 ){
-		xIn  = strMail.Find( ": ", x );
-		xOut = strMail.Find( "\r\n", xIn+2 );
-		CStringA str = strMail.Mid( xIn+2, xOut-(xIn+2) );
+		CStringA str = GetHeaderField( strMail, x );
 		if	( !str.CompareNoCase( "7bit" ) )
 			attr.m_iEncode = CAttr::Bit7;
 		else if	( !str.CompareNoCase( "8bit" ) )
@@ -1400,134 +1251,152 @@ CMainWnd::GetEncode( CStringA strMail, CAttr& attr )
 }
 
 void
-CMainWnd::GetTime( CStringA strMail, CAttr& attr )
+CMainWnd::GetDate( CStringA strMail, CAttr& attr )
 {
-	// Get time according to RFC 5322 and save it in UTC.
-
-	int	x, xIn, xOut;
+	int	x;
 
 	x = strMail.Find( "Date: " );
 	if	( x < 0 )
 		x = strMail.Find( "date: " );
 	if	( x >= 0 ){
-		xIn  = strMail.Find( ": ", x );
-		xOut = strMail.Find( "\r\n", xIn+2 );
-		CStringA strDate = strMail.Mid( xIn+2, xOut-(xIn+2) );
 
-		x = strDate.ReverseFind( ' ' );
-		CStringA strZone = strDate.Mid( x+1 );
-		strDate = strDate.Left( x );
-		if	( strZone[0] == '(' ){
-			strZone.Delete( 0, 1 );
-			strZone.Delete( strZone.GetLength()-1, 1 );
-		}
-		if	( x >= 5 &&
-			  ( strDate[x-5] == '+' ||
-			    strDate[x-5] == '-' ) )
-			strZone = strDate.Mid( x-5 );
+		// Take 'Date:'.
 
-		int	nYear = 0, nMonth = 0, nDay = 0, nHour = 0, nMinute = 0, nSecond = 0;
-		bool	bError = false;
-		do{
-			x = strDate.Find( ", " );
-			if	( x < 0 ){				// missing week
-				if	( !isdigit( strDate[0] ) ){	// omitted week
-					bError = true;	
-					break;
-				}
-			}
-			else
-				strDate.Delete( 0, x+2 );
-			attr.m_strZone = strZone;
+		CStringA strDate = GetHeaderField( strMail, x );
 
-			char*	pchDate = strDate.GetBuffer();
-			char*	pch = NULL;
-			nDay = strtol( pchDate, &pch, 10 );
-			pch++;
-			char*	apchMonth[] = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", NULL };
-			for	( int i = 0; apchMonth[i]; i++ )
-				if	( !strncmp( pch, apchMonth[i], 3 ) )
-					nMonth = i+1;
-			if	( !nMonth ){
-				bError = true;	// missing month
-				break;
-			}
-			pch += 4;
-			nYear = strtol( pch, &pch, 10 );
-			if	( nYear < 2000 ){
-				bError = true;	// missing year
-				break;
-			}
-			nHour = strtol( ++pch, &pch, 10 );
-			if	( nHour < 0 || nHour > 23 ){
-				bError = true;	// missing hour
-				break;
-			}
-			nMinute = strtol( ++pch, &pch, 10 );
-			if	( nMinute < 0 || nMinute > 59 ){
-				bError = true;	// missing minute
-				break;
-			}
-			nSecond = strtol( ++pch, &pch, 10 );
-			if	( nSecond < 0 || nSecond > 59 ){
-				bError = true;	// missing second
-				break;
-			}
-		}while	( 0 );
+		// Get CTime from the 'Date:'.
 
-		if	( bError ){
-			FilterError( IDS_RE_DATE, attr );
-			return;
-		}
+		attr.m_time = GetTime( strDate, attr );
 
-		CTime	time( nYear, nMonth, nDay, nHour, nMinute, nSecond );
-		
-		long	lBias = 0;
-		bool	bMinus = false;
-		if	( strZone[0] == '+' ||
-			  strZone[0] == '-' ){
-			lBias = atoi( strZone );
-		}
-		else{
-			// Replace "GMT" with "UTC" since they say "GMT" in the mail header.
-
-			if	( strZone == "GMT" )
-				  strZone = "UTC";
-			CTimeZones	zones;
-			lBias = zones.GetBias( (CString)strZone );
-			if	( lBias == INT_MAX ){
-				FilterError( IDS_RE_ABBR, attr );
-				lBias = 0;
-			}
-			lBias = (lBias/60)*100 + (lBias%60);
-			strZone.Format( "%04d", abs( lBias ) );	
-			strZone.Insert( 0, ( lBias >= 0 )? "+": "-" );
-		}
-		if	( lBias <= 0 ){
-			lBias = -lBias;
-			bMinus = true;
-		}
-		int	nBias = (lBias/100)*60 + (lBias%100);
-
-		CTimeSpan	tsBias( 0, 0, nBias, 0 );
-		if	( bMinus )
-			time += tsBias;
-		else
-			time -= tsBias;
-		
-		attr.m_time = time;
+		// Check if the timezone is filtered.
 
 		x = 0;
 		for	( ;; ){
 			CString	strTime = m_strTimes.Tokenize( _T("\n"), x );
 			if	( strTime.IsEmpty() )
 				break;
-			if	( strTime == (CString)strZone ){
+			if	( strTime == (CString)attr.m_strZone ){
 				FilterError( IDS_RF_TIMEZONE, attr );
 				break;
 			}
 		}
 	}
+}
+
+CTime
+CMainWnd::GetTime( CStringA strDate, CAttr& attr )
+{
+	// Get time according to RFC 5322 and save it in UTC.
+
+	int	x;
+
+	x = strDate.ReverseFind( ' ' );
+	CStringA strZone = strDate.Mid( x+1 );
+	strDate = strDate.Left( x );
+	if	( strZone[0] == '(' ){
+		strZone.Delete( 0, 1 );
+		strZone.Delete( strZone.GetLength()-1, 1 );
+	}
+	if	( x >= 5 &&
+		  ( strDate[x-5] == '+' ||
+		    strDate[x-5] == '-'    ) )
+		strZone = strDate.Mid( x-5 );
+
+	int	nYear = 0, nMonth = 0, nDay = 0, nHour = 0, nMinute = 0, nSecond = 0;
+	bool	bError = false;
+	do{
+		x = strDate.Find( ", " );
+		if	( x < 0 ){				// missing week
+			if	( !isdigit( strDate[0] ) ){	// omitted week
+				bError = true;	
+				break;
+			}
+		}
+		else
+			strDate.Delete( 0, x+2 );
+		attr.m_strZone = strZone;
+
+		char*	pchDate = strDate.GetBuffer();
+		char*	pch = NULL;
+		nDay = strtol( pchDate, &pch, 10 );
+		pch++;
+		char*	apchMonth[] = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", NULL };
+		for	( int i = 0; apchMonth[i]; i++ )
+			if	( !strncmp( pch, apchMonth[i], 3 ) )
+				nMonth = i+1;
+		if	( nMonth )
+			pch += 4;
+		else{
+			nMonth = strtol( pch, &pch, 10 );
+			if	( nMonth <= 0 || nMonth > 12 ){
+				bError = true;	// missing month
+				break;
+			}
+		}
+		nYear = strtol( pch, &pch, 10 );
+		if	( nYear < 2000 ){
+			bError = true;	// missing year
+			break;
+		}
+		nHour = strtol( ++pch, &pch, 10 );
+		if	( nHour < 0 || nHour > 23 ){
+			bError = true;	// missing hour
+			break;
+		}
+		nMinute = strtol( ++pch, &pch, 10 );
+		if	( nMinute < 0 || nMinute > 59 ){
+			bError = true;	// missing minute
+			break;
+		}
+		nSecond = strtol( ++pch, &pch, 10 );
+		if	( nSecond < 0 || nSecond > 59 ){
+			bError = true;	// missing second
+			break;
+		}
+	}while	( 0 );
+
+	if	( bError ){
+		FilterError( IDS_RE_DATE, attr );
+		return	CTime( 0 );
+	}
+
+	CTime	time( nYear, nMonth, nDay, nHour, nMinute, nSecond );
+		
+	long	lBias = 0;
+	bool	bMinus = false;
+	if	( strZone[0] == '+' ||
+		  strZone[0] == '-' ){
+		lBias = atoi( strZone );
+	}
+	else{
+		// Replace "GMT" with "UTC" since they say "GMT" in the mail header.
+
+		if	( strZone == "GMT" )
+				strZone = "UTC";
+		CTimeZones	zones;
+		lBias = zones.GetBias( (CString)strZone );
+		if	( lBias == INT_MAX ){
+			FilterError( IDS_RE_ABBR, attr );
+			lBias = 0;
+		}
+		lBias = (lBias/60)*100 + (lBias%60);
+		strZone.Format( "%04d", abs( lBias ) );	
+		strZone.Insert( 0, ( lBias >= 0 )? "+": "-" );
+	}
+
+	if	( lBias <= 0 ){
+		lBias = -lBias;
+		bMinus = true;
+	}
+	int	nBias = (lBias/100)*60 + (lBias%100);
+
+	CTimeSpan	tsBias( 0, 0, nBias, 0 );
+	if	( bMinus )
+		time += tsBias;
+	else
+		time -= tsBias;
+
+	return	time;
 }
 
 // See https://learn.microsoft.com/en-us/windows/win32/intl/code-page-identifiers
@@ -1576,15 +1445,117 @@ CMainWnd::GetCodePage( CStringA strMail )
 }
 
 void
+CMainWnd::CheckToCc( CStringA strMail, CAttr& attr )
+{
+	// No recipients to check, skip this check.
+
+	if	( m_strRecipients.IsEmpty() )
+		return;
+
+	CStringA strRecipients;
+	int	x;
+
+	// Get nominal recipients.
+
+	x = strMail.Find( "\nTo: " );
+	if	( x < 0 )
+		x = strMail.Find( "\nto: " );
+	if	( x >= 0 )
+		strRecipients += GetHeaderField( strMail, x );
+
+	// Get carbon copies.
+
+	x = strMail.Find( "Cc: " );
+	if	( x < 0 )
+		x = strMail.Find( "cc: " );
+	if	( x < 0 )
+		x = strMail.Find( "CC: " );
+	if	( x >= 0 )
+		strRecipients += GetHeaderField( strMail, x );
+
+	// Do nothing in the turn of a partial check.
+
+	if	( strRecipients.IsEmpty() )
+		return;
+
+	// Check each recipient.
+
+	bool	bKeep = false;
+	while	( !bKeep ){
+		if	( strRecipients.IsEmpty() )
+			break;
+
+		CStringA strAddr;
+		x = strRecipients.Find( '<' );
+		if	( x >= 0 ){
+			{
+				strAddr = strRecipients.Mid( x+1 );
+				int	i = strAddr.Find( '>' );
+				strAddr = strAddr.Left( i );
+				x += i+1;
+			}
+		}
+		else{
+			x = strRecipients.Find( ',' );
+			if	( x < 0 ){
+				strAddr = strRecipients;
+				strRecipients.Empty();
+			}
+			else
+				strAddr = strRecipients.Left( x );
+		}
+		if	( x > 0 ){
+			strRecipients.Delete( 0, x+1 );
+			strRecipients.TrimLeft();
+			if	( strRecipients[0] == ',' ){
+				strRecipients.Delete( 0, 1 );
+				strRecipients.TrimLeft();
+			}
+		}
+
+		CString	strTo = CString( strAddr );
+		x = 0;
+		while	( !bKeep ){
+			CString	strRecipient = m_strRecipients.Tokenize( _T("\n"), x );
+			if	( strRecipient.IsEmpty() )
+				break;
+			if	( strTo.Find( strRecipient ) >= 0 )
+				bKeep = true;
+		}
+	}
+
+	// If the sender belongs to the trusted domain, keep this mail.
+
+	if	( !bKeep ){
+		CString	strFrom = CString( attr.m_strFrom );
+		x = 0;
+		for	( ;; ){
+			CString	strTrusted = m_strSenders.Tokenize( _T("\n"), x );
+			if	( strTrusted.IsEmpty() )
+				break;
+			if	( strFrom.Find( strTrusted ) >= 0 ){
+				bKeep = true;
+				break;
+			}
+		}
+	}
+
+	// From untrusted sender to unknown recipient, discard it.
+
+	if	( !bKeep )
+		FilterError( IDS_RF_RECIPIENT, attr );
+}
+
+void
 CMainWnd::CheckMID( CStringA strMail, CAttr& attr )
 {
 	int	x, xIn, xOut;
 
 	x = strMail.Find( "Message-ID: " );
 	if	( x >= 0 ){
-		xIn  = strMail.Find( "<", x );
-		xOut = strMail.Find( ">", xIn+1 );
-		CStringA strMessageId = strMail.Mid( xIn+1, xOut-(xIn+1) );
+		xIn  = strMail.Find( "<", x )+1;
+		xOut = strMail.Find( ">", xIn );
+		CStringA strMessageId = strMail.Mid( xIn, xOut-xIn );
 		x = strMessageId.ReverseFind( '@' );
 		do{
 			if	( x < 0 )
@@ -1638,56 +1609,33 @@ CMainWnd::CheckReceived( CStringA strMail, CAttr& attr )
 	
 	CStringA strReceived = strMail.Mid( xIn, xOut-xIn );
 
-	// Get the time zone in the 'Received: '.
+	// Get the time in the last 'Received:'.
 
-	CStringA strZone;
-	x = 0;
-	while	( strZone.IsEmpty() ){
-		x = strReceived.Find( '+', x );
-		if	( x < 0 )
-			break;
-		else if	( isdigit( strReceived[x+1] ) &&
-			  isdigit( strReceived[x+2] ) &&
-			  isdigit( strReceived[x+3] ) &&
-			  isdigit( strReceived[x+4] ) &&
-			 !isdigit( strReceived[x+5] )    ){
-			strZone = strReceived.Mid( x, 5 );
-			int	nHour = atoi( strZone.GetBuffer()+1 );
-			if	( nHour < 2400 )
-				break;
-		}
-		x++;
-	}
-	x = 0;
-	while	( strZone.IsEmpty() ){
-		x = strReceived.Find( '-', x );
-		if	( x < 0 )
-			break;
-		else if	( isdigit( strReceived[x+1] ) &&
-			  isdigit( strReceived[x+2] ) &&
-			  isdigit( strReceived[x+3] ) &&
-			  isdigit( strReceived[x+4] ) &&
-			 !isdigit( strReceived[x+5] )    ){
-			strZone = strReceived.Mid( x, 5 );
-			int	nHour = atoi( strZone.GetBuffer()+1 );
-			if	( nHour < 2400 )
-				break;
-		}
-		x++;
-	}
+	x = strReceived.ReverseFind( ';' );
+	CStringA strTime = strReceived.Mid( x+1 );
+	strTime.Trim();
+	CAttr	attrTime;
+	CTime	time = GetTime( strTime, attrTime );
 
 	// Check if the time zone is unreliale.
 
-	if	( !strZone.IsEmpty() ){
+	if	( !attrTime.m_strZone.IsEmpty() ){
 		x = 0;
 		for	( ;; ){
 			CString	strTime = m_strTimes.Tokenize( _T("\n"), x );
 			if	( strTime.IsEmpty() )
 				break;
-			if	( strTime == (CString)strZone ){
+			if	( strTime == (CString)attrTime.m_strZone ){
 				FilterError( IDS_RF_TIMEZONE, attr );
 				break;
 			}
+		}
+
+		// Check if the time in the last 'Received:' is in the past of 'Date:'.
+
+		if	( time < attr.m_time ){
+			attr.m_time = time;
+			FilterError( IDS_RF_TIMEZONE, attr );
 		}
 	}
 }
@@ -1711,6 +1659,36 @@ CMainWnd::CheckBlackList( CStringA strSender, CAttr& attr )
 
 	if	( bDrop )
 		FilterError( IDS_RF_DOMAIN, attr );
+}
+
+CStringA
+CMainWnd::GetHeaderField( CStringA strMail, int iField )
+{
+	int	xIn = strMail.Find( ": ", iField );
+	if	( xIn < 0 )
+		return	NULL;
+
+	for	( ++xIn; strMail[xIn] <= ' '; xIn++ )
+		;
+
+	CStringA strField = strMail.Mid( xIn );
+	int	xBody = strMail.Find( "\r\n\r\n", xIn );
+	int	xOut  = strMail.Find( ": ",       xIn );
+	if	( xOut < 0 )
+		xOut = xBody;
+	else if	( xBody < xOut )
+		xOut = xBody;
+
+	strField = strMail.Mid( xIn, xOut-xIn );
+
+	if	( xOut < xBody ){
+		xOut = strField.ReverseFind( '\r' );
+		if	( xOut >= 0 )
+			strField = strField.Left( xOut );
+		strField.Replace( "\r\n\t", " " );
+	}
+
+	return	strField;
 }
 
 CString
@@ -1737,6 +1715,10 @@ CMainWnd::MakeLog( CStringA strMail, CAttr& attr )
 	// Check 'alias' of 'From:'.
 
 	CheckAlias( strLog, attr );
+
+	// Check 'alias' in 'Subject:'.
+
+	CheckSubject( strLog, attr );
 
 	// Make a log from the mail body.
 
@@ -1848,7 +1830,7 @@ CMainWnd::MakeLog( CStringA strMail, CAttr& attr )
 		}
 		CString	strReason;
 		DWORD	dwReason = attr.m_dwReason;
-		for	( UINT uID = IDS_RF_AUTH; uID <= IDS_RF_TIMEZONE; uID++ ){
+		for	( UINT uID = IDS_RF_AUTH; uID <= IDS_RF_LINK_EVASIVE; uID++ ){
 			UINT	uBit = 1<<(uID-IDS_RF_AUTH);
 			if	( dwReason & uBit ){
 				CString	strError;
@@ -2444,9 +2426,13 @@ CMainWnd::StringFromCodePage( CStringA strIn, CAttr& attr )
 	return	strOut;
 }
 
+#include <locale.h>
+
 CStringA
 CMainWnd::EscapeFromJIS( CStringA strIn, CAttr& attr )
 {
+	_locale_t	lt = _wcreate_locale( LC_ALL, _T("ja-JP") );
+
 	CStringA strOut;
 
 	struct{
@@ -2494,7 +2480,7 @@ CMainWnd::EscapeFromJIS( CStringA strIn, CAttr& attr )
 
 		else if	( bMutiByte ){
 			WORD	w = MAKEWORD( strIn[i+1], strIn[i] );
-			w =_mbcjistojms( w );
+			w =_mbcjistojms_l( w, lt );
 			strOut += HIBYTE( w );
 			strOut += LOBYTE( w );
 			i += 2;
@@ -2506,10 +2492,14 @@ CMainWnd::EscapeFromJIS( CStringA strIn, CAttr& attr )
 			CStringA	strConvert =
 				"000102030405060708090A0B0C0D0E0F"
 				"101112131415161718191A1B1C1D1E1F"
-				"20。「」、・ヲァィゥェォャュョッ"
-				"ーアイウエオカキクケコサシスセソ"
-				"タチツテトナニヌネノハヒフヘホマ"
-				"ミムメモヤユヨラリルレロワン゛゜"
+				"\x81\x40\x81\x42\x81\x75\x81\x76\x81\x41\x81\x45\x83\x92\x83\x40"
+				"\x83\x42\x83\x44\x83\x46\x83\x48\x83\x83\x83\x85\x83\x87\x83\x62"
+				"\x81\x5b\x83\x41\x83\x43\x83\x45\x83\x47\x83\x49\x83\x4a\x83\x4c"
+				"\x83\x4e\x83\x50\x83\x52\x83\x54\x83\x56\x83\x58\x83\x5a\x83\x5c"
+				"\x83\x5e\x83\x60\x83\x63\x83\x65\x83\x67\x83\x69\x83\x6a\x83\x6b"
+				"\x83\x6c\x83\x6d\x83\x6e\x83\x71\x83\x74\x83\x77\x83\x7a\x83\x7d"
+				"\x83\x7e\x83\x80\x83\x81\x83\x82\x83\x84\x83\x86\x83\x88\x83\x89"
+				"\x83\x8a\x83\x8b\x83\x8c\x83\x8d\x83\x8f\x83\x93\x81\x4a\x81\x4b"
 				"606162636465666768696A6B6C6D6E6F"
 				"707172737475767778797A7B7C7D7E7F";
 			BYTE	b = strIn[i++];
@@ -2522,6 +2512,8 @@ CMainWnd::EscapeFromJIS( CStringA strIn, CAttr& attr )
 		else
 			strOut += strIn[i++];
 	}
+
+	_free_locale( lt );
 
 	// 2nd: Set to convert from SJIS to UNICODE.
 
@@ -2762,16 +2754,16 @@ CMainWnd::CheckAlias( CString strLog, CAttr& attr )
 			FilterError( IDS_RF_FAKE_ALIAS, attr );			
 	}while	( 0 );
 
-	// Get the sendee.
+	// Get the recipient.
 
-	x = strLog.Find( _T("To: ") );
+	x = strLog.Find( _T("\nTo: ") );
 	if	( x < 0 )
-		x = strLog.Find( _T("to: ") );
+		x = strLog.Find( _T("\nto: ") );
 	do{
 		if	( x < 0 )
 			break;
 
-		// Extract sendee's alias.
+		// Extract recipient's alias.
 
 		xIn  = x + 4;
 		xOut = strLog.Find( ':', xIn );
@@ -2810,6 +2802,94 @@ CMainWnd::CheckAlias( CString strLog, CAttr& attr )
 
 		FilterError( IDS_RF_CALL_BY_ADDR, attr );
 
+	}while	( 0 );
+}
+
+void
+CMainWnd::CheckSubject( CString strLog, CAttr& attr )
+{
+	int	x, xIn, xOut;
+
+	// Get the subject.
+
+	x = strLog.Find( _T("Subject: ") );
+	if	( x < 0 )
+		x = strLog.Find( _T("subject: ") );
+	do{
+		if	( x < 0 )
+			break;
+
+		// Extract the subject.
+
+		xIn  = x + 9;
+		xOut = strLog.Find( ':', xIn );
+		CString strSubject = strLog.Mid( xIn, xOut-xIn );
+		strSubject.MakeLower();
+
+		// Extract sender's domain.
+
+		CString	strDomain = (CString)attr.m_strFrom;
+		x = strLog.Find( _T("Sender: ") );
+		if	( x >= 0 ){
+			strDomain = strLog.Mid( x );
+			x = strDomain.Find( '\r' );
+			strDomain = strDomain.Left( x );
+		}
+		x = strDomain.Find( '@' );
+		if	( x < 0 )
+			break;
+
+		strDomain = strDomain.Mid( x+1 );
+
+		// Check the combination of alias and domain.
+
+		bool	bHit = false;
+		bool	bMet = false;
+
+		int	iName = 0;
+		for	( ;; ){
+
+			// Check if the the registered word in alias.
+
+			CString	strName = m_strNames.Tokenize( _T("\n"), iName );
+			if	( iName < 0 )
+				break;
+			x = strName.Find( '\t' );
+			CString	strWord = strName.Left( x );
+			NormalizeAlias( strWord );
+			strWord.MakeLower();
+			int	iWord = strSubject.Find( strWord );
+			if	( iWord < 0 )
+				continue;
+
+			bHit = true;
+
+			// Check if the the registered word in domain.
+
+			strWord = strName.Mid( x+1 );
+			if	( strWord.FindOneOf( _T("*?") ) >= 0 ){
+				if	( !CompareWild( strWord, strDomain ) ){
+					bMet = true;
+					break;
+				}
+			}
+			else if	( strWord.Find( '.' ) >= 0 ){
+				int	cch = strWord.GetLength();
+				if	( strDomain.Right( cch ) == strWord ){
+					bMet = true;
+					break;
+				}
+			}
+			else{
+				if	( strDomain.Find( strWord ) >= 0 ){
+					bMet = true;
+					break;
+				}
+			}
+		}
+
+		if	( bHit && !bMet )
+			FilterError( IDS_RF_SUBJECT_FAKED, attr );			
 	}while	( 0 );
 }
 
@@ -2875,30 +2955,17 @@ CMainWnd::NormalizeAlias( CString& strAlias )
 {
 	// Remove symbols.
 
-	strAlias.Replace( _T("\""), _T(" ") );
-	strAlias.Replace( _T("'"),  _T(" ") );
-	strAlias.Replace( _T("・"),  _T("") );
-	strAlias.Replace( _T("_"),  _T(" ") );
+	strAlias.Replace( L"\"", L" " );
+	strAlias.Replace( L"'",  L" " );
+	strAlias.Replace( L"\x30fb",  L"" );
+	strAlias.Replace( L"_",  L" " );
+	strAlias.Replace( L"-",  L" " );
 	strAlias.Trim();
 
 	// Remove padding spaces.
-#if	0
-	bool	bSpaced = true;
-	int	nch = strAlias.GetLength();
-	for	( int x = 1; x < nch; x += 2 ){
-		if	( strAlias[x] != ' ' ){
-			bSpaced = false;
-			break;
-		}
-	}
-	if	( bSpaced ){
-		strAlias.Replace( _T(" "), _T("") );
-		n = strAlias.GetLength();
-	}
-#else
-	strAlias.Replace( _T(" "),  _T("") );
+
+	strAlias.Replace( L" ",  L"" );
 	strAlias.Trim();
-#endif
 
 	// Large codes to ASCII code.
 
@@ -2906,9 +2973,13 @@ CMainWnd::NormalizeAlias( CString& strAlias )
 	for	( int x = 0; x < n; x++ ){
 		TCHAR	ch = strAlias[x];
 
-		if	( ch >= 0x0300 && ch <= 0x036f ){	// Combining Diacritical Marks
+		if	( ( ch >= 0x0300 && ch <= 0x036f ) ||	// Combining Diacritical Marks
+			  ( ch >= 0x2000 && ch <= 0x200f ) ||	// General Punctuations Space to RLM
+			  ( ch >= 0x2028 && ch <= 0x202f ) ||	// General Punctuations Separator to NNB SP
+			  ( ch >= 0x205f && ch <= 0x206f )   ){	// General Punctuations MM SP to NO DS
 			strAlias.Delete( x, 1 );
 			n--;
+			x--;
 		}
 		else if	( ch >= 0x2460 && ch <= 0x2468 )	// Circled numbers 1 to 9
 			strAlias.SetAt( x, '1'+(ch-0x2460) );
@@ -2945,9 +3016,81 @@ CMainWnd::NormalizeAlias( CString& strAlias )
 					n--;
 				}
 			}
-
+		}
+		else{
+			TCHAR	ech = EvasiveToASCII( ch );
+			if	( ech != ch )
+				strAlias.SetAt( x, ech );
 		}
 	}
+}
+
+TCHAR
+CMainWnd::EvasiveToASCII( TCHAR ch )
+{
+	// Codes of similar letters: Hover mouse pointer on the string and you'll see what I mean.
+
+	static	TCHAR	*apch[] = {
+		L"A\x0c0\x0c1\x0c2\x0c3\x0c4\x0c5\x100\x102\x104\x200\x386\x391\x410\x4d0\x4d2",
+		L"B\x392\x412",
+		L"C\x0c7\x106\x108\x10a\x10c\x187\x3f9\x421\x4aa",
+		L"D\x10e\x110\x189\x18a",
+		L"E\x0c8\x0c9\x0ca\x0cb\x112\x114\x116\x118\x11a\x204\x206\x228\x395\x400\x401\x4d6",
+		L"F\x191\x3dc\x4fa\x4fb",
+		L"G\x11c\x11e\x120\x122\x193\x1e4\x1e6\x1f4\x50c\x50d",
+		L"H\x124\x126\x21e\x389\x397\x4a2\x4a4\x4c9\x4ca\x528",
+		L"I\x128\x12a\x12c\x12e\x130\x196\x208\x20a\x38a\x399\x3aa\x406\x407\x4c0",
+		L"J\x134\x37f\x408",
+		L"K\x136\x138\x198\x1e8\x3cf\x40c\x43a\x45c\x49a\x49b\x49c\x49d\x49e\x49f\x4a0\x4a1",
+		L"L\x139\x13b\x13d\x13f\x141\x53c",
+		L"M\x39c\x3fa\x41c\x43c",
+		L"N\x143\x145\x147\x39d",
+		L"O\x0d2\x0d3\x0d4\x0d5\x0d6\x14c\x14e\x150\x1a0\x1d1\x20c\x20e\x22a\x22c\x22e\x230\x38c\x39f\x41e\x555",
+		L"P\x3a1\x420",
+		L"Q\x1ea\x1ec\x3d8\x51a",
+		L"R\x154\x156\x158",
+		L"S\x15a\x15c\x15e\x160\x218\x405\x54f",
+		L"T\x162\x164\x166\x1ac\x1ae\x21a\x3a4\x422\x442\x4ac\x4ad",
+		L"U\x0d9\x0da\x0db\x0dc\x168\x16a\x16c\x16e\x170\x172\x1d3\x1d5\x1d7\x1d9\x1db\x54d",
+		L"V\x474\x476",
+		L"W\x174",
+		L"X\x3a7",
+		L"Y\x0dd\x176\x178\x232\x24e\x28f\x38e\x3a5\x4ae\x4af",
+		L"Z\x179\x17b\x17d\x224\x396",
+		L"a\x0e0\x0e1\x0e2\x0e3\x0e4\x0e5\x101\x103\x105\x1ce\x1df\x1e1\x1fb\x201\x203\x251\x3ac\x3b1\x430\x4d1\x4d3",
+		L"b\x180\x184\x185\x44c",
+		L"c\x00e7\x0107\x109\x10b\x10d\x441\x4ab",
+		L"d\x10f\x111\x257",
+		L"e\x0e8\x0e9\x0ea\x0eb\x113\x115\x117\x119\x11b\x205\x207\x229\x435\x450\x451\x4bd\x4bf\x4d7",
+		L"f\x192",
+		L"g\x11d\x11f\x121\x123\x1e5\x1e7\x261\x581",
+		L"h\x125\x127\x21f\x266\x570",
+		L"i\x0ec\x0ed\x0ee\x0ef\x129\x12b\x12d\x12f\x131\x1d0\x209\x20b\x268\x390\x3af\x3ca\x456\x457",
+		L"j\x135\x237\x249\x458\x575",
+		L"k\x137\x199\x1e9",
+		L"l\x13a\x13c\x13e\x140\x142\x4cf",
+		L"m\x271\x560",
+		L"o\x0f0\x0f2\x0f3\x0f4\x0f5\x0f6\x14d\x14f\x151\x1a1\x1d2\x1eb\x1ed\x20d\x20f\x22b\x22d\x22f\x231\x3cc\x43e\x4e7\x585",
+		L"p\x440",
+		L"q\x2a0\x51b",
+		L"r\x155\x157\x159\x211\x213\x433\x453",
+		L"s\x15b\x15d\x15f\x161\x219\x455",
+		L"t\x163\x165\x167\x1ab\x1ad\x21b",
+		L"u\x0f9\x0fa\x0fb\x0fc\x1d4\x1d6\x1d8\x1da\x1dc\x215\x217\x3cb\x3cd\x57d",
+		L"v\x3bd\x475\x477",
+		L"w\x175\x461",
+		L"x\x445\x4fd",
+		L"y\x0fd\x0ff\x177\x233\x24f\x40e\x423\x443\x45e\x4ee\x4ef\x4f0\x4f1\x4f2\x4f3",
+		L"z\x17a\x17c\x17e\x1b6",
+		NULL
+	};
+
+	for	( int y = 0; apch[y]; y++ )
+		for	( int x = 1; apch[y][x]; x++ )
+			if	( ch == apch[y][x] )
+				return	apch[y][0];
+
+	return	ch;
 }
 
 void
@@ -3020,22 +3163,23 @@ CMainWnd::CheckLink( CString& strLog, CAttr& attr )
 				strURL  = strLink.Left( xLink );
 			}
 
-			// Check if the path is faking a domain.
+			// Check if the path is faking a domain like
+			// "amazon.com@phishing.com".
 
 			do{
 				if	( strPath.IsEmpty() )
 					break;
 				int	x = strPath.FindOneOf( _T("?#<") );
-				if	( x < 0 )
+				if	( x >= 0 )
 					strPath = strPath.Left( x );
 				x = strPath.ReverseFind( '.' );
 				if	( x < 0 )
 					break;
 				CString	strTLD = strPath.Mid( x );
+				strTLD += _T("\n");
 				strTLD.MakeLower();
 				if	( m_strTLDCache.Find( strTLD ) < 0 )
 					break;
-				strTLD += _T("\n");
 				if	( m_strTLDCache.Find( strTLD ) >= 0 )
 					FilterError( IDS_RF_LINK_FAKED, attr );
 			}while	( 0 );
@@ -3095,10 +3239,59 @@ CMainWnd::CheckLink( CString& strLog, CAttr& attr )
 				CString	strDrop = m_strDomains.Tokenize( _T("\n"), x );
 				if	( strDrop.IsEmpty() )
 					break;
-				if	( strDrop == strTLD ){
+				bool	bDrop = false;
+				if	( strDrop[0] == '.' ){
+					if	( strDrop == strTLD )
+						bDrop = true;
+				}
+				else{
+					if	( !CompareWild( strDrop, strURL ) )
+						bDrop = true;
+				}
+				if	( bDrop ){
 					FilterError( IDS_RF_LINK_DOMAIN, attr );
 					if	( attr.m_strLinks.Find( strLink ) < 0 )
 						attr.m_strLinks += strLink + _T("\n");
+					break;
+				}
+			}
+
+			// Check if the URL faking a top level domain like
+			// "amazon.com.phising.com".
+
+			CString	strMatch;
+			bool	bTop = true;
+			int	nHit = 0;
+			for	( int i = 0; i >= 0; ){
+
+				// Take one dotted word.
+
+				CString	strDot = strURL.Tokenize( _T("."), i );
+				if	( strDot.IsEmpty() )
+					break;
+
+				if	( bTop )
+					bTop = false;
+				else
+					strDot.Insert( 0, _T(".") );
+
+				// Check if the word is a TLD.
+
+				for	( x = 0; x >= 0; ){
+					CString	strDom = m_strTLDCache.Tokenize( _T("\n"), x );
+					if	( strDom.IsEmpty() )
+						break;
+					else if	( strDom == strDot ){
+						strMatch = strDot;
+						break;
+					}
+				}
+
+				// Do not accept a TLD in front of non-TLD token.
+
+				if	( !strMatch.IsEmpty() && strDot != strMatch ){
+				//	TRACE( L"%s followed by %s is fake domain\n", strMatch, strDot );
+					FilterError( IDS_RF_LINK_FAKED, attr );
 					break;
 				}
 			}
@@ -3309,7 +3502,7 @@ CMainWnd::FilterError( UINT uIdError, CAttr& attr )
 	}
 	else if	( uIdError == IDS_RF_FAKE_ALIAS ){
 	}
-	else if	( uIdError >= IDS_RF_MESSAGEID && uIdError <= IDS_RF_LINK_FAKED ){
+	else if	( uIdError >= IDS_RF_MESSAGEID && uIdError <= IDS_RF_SUBJECT_FAKED ){
 		int	i = uIdError-IDS_RF_MESSAGEID;
 		if	( !( m_dwSender & (1<<i) ) )
 			uIdError = 0;
@@ -3375,7 +3568,7 @@ CMainWnd::ConnectPOP( void )
 #undef	atoi
 #endif//UNICODE
 
-//#define	DBGOUTPUT
+#define	DBGOUTPUT
 
 void
 CMainWnd::RespondPOP( CStringA strMessage )
@@ -3603,7 +3796,8 @@ CMainWnd::ReadFromEML( LPCTSTR pchFolder )
 				fIn.Read( pch, cch );
 				pch[cch] = '\0';
 				CAttr	attr;
-				GetTime( pch, attr );
+				GetDate( pch, attr );
+				CheckReceived( pch, attr );
 				ft.m_time = attr.m_time;
 				delete	[] pch;
 			}
