@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include "CharMap.h"
 #include "ParaSocket.h"
 #include "NotifyWnd.h"
 
@@ -76,7 +77,6 @@ class CMainWnd : public CWnd
 {
 public:
 	CMainWnd( void );
-	~CMainWnd( void );
 
 protected:
 		int	m_nPoll;
@@ -89,6 +89,7 @@ protected:
 
 		int	m_nAuth;
 		DWORD	m_dwCode;
+		CString	m_strCodeFont;
 		CString	m_strDomains;
 		CString	m_strNames;
 		CString	m_strRecipients;
@@ -96,6 +97,8 @@ protected:
 		DWORD	m_dwSender;
 		CString	m_strTimes;
 		CString	m_strWhites;
+		CString	m_strLanguage;
+	       CCharMap	m_charmap;
 
 		DWORD	m_dwAuthCache;
 		CString	m_strTLDCache;
@@ -175,12 +178,13 @@ protected:
 		void	GetType(   CStringA strMail, CAttr& attr );
 		void	GetEncode( CStringA strMail, CAttr& attr );
 		void	GetDate(   CStringA strMail, CAttr& attr );
-		CTime	GetTime(   CStringA strDate, CAttr& attr );
 		int	GetCodePage(   CStringA strMail );
 		void	CheckToCc(     CStringA strMail, CAttr& attr );
 		void	CheckMID(      CStringA strMail, CAttr& attr );
 		void	CheckReceived( CStringA strMail, CAttr& attr );
 		void	CheckBlackList( CStringA strSender, CAttr& attr );
+		CTime	GetTime( CStringA strDate, CAttr& attr );
+		int	FindHeaderField( CStringA strMail, CStringA strField );
 	       CStringA	GetHeaderField( CStringA strMail, int iField );
 
 		CString	MakeLog( CStringA strMail, CAttr& attr );
@@ -207,15 +211,16 @@ protected:
 		void	CheckUnicode(   CString& strLog,   CAttr& attr );
 		void	CheckAlias(     CString  strLog,   CAttr& attr );
 		void	CheckSubject(   CString  strLog,   CAttr& attr );
-		int	CompareWild( CString strWild, CString strName );
 		void	NormalizeAlias( CString& strName );
-		TCHAR	EvasiveToASCII( TCHAR ch );
 		void	CheckWhiteList( CString  strLog,   CAttr& attr );
-		void	CheckLink(      CString& strLog,   CAttr& attr );
+		void	CheckLink(      CString  strLog,   CAttr& attr );
 		bool	GetLinkInHTML(  CString  strLog, int& xLines, CString& strLink, CString& strDisplay );
 		void	GetLinkInText(  CString  strLog, int& xLines, CString& strLink );
-		bool	IsEvasiveCode(  CString  strLog, int& xLines );
 		void	SetLinkVisible( CString& strLink,  CAttr& attr );
+		int	CompareWild( CString strWild, CString strName );
+		DWORD	GetCharType( CString strUC, int& iRef, UINT& uAlt );
+		TCHAR	ReplaceByASCII( TCHAR ch );
+		TCHAR	SeekASCII( TCHAR** ppchTable, TCHAR ch );
 
 		void	FilterError( UINT uIdError, CAttr& attr );
 

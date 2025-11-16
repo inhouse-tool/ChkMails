@@ -39,17 +39,18 @@
 #define IDS_RF_CHARSET                  201
 #define IDS_RF_CONTROLCODE              202
 #define IDS_RF_EVASIVECODE              203
-#define IDS_RF_DOMAIN                   204
-#define IDS_RF_FAKE_ALIAS               205
-#define IDS_RF_RECIPIENT                206
-#define IDS_RF_MESSAGEID                207
-#define IDS_RF_CALL_BY_ADDR             208
-#define IDS_RF_FAKE_DOMAIN              209
-#define IDS_RF_LINK_FAKED               210
-#define IDS_RF_SUBJECT_FAKED            211
-#define IDS_RF_TIMEZONE                 212
-#define IDS_RF_LINK_DOMAIN              213
-#define IDS_RF_LINK_EVASIVE             214
+#define IDS_RF_UNMAPPEDCODE             204
+#define IDS_RF_DOMAIN                   205
+#define IDS_RF_FAKE_ALIAS               206
+#define IDS_RF_RECIPIENT                207
+#define IDS_RF_MESSAGEID                208
+#define IDS_RF_CALL_BY_ADDR             209
+#define IDS_RF_FAKE_DOMAIN              210
+#define IDS_RF_LINK_FAKED               211
+#define IDS_RF_SUBJECT_FAKED            212
+#define IDS_RF_TIMEZONE                 213
+#define IDS_RF_LINK_DOMAIN              214
+#define IDS_RF_LINK_EVASIVE             215
 #define IDS_RE_DATE                     240
 #define IDS_RE_ABBR                     241
 #define IDS_RE_ENCODING                 242
@@ -91,6 +92,7 @@
 #define IDC_CHECK_CODE_CHARSET          1030
 #define IDC_CHECK_CODE_CONTROL          1031
 #define IDC_CHECK_CODE_EVASIVE          1032
+#define IDC_CHECK_CODE_FONT             1033
 #define IDC_LIST_DOMAIN                 1040
 #define IDC_EDIT_DOMAIN                 1041
 #define IDC_BUTTON_DOMAIN_ADD           1042
@@ -119,6 +121,7 @@
 #define IDC_LIST_WHITE                  1090
 #define IDC_BUTTON_WHITE_DEL            1091
 #define IDC_STATIC_WHITE                1092
+#define IDC_BUTTON_CODE_FONT            1134
 #define ID_MENU_ACCOUNTS                32771
 #define ID_MENU_SETUP                   32772
 #define ID_MENU_FILTER                  32773
@@ -131,7 +134,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        180
 #define _APS_NEXT_COMMAND_VALUE         32780
-#define _APS_NEXT_CONTROL_VALUE         1100
+#define _APS_NEXT_CONTROL_VALUE         1108
 #define _APS_NEXT_SYMED_VALUE           110
 #endif
 #endif
