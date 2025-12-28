@@ -37,12 +37,12 @@ public:
 		enum{
 			unsupported,
 			Text,
-			Multipart,
+			Multipart
 		}	m_iType;
 		enum{
 			uninterested,
 			Plain,
-			HTML,
+			HTML
 		}	m_iSubType;
 		enum{
 			unencoded,
@@ -58,6 +58,7 @@ public:
 	     CStringA	m_strFrom,
 			m_strSender;
 	     CStringA	m_strZone;
+	     CString	m_strTalking;
 		int	m_nAuth;
 		DWORD	m_dwReason;
 		CString	m_strLinks;
@@ -67,7 +68,7 @@ public:
 			m_iType    = unsupported;
 			m_iSubType = uninterested;
 			m_iCharset = -1;
-			m_iEncode  = Bit7;
+			m_iEncode  = unencoded;
 			m_nAuth    = 0;
 			m_dwReason = 0;
 		}
@@ -97,6 +98,8 @@ protected:
 		DWORD	m_dwSender;
 		CString	m_strTimes;
 		CString	m_strWhites;
+		int	m_nNameInBody;
+
 		CString	m_strLanguage;
 	       CCharMap	m_charmap;
 
@@ -184,8 +187,8 @@ protected:
 		void	CheckReceived( CStringA strMail, CAttr& attr );
 		void	CheckBlackList( CStringA strSender, CAttr& attr );
 		CTime	GetTime( CStringA strDate, CAttr& attr );
-		int	FindHeaderField( CStringA strMail, CStringA strField );
-	       CStringA	GetHeaderField( CStringA strMail, int iField );
+	       CStringA	GetHeaderFieldA( CStringA strMail, CStringA strField );
+	       CStringA	MakeLowerA( CStringA strSource );
 
 		CString	MakeLog( CStringA strMail, CAttr& attr );
 		void	SaveLog( CStringA strMail, CString strLog, CAttr& attr );
@@ -199,20 +202,27 @@ protected:
 		void	ShareSummary( CString strSummary );
 
 		CString	StringFromHeader( CStringA strIn, CAttr& attr );
+		CString	StringFromPart(   CStringA strIn, CAttr& attr );
 		CString	StringFromBody(   CStringA strIn, CAttr& attr );
+		void	DecodeReason( CString& strLog, CAttr& attr );
 	       CStringA	DecodeBase64( CStringA strEncoded );
 	       CStringA	DecodeQuoted( CStringA strEncoded );
 		CString	StringFromCodePage( CStringA strIn, CAttr& attr );
 	       CStringA	EscapeFromJIS(      CStringA strIn, CAttr& attr );
+		CString	StringFromUTF8( CStringA strIn, CAttr& attr );
 	       CStringA	StringToUTF8( CStringW strIn, CAttr& attr );
 		void	LFtoCRLF(     CString& strLines );
 		void	HexToUnicode( CString& strLines );
 
 		void	CheckUnicode(   CString& strLog,   CAttr& attr );
-		void	CheckAlias(     CString  strLog,   CAttr& attr );
-		void	CheckSubject(   CString  strLog,   CAttr& attr );
+		bool	CheckAlias(     CString  strLog,   CAttr& attr );
+		bool	CheckSubject(   CString  strLog,   CAttr& attr );
+		bool	CheckTalking(   CString  strBody,  CAttr& attr );
+		int	IsFieldRegisterd( CString strField, CAttr& attr );
+		int	IsBodyTalking(    CString strBody,  CAttr& attr );
+		bool	IsDomainRegisterd( CString strDomain, CString strRegisterd );
 		void	NormalizeAlias( CString& strName );
-		void	CheckWhiteList( CString  strLog,   CAttr& attr );
+		bool	CheckWhiteList( CString  strLog,   CAttr& attr );
 		void	CheckLink(      CString  strLog,   CAttr& attr );
 		bool	GetLinkInHTML(  CString  strLog, int& xLines, CString& strLink, CString& strDisplay );
 		void	GetLinkInText(  CString  strLog, int& xLines, CString& strLink );
@@ -221,8 +231,10 @@ protected:
 		DWORD	GetCharType( CString strUC, int& iRef, UINT& uAlt );
 		TCHAR	ReplaceByASCII( TCHAR ch );
 		TCHAR	SeekASCII( TCHAR** ppchTable, TCHAR ch );
+	       CString	GetHeaderField( CString strMail, CString strField );
 
 		void	FilterError( UINT uIdError, CAttr& attr );
+		bool	IsFiltered( UINT uIdError );
 
 		void	ConnectPOP( void );
 		void	RespondPOP( CStringA strMessage );
