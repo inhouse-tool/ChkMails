@@ -607,6 +607,10 @@ CCharMapDlg::PreTranslateMessage( MSG* pMsg )
 				}
 			}
 		}
+		else if	( pMsg->wParam == VK_F1 ){
+			OnHelp();
+			return	TRUE;
+		}
 		else if	( pMsg->wParam == VK_F3 ){
 			OnEditFind();
 			return	TRUE;
@@ -1448,6 +1452,13 @@ CCharMapDlg::SetFont( void )
 	lf.lfHeight         = 50;
 	font.CreateFontIndirect( &lf );
 	((CEdit*)GetDlgItem( IDC_EDIT_CHAR ))->SetFont( &font );
+}
+
+void
+CCharMapDlg::OnHelp( void )
+{
+	CString	strPath = _T("https://github.com/inhouse-tool/chkmails/blob/main/CharacterMap.md");
+	ShellExecute( NULL, _T("open"), strPath, NULL, NULL, SW_SHOWNORMAL );
 }
 
 BOOL

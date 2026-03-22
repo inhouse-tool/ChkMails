@@ -89,6 +89,10 @@ CFilterSheet::PreTranslateMessage( MSG* pMsg )
 			pPage->PostMessage( WM_COMMAND, ID_EDIT_PASTE, 0 );
 			return	TRUE;
 		}
+		else if	( pMsg->wParam == VK_F1 ){
+			OnHelp();
+			return	TRUE;
+		}
 
 	return	CProperSheet::PreTranslateMessage( pMsg );
 }

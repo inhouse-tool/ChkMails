@@ -11,6 +11,7 @@ public:
 	CSenderPage( void );
 
 		DWORD	m_dwFlags;
+		int	m_nNameInBody;
 
 protected:
 	virtual	BOOL	OnInitDialog( void );

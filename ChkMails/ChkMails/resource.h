@@ -48,9 +48,10 @@
 #define IDS_RF_FAKE_DOMAIN              210
 #define IDS_RF_LINK_FAKED               211
 #define IDS_RF_SUBJECT_FAKED            212
-#define IDS_RF_TIMEZONE                 213
-#define IDS_RF_LINK_DOMAIN              214
-#define IDS_RF_LINK_EVASIVE             215
+#define IDS_RF_SENDER_FAKED             213
+#define IDS_RF_TIMEZONE                 214
+#define IDS_RF_LINK_DOMAIN              215
+#define IDS_RF_LINK_EVASIVE             216
 #define IDS_RE_DATE                     240
 #define IDS_RE_ABBR                     241
 #define IDS_RE_ENCODING                 242
@@ -93,6 +94,7 @@
 #define IDC_CHECK_CODE_CONTROL          1031
 #define IDC_CHECK_CODE_EVASIVE          1032
 #define IDC_CHECK_CODE_FONT             1033
+#define IDC_BUTTON_CODE_FONT            1034
 #define IDC_LIST_DOMAIN                 1040
 #define IDC_EDIT_DOMAIN                 1041
 #define IDC_BUTTON_DOMAIN_ADD           1042
@@ -107,6 +109,9 @@
 #define IDC_CHECK_SENDER_FAKEUSER       1062
 #define IDC_CHECK_SENDER_FAKELINK       1063
 #define IDC_CHECK_SENDER_FAKESUBJECT    1064
+#define IDC_CHECK_SENDER_FAKESENDER     1065
+#define IDC_CHECK_SENDER_FAKEBODY       1065
+#define IDC_EDIT_SENDER_FAKEBODY        1066
 #define IDC_LIST_RECIPIENT              1070
 #define IDC_EDIT_RECIPIENT              1071
 #define IDC_BUTTON_RECIPIENT_ADD        1072
@@ -121,7 +126,8 @@
 #define IDC_LIST_WHITE                  1090
 #define IDC_BUTTON_WHITE_DEL            1091
 #define IDC_STATIC_WHITE                1092
-#define IDC_BUTTON_CODE_FONT            1134
+#define IDC_SPIN1                       1100
+#define IDC_SPIN_SENDER_FAKEBODY        1100
 #define ID_MENU_ACCOUNTS                32771
 #define ID_MENU_SETUP                   32772
 #define ID_MENU_FILTER                  32773
@@ -134,7 +140,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        180
 #define _APS_NEXT_COMMAND_VALUE         32780
-#define _APS_NEXT_CONTROL_VALUE         1108
+#define _APS_NEXT_CONTROL_VALUE         1101
 #define _APS_NEXT_SYMED_VALUE           110
 #endif
 #endif

@@ -95,6 +95,8 @@ protected:
 		void	FollowFont( void );
 		void	SetFont( void );
 
+		void	OnHelp( void );
+
 		BOOL	OnKeyOnMap( WPARAM wParam );
 
 	    CString	m_strToFind;
