@@ -1,6 +1,7 @@
 # インストール手順
 
-の古い方 ( 初版オリジナル ) です.
+> [!CAUTION]
+インストール手順の古い方 ( 初版オリジナル ) です.
 最新情報は[こちら](Installation/README.md)をご参照ください.
 
 [`Releases`](https://github.com/inhouse-tool/ChkMails/releases)
