@@ -11,7 +11,7 @@
 
 #### Constructor
 
-[`CNamePage`](#cdomainpage-1)
+[`CNamePage`](#cnamepage-1)
 
 #### Override
 
