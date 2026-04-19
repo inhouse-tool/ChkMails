@@ -60,6 +60,7 @@ public:
 	     CStringA	m_strZone;
 	     CString	m_strTalking;
 		int	m_nAuth;
+		bool	m_bHit;
 		DWORD	m_dwReason;
 		CString	m_strLinks;
 		CString	m_strFile;
@@ -70,6 +71,7 @@ public:
 			m_iCharset = -1;
 			m_iEncode  = unencoded;
 			m_nAuth    = 0;
+			m_bHit     = false;
 			m_dwReason = 0;
 		}
 };
@@ -97,6 +99,7 @@ protected:
 		CString	m_strSenders;
 		DWORD	m_dwSender;
 		CString	m_strTimes;
+		CString	m_strWords;
 		CString	m_strWhites;
 		int	m_nNameInBody;
 
@@ -213,13 +216,14 @@ protected:
 	       CStringA	StringToUTF8( CStringW strIn, CAttr& attr );
 		void	LFtoCRLF(     CString& strLines );
 		void	HexToUnicode( CString& strLines );
+		CString	UnicodeToStr( UINT uCode );
 
 		void	CheckUnicode(   CString& strLog,   CAttr& attr );
 		bool	CheckAlias(     CString  strLog,   CAttr& attr );
 		bool	CheckSubject(   CString  strLog,   CAttr& attr );
 		bool	CheckTalking(   CString  strBody,  CAttr& attr );
+		void	CheckWords(     CString  strLog,   CAttr& attr );
 		int	IsFieldRegisterd( CString strField, CAttr& attr );
-		int	IsBodyTalking(    CString strBody,  CAttr& attr );
 		bool	IsDomainRegisterd( CString strDomain, CString strRegisterd );
 		void	NormalizeAlias( CString& strName );
 		bool	CheckWhiteList( CString  strLog,   CAttr& attr );
@@ -231,9 +235,10 @@ protected:
 		DWORD	GetCharType( CString strUC, int& iRef, UINT& uAlt );
 		TCHAR	ReplaceByASCII( TCHAR ch );
 		TCHAR	SeekASCII( TCHAR** ppchTable, TCHAR ch );
+		void	DelHeaderField( CString& strMail, CString strField );
 	       CString	GetHeaderField( CString strMail, CString strField );
 
-		void	FilterError( UINT uIdError, CAttr& attr );
+		bool	FilterError( UINT uIdError, CAttr& attr );
 		bool	IsFiltered( UINT uIdError );
 
 		void	ConnectPOP( void );

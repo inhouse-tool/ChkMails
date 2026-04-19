@@ -1,9 +1,9 @@
-// DomainPage.cpp : implementation file
+// WordPage.cpp : implementation file
 //
 
 #include "pch.h"
 #include "ChkMails.h"
-#include "DomainPage.h"
+#include "WordPage.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -13,13 +13,13 @@
 #define	strcpy_s	wcscpy_s
 #endif//_UNICODE
 
-IMPLEMENT_DYNAMIC( CDomainPage, CPropertyPage )
+IMPLEMENT_DYNAMIC( CWordPage, CPropertyPage )
 
 ///////////////////////////////////////////////////////////////////////////////////////
 // Constructor
 
-CDomainPage::CDomainPage( void )
-	: CPropertyPage( IDD_DOMAIN )
+CWordPage::CWordPage( void )
+	: CPropertyPage( IDD_WORD )
 {
 }
 
@@ -27,22 +27,22 @@ CDomainPage::CDomainPage( void )
 // Overridden Functions
 
 BOOL
-CDomainPage::OnInitDialog( void )
+CWordPage::OnInitDialog( void )
 {
 	CPropertyPage::OnInitDialog();
 
 	// Get a fixed-pitch font for the editboxes.
 
 	CFont*	pFont = GetCommonFont();
-	GetDlgItem( IDC_EDIT_DOMAIN )->SetFont( pFont, FALSE );
+	GetDlgItem( IDC_EDIT_WORD )->SetFont( pFont, FALSE );
 
-	// Initialize the domain list.
+	// Initialize the word list.
 
 	CListCtrl*	pList;
 	CStringArray	saList;
 	DWORD		dwExStyle;
 	
-	pList = (CListCtrl*)GetDlgItem( IDC_LIST_DOMAIN );
+	pList = (CListCtrl*)GetDlgItem( IDC_LIST_WORD );
 	pList->SetFont( pFont, FALSE );
 
 	dwExStyle = pList->GetExtendedStyle();
@@ -51,7 +51,7 @@ CDomainPage::OnInitDialog( void )
 	dwExStyle |= LVS_EX_CHECKBOXES;
 	pList->SetExtendedStyle( dwExStyle );
 
-	// Insert columns into the domain list.
+	// Insert columns into the word list.
 	{
 		int	iColumn = 0;
 		pList->InsertColumn( iColumn++, _T(""), LVCFMT_LEFT,   20 );
@@ -59,41 +59,25 @@ CDomainPage::OnInitDialog( void )
 		pList->InsertColumn( iColumn++, _T(""), LVCFMT_LEFT,    0 );
 	}
 
-	// Add domains.
+	// Add words.
 	{
-		SortDomain( saList, m_strTLDCache );
+		SortWord( saList, m_strWords );
 		INT_PTR	nRow = saList.GetCount();
-
-		// Get maximum length of domain.
-
-		int	nch = 0;
-		for	( INT_PTR i = 0; i < nRow; i++ )
-			if	( saList[i].GetLength() > nch )
-				nch = saList[i].GetLength();
 
 		for	( int iRow = 0; iRow < nRow; iRow++ ){
 			CString	str = saList[iRow];
+			bool	bDrop = false;
+			if	( str.Right( 1 ) == _T("\b") ){
+				str = str.Left( str.GetLength()-1 );
+				bDrop = true;
+			}
 			pList->InsertItem( iRow, _T("") );
-			int	xDrop = m_strDomains.Find( str );
 
-			// Set right-align to the address ( not a top level domain ).
-
-			if	( str[0] != '.' )
-				str.Insert( 0, CString( ' ', nch-saList[iRow].GetLength() ) );
 			pList->SetItemText( iRow, 1, str );
 
-			// Set a check for the domain in the blacklist.
+			// Set a check for the word in the censored words list.
 
-			str += _T("\n");
-			if	( xDrop < 0 )
-				continue;
-			else if	( xDrop == 0 )
-				;
-			else if	( m_strDomains[xDrop-1] == '\n' )
-				;
-			else
-				continue;
-			pList->SetCheck( iRow, TRUE );
+			pList->SetCheck( iRow, bDrop? TRUE: FALSE );
 		}
 		pList->SetItemState( (int)nRow-1, 0, LVNI_SELECTED );
 	}
@@ -109,30 +93,29 @@ CDomainPage::OnInitDialog( void )
 }
 
 void
-CDomainPage::OnOK( void )
+CWordPage::OnOK( void )
 {
-	m_strTLDCache.Empty();
-	m_strDomains.Empty();
+	m_strWords.Empty();
 
-	CListCtrl*	pList = (CListCtrl*)GetDlgItem( IDC_LIST_DOMAIN );
+	CListCtrl*	pList = (CListCtrl*)GetDlgItem( IDC_LIST_WORD );
 	int	nRow = pList->GetItemCount();
 	for	( int iRow = 0; iRow < nRow; iRow++ ){
 		CString	str = pList->GetItemText( iRow, 1 );
 		str.TrimLeft();
-		m_strTLDCache += str + _T("\n");
 		if	( pList->GetCheck( iRow ) )
-			m_strDomains += str + _T("\n");
+			str += _T("\b");
+		m_strWords += str + _T("\n");
 	}
 }
 
 BOOL
-CDomainPage::PreTranslateMessage( MSG* pMsg )
+CWordPage::PreTranslateMessage( MSG* pMsg )
 {
 	if	( pMsg->message == WM_KEYDOWN &&
 		  pMsg->wParam  == VK_RETURN ){
 		CWnd*	pwnd = GetFocus();
-		if	( pwnd == GetDlgItem( IDC_EDIT_DOMAIN ) ){
-			PostMessage( WM_COMMAND, MAKEWPARAM( IDC_BUTTON_DOMAIN_ADD,  BN_CLICKED ), NULL );
+		if	( pwnd == GetDlgItem( IDC_EDIT_WORD ) ){
+			PostMessage( WM_COMMAND, MAKEWPARAM( IDC_BUTTON_WORD_ADD,  BN_CLICKED ), NULL );
 			return	TRUE;
 		}
 	}
@@ -143,20 +126,23 @@ CDomainPage::PreTranslateMessage( MSG* pMsg )
 ///////////////////////////////////////////////////////////////////////////////////////
 // Message Handlers
 
-BEGIN_MESSAGE_MAP( CDomainPage, CPropertyPage )
-	ON_BN_CLICKED( IDC_BUTTON_DOMAIN_ADD,  OnButtonAdd )
-	ON_BN_CLICKED( IDC_BUTTON_DOMAIN_DEL,  OnButtonDelete )
-	ON_EN_CHANGE( IDC_EDIT_DOMAIN,  OnEditDomain )
-	ON_NOTIFY( LVN_ITEMCHANGED, IDC_LIST_DOMAIN,  OnChangeList )
+BEGIN_MESSAGE_MAP( CWordPage, CPropertyPage )
+	ON_BN_CLICKED( IDC_BUTTON_WORD_ADD,  OnButtonAdd )
+	ON_BN_CLICKED( IDC_BUTTON_WORD_DEL,  OnButtonDelete )
+	ON_EN_CHANGE( IDC_EDIT_WORD,  OnChangeEdit )
+	ON_NOTIFY( LVN_ITEMCHANGED, IDC_LIST_WORD,  OnChangeList )
 END_MESSAGE_MAP()
 
+#define	LVNI_UNCHECKED	0x1000
+#define	LVNI_CHECKED	0x2000
+
 void
-CDomainPage::OnButtonAdd( void )
+CWordPage::OnButtonAdd( void )
 {
 	CString	strNew;
-	GetDlgItem( IDC_EDIT_DOMAIN )->GetWindowText( strNew );
+	GetDlgItem( IDC_EDIT_WORD )->GetWindowText( strNew );
 
-	CListCtrl*	pList = (CListCtrl*)GetDlgItem( IDC_LIST_DOMAIN );
+	CListCtrl*	pList = (CListCtrl*)GetDlgItem( IDC_LIST_WORD );
 	
 	int	iRow, nRow = pList->GetItemCount();
 	for	( iRow = 0; iRow < nRow; iRow++ ){
@@ -171,14 +157,15 @@ CDomainPage::OnButtonAdd( void )
 	pList->SetColumnWidth( ++iColumn, LVSCW_AUTOSIZE_USEHEADER );
 	pList->EnsureVisible( iRow, FALSE );
 	pList->SetItemState(  iRow, LVNI_SELECTED, LVNI_SELECTED );
+	pList->SetCheck( iRow, TRUE );
 
-	GetDlgItem( IDC_EDIT_DOMAIN )->SetWindowText( _T("") );
+	GetDlgItem( IDC_EDIT_WORD )->SetWindowText( _T("") );
 }
 
 void
-CDomainPage::OnButtonDelete( void )
+CWordPage::OnButtonDelete( void )
 {
-	CListCtrl*	pList = (CListCtrl*)GetDlgItem( IDC_LIST_DOMAIN );
+	CListCtrl*	pList = (CListCtrl*)GetDlgItem( IDC_LIST_WORD );
 
 	POSITION	pos = pList->GetFirstSelectedItemPosition();
 	while	( pos ){
@@ -188,18 +175,15 @@ CDomainPage::OnButtonDelete( void )
 }
 
 void
-CDomainPage::OnEditDomain( void )
+CWordPage::OnChangeEdit( void )
 {
 	CString	str;
-	GetDlgItem( IDC_EDIT_DOMAIN )->GetWindowText( str );
-	GetDlgItem( IDC_BUTTON_DOMAIN_ADD )->EnableWindow( str.IsEmpty()? FALSE: TRUE );
+	GetDlgItem( IDC_EDIT_WORD )->GetWindowText( str );
+	GetDlgItem( IDC_BUTTON_WORD_ADD )->EnableWindow( str.IsEmpty()? FALSE: TRUE );
 }
 
-#define	LVNI_UNCHECKED	0x1000
-#define	LVNI_CHECKED	0x2000
-
 void
-CDomainPage::OnChangeList( NMHDR* pNMHDR, LRESULT* pResult )
+CWordPage::OnChangeList( NMHDR* pNMHDR, LRESULT* pResult )
 {
 	*pResult = 0;
 	NMLISTVIEW* pNMLV = reinterpret_cast<NMLISTVIEW*>( pNMHDR );
@@ -228,8 +212,8 @@ CDomainPage::OnChangeList( NMHDR* pNMHDR, LRESULT* pResult )
 
 	if	( iChecked >= 0 ){
 		CListCtrl*	pList = (CListCtrl*)GetDlgItem( (UINT)pNMLV->hdr.idFrom );
-		CString	strDomain = pList->GetItemText( iRow, 1 );
-		if	( strDomain.IsEmpty() )
+		CString	strWord = pList->GetItemText( iRow, 1 );
+		if	( strWord.IsEmpty() )
 			return;
 
 		int	nRow = pList->GetItemCount();
@@ -238,21 +222,21 @@ CDomainPage::OnChangeList( NMHDR* pNMHDR, LRESULT* pResult )
 				continue;
 
 			CString	str = pList->GetItemText( i, 1 );
-			if	( str == strDomain )
+			if	( str == strWord )
 				pList->SetCheck( i, ( iChecked > 0 )? TRUE: FALSE );
 		}
 		pList->SetItemState( iRow, LVNI_SELECTED, LVNI_SELECTED );
 		iSelected = 1;
 	}
 
-	GetDlgItem( IDC_BUTTON_DOMAIN_DEL  )->EnableWindow( ( iSelected > 0 )? TRUE: FALSE );
+	GetDlgItem( IDC_BUTTON_WORD_DEL  )->EnableWindow( ( iSelected > 0 )? TRUE: FALSE );
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////
 // Specific Functions
 
 void
-CDomainPage::SortDomain( CStringArray& saList, CString strList )
+CWordPage::SortWord( CStringArray& saList, CString strList )
 {
 	saList.RemoveAll();
 
@@ -265,63 +249,9 @@ CDomainPage::SortDomain( CStringArray& saList, CString strList )
 		for	( i = 0; i < n; i++ ){
 			CString	strList = saList[i];
 			strList.TrimLeft();
-			int	iOrder = CompareDomain( strItem, strList );
-			if	( iOrder < 0 )
+			if	( strItem < strList )
 				break;
 		}
 		saList.InsertAt( i, strItem );
 	}
-}
-
-int
-CDomainPage::CompareDomain( CString strDomain1, CString strDomain2 )
-{
-	int	x1, x2, x1a, x2a;
-
-	CString	strAddr1 = strDomain1;
-	CString	strAddr2 = strDomain2;
-
-	x1  = strAddr1.ReverseFind( '.' );
-	x2  = strAddr2.ReverseFind( '.' );
-
-	CString	str1, str2;
-
-	for	( ;; ){
-		if	( x1 < 0 )
-			x1 = 0;
-		if	( x2 < 0 )
-			x2 = 0;
-		str1 = strAddr1.Mid( x1 );
-		str2 = strAddr2.Mid( x2 );
-		strAddr1 = strAddr1.Left( x1 );
-		strAddr2 = strAddr2.Left( x2 );
-
-		if	( str1[0] == '@' )
-			str1.Delete( 0, 1 );
-		if	( str2[0] == '@' )
-			str2.Delete( 0, 1 );
-		if	( str1[0] == '.' )
-			str1.Delete( 0, 1 );
-		if	( str2[0] == '.' )
-			str2.Delete( 0, 1 );
-
-		if	( str1 > str2 )
-			return	+1;
-		else if	( str1 < str2 )
-			return	-1;
-		else if	( str1.IsEmpty() && str2.IsEmpty() )
-			break;
-
-		x1  = strAddr1.ReverseFind( '.' );
-		x2  = strAddr2.ReverseFind( '.' );
-		x1a = strAddr1.ReverseFind( '@' );
-		x2a = strAddr2.ReverseFind( '@' );
-
-		if	( x1 < x1a )
-			x1 = x1a;
-		if	( x2 < x2a )
-			x2 = x2a;
-	}
-
-	return	0;
 }

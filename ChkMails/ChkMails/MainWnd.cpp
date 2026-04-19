@@ -491,6 +491,7 @@ CMainWnd::OnMenuFilter( void )
 	sheet.m_pageSender   .m_dwFlags       = m_dwSender;
 	sheet.m_pageSender   .m_nNameInBody   = m_nNameInBody;
 	sheet.m_pageZone     .m_strTimes      = m_strTimes;
+	sheet.m_pageWord     .m_strWords      = m_strWords;
 	sheet.m_pageWhite    .m_strWhites     = m_strWhites;
 
 	sheet.SetOwner( this );
@@ -543,6 +544,10 @@ CMainWnd::OnMenuFilter( void )
 	}
 	if	( sheet.m_pageZone  .m_strTimes         != m_strTimes ){
 		m_strTimes      = sheet.m_pageZone        .m_strTimes;
+		bUpdate = true;
+	}
+	if	( sheet.m_pageWord  .m_strWords         != m_strWords ){
+		m_strWords      = sheet.m_pageWord        .m_strWords;
 		bUpdate = true;
 	}
 	if	( sheet.m_pageWhite .m_strWhites        != m_strWhites ){
@@ -855,6 +860,7 @@ CMainWnd::LoadFilters( void )
 		m_dwSender &= ~( 1<<5 );
 	}
 	m_strTimes      = pApp->GetProfileString( _T("Filters"), _T("TimeZone"),   _T("") );
+	m_strWords      = pApp->GetProfileString( _T("Filters"), _T("Words"),      _T("") );
 	m_strWhites     = pApp->GetProfileString( _T("Filters"), _T("White"),      _T("") );
 }
 
@@ -874,6 +880,7 @@ CMainWnd::SaveFilters( void )
 	pApp->WriteProfileInt(    _T("Filters"), _T("Sender"),     m_dwSender );
 	pApp->WriteProfileInt(    _T("Filters"), _T("NameInBody"), m_nNameInBody );
 	pApp->WriteProfileString( _T("Filters"), _T("TimeZone"),   m_strTimes );
+	pApp->WriteProfileString( _T("Filters"), _T("Words"),      m_strWords );
 	pApp->WriteProfileString( _T("Filters"), _T("White"),      m_strWhites );
 }
 
@@ -1310,7 +1317,10 @@ CMainWnd::GetDate( CStringA strMail, CAttr& attr )
 // See https://learn.microsoft.com/en-us/windows/win32/intl/code-page-identifiers
 
 #define	CP_SHIFT_JIS	  932
+#define	CP_UTF16_LE	 1200	// UTF-16LE
+#define	CP_EUC_JP	20932	// EUC-JP for conversion
 #define	CP_ISO_2022_JP	50220	// JIS X 0201-1989
+#define	CP_euc_jp	51932	// EUC-JP in the registry
 #define	CP_GB18030	54936	// GB18030
 //efine	CP_UTF8		65001	// defined in <WinNls.h>
 
@@ -1346,6 +1356,12 @@ CMainWnd::GetCodePage( CStringA strMail )
 			iCodePage = CP_GB18030;
 		else
 			TRACE( "code page '%s' is unknown.\n", strMail );
+	}
+	else{
+		// Apply 20932 instead of 51932 which is not supported in MultiByteToWideChar.
+		// https://www.google.com/search?q=MultiByteToWideChar+51932
+	//	if	( iCodePage == CP_euc_jp )
+	//		iCodePage = CP_EUC_JP;
 	}
 
 	return	iCodePage;
@@ -1742,7 +1758,7 @@ CMainWnd::GetHeaderFieldA( CStringA strMail, CStringA strField )
 		strAdded.Trim();
 		CStringA strLower = MakeLowerA( strAdded );
 		x = strLower.Find( "added by postmaster" );
-		if	( x >= 0 )
+		if	( x >= 0 && strField != "\nDate: " )
 			strLine.Empty();
 	}
 
@@ -1788,11 +1804,10 @@ CMainWnd::MakeLog( CStringA strMail, CAttr& attr )
 
 	// Check 'alias' in 'From:' and 'Subject:'.
 
-	bool	bNamed = false;
 	if	( CheckAlias( strLog, attr ) )
-		bNamed = true;
+		attr.m_bHit = true;
 	else if	( CheckSubject( strLog, attr ) )
-		bNamed = true;
+		attr.m_bHit = true;
 
 	// Make a log from the mail body.
 
@@ -1802,11 +1817,13 @@ CMainWnd::MakeLog( CStringA strMail, CAttr& attr )
 	// Make logs from the multipart bodies.
 
 	else if	( attr.m_iType == CAttr::Multipart ){
-		// Seek the top of boundary.
+
+		// Do not dive into a malformed multipart.
 
 		x = strBody.Find( attr.m_strBoundary );
 		if	( x < 0 || attr.m_strBoundary.IsEmpty() ){
 			FilterError( IDS_RE_MULTIPART, attr );
+			DecodeReason( strLog, attr );
 			return	strLog;
 		}
 			
@@ -1821,12 +1838,13 @@ CMainWnd::MakeLog( CStringA strMail, CAttr& attr )
 		strLog += (CString)strBody.Left( x+1 );
 		strBody.Delete( 0, x+1 );
 
-		strLog += StringFromPart( strBody, attr );
+		CString	strText = StringFromPart( strBody, attr );
+		strLog += strText;
 	}
 
-	if	( !CheckWhiteList( strLog, attr ) )
-		if	( !bNamed )
-			CheckTalking( strLog.Mid( cchHeader ), attr );
+	// Resore the mails in the whitelist.
+
+	CheckWhiteList( strLog, attr );
 
 	// If the mail should be discarded, insert the links and the reasons in the log.
 
@@ -2187,6 +2205,7 @@ CMainWnd::StringFromHeader( CStringA strIn, CAttr& attr )
 			attr.m_iCharset = GetCodePage( strCharset );
 			if	( !attr.m_iCharset ){
 				strOut += strIn;
+				strIn.Empty();
 				FilterError( IDS_RF_CHARSET, attr );
 				break;
 			}
@@ -2273,7 +2292,15 @@ CMainWnd::StringFromHeader( CStringA strIn, CAttr& attr )
 
 	attr.m_iCharset = iCharset;
 
+	// Check codes and words in the mail header.
+
 	CheckUnicode( strOut, attr );
+	{
+		CString	strHeader = strOut;
+		DelHeaderField( strHeader, _T("DKIM-Signature: ") );
+		DelHeaderField( strHeader, _T("BIMI-Indicator: ") );
+		CheckWords( strHeader, attr );
+	}
 
 	return	strOut;
 }
@@ -2303,34 +2330,65 @@ CMainWnd::StringFromPart( CStringA strIn, CAttr& attr )
 			x++;
 			continue;
 		}
-		CStringA strBound = strIn.Left( x+1 );
+		else{
+			for	( --x; ; x-- )
+				if	( strIn[x] != '\r' &&
+					  strIn[x] != '\n' )
+					break;
+			x++;
+		}
+
+		CStringA strBound = strIn.Left( x );
 		strOut += StringFromPart( strBound, attr );
 		strIn.Delete( 0, x );
+		for	( x = attr.m_strBoundary.GetLength(); strIn[x]; x++ )
+			if	( strIn[x] == '\n' ){
+				x++;
+				break;
+			}
+
+		// Add and skip the boundary mark.
+
+		strOut += CString( strIn.Left( x ) );
+		strIn.Delete( 0, x );
+		x = 0;
 	}
 
-	// Separate the part header and the part body.
+	// Save the text out of the boundary.
 
 	x = strIn.Find( "\r\n\r\n" );
-	if	( x < 0 ){
-		FilterError( IDS_RE_MAIL_HEADER, attr );
-		return	_T("");
+	if	( x < 0 )
+		strOut += CString( strIn );
+	else{
+		// Separate the part header and the part body.
+
+		CStringA strHeader = strIn.Left( x+4 );
+		CStringA strBody   = strIn.Mid(  x+4 );
+
+		CAttr	attrPart = attr;
+
+		strHeader.Insert( 0, "\n" );
+		GetType(   strHeader, attrPart );
+		GetEncode( strHeader, attrPart );
+		strHeader.Delete( 0, 1 );
+		strOut += (CString)strHeader;
+
+		// Handle the part.
+
+		if	( attrPart.m_iType == CAttr::unsupported )
+			strOut += CString( strBody );
+		else if	( attrPart.m_iType == CAttr::Multipart )
+			strOut += StringFromPart( strBody, attrPart );
+		else if	( attrPart.m_iType == CAttr::Text )
+			strOut += StringFromBody( strBody, attrPart );
+
+		// Merge attributes.
+
+		attr.m_dwReason   |= attrPart.m_dwReason;
+		attr.m_strLinks   += attrPart.m_strLinks;
+		if	( attr.m_strTalking.Find( attrPart.m_strTalking ) < 0 )
+			attr.m_strTalking += attrPart.m_strTalking;
 	}
-
-	CStringA strHeader = strIn.Left( x+4 );
-	CStringA strBody   = strIn.Mid(  x+4 );
-
-	CAttr	attrPart;
-
-	strHeader.Insert( 0, "\n" );
-	GetType(   strHeader, attrPart );
-	GetEncode( strHeader, attrPart );
-	strHeader.Delete( 0, 1 );
-	strOut += (CString)strHeader;
-
-	if	( attrPart.m_iType == CAttr::Multipart )
-		strOut += StringFromPart( strBody, attrPart );
-	else
-		strOut += StringFromBody( strBody, attrPart );
 
 	return	strOut;
 }
@@ -2363,8 +2421,13 @@ CMainWnd::StringFromBody( CStringA strIn, CAttr& attr )
 
 	LFtoCRLF( strOut );
 	HexToUnicode( strOut );
+
 	CheckUnicode( strOut, attr );
+	CheckWords( strOut, attr );
+
 	CheckLink( strOut, attr );
+
+	CheckTalking( strOut, attr );
 
 	return	strOut;
 }
@@ -2393,7 +2456,7 @@ CMainWnd::DecodeReason( CString& strLog, CAttr& attr )
 
 	CString	strReason;
 	DWORD	dwReason = attr.m_dwReason;
-	for	( UINT uID = IDS_RF_AUTH; uID <= IDS_RF_LINK_EVASIVE; uID++ ){
+	for	( UINT uID = IDS_RF_AUTH; uID <= IDS_RF_WORD; uID++ ){
 		UINT	uBit = 1<<(uID-IDS_RF_AUTH);
 		if	( dwReason & uBit ){
 			CString	strError;
@@ -2513,6 +2576,35 @@ CMainWnd::StringFromCodePage( CStringA strIn, CAttr& attr )
 	CString	strOut;
 	if	( strIn.IsEmpty() )
 		;
+	else if	( attr.m_iCharset == CP_euc_jp ){
+		HMODULE	hDLL = LoadLibraryEx( _T("Mlang.dll"), NULL, LOAD_LIBRARY_SEARCH_SYSTEM32 );
+		if	( hDLL ){
+			HRESULT	(WINAPI *ConvertINetString)( LPDWORD lpdwMode, DWORD dwSrcEncode, DWORD dwDstEncode, LPCSTR lpSrcStr, LPINT lpnStrSize, LPBYTE lpDstStr, LPINT lpnDstSize );
+			ConvertINetString =
+				(HRESULT (WINAPI *)( LPDWORD, DWORD, DWORD, LPCSTR, LPINT, LPBYTE, LPINT ))
+				GetProcAddress( hDLL, "ConvertINetString" );
+
+			if	( ConvertINetString ){
+				DWORD	dwMode = 0;
+				char*	pchIn = strIn.GetBuffer();
+				int	cchOut = -1;
+
+				ConvertINetString( &dwMode, attr.m_iCharset, CP_UTF16_LE, pchIn, NULL, NULL, &cchOut );
+				WCHAR*	pchOut = new WCHAR[cchOut];
+				memset( pchOut, 0, sizeof( *pchOut ) * cchOut );
+				ConvertINetString( &dwMode, attr.m_iCharset, CP_UTF16_LE, pchIn, NULL, (BYTE*)pchOut, &cchOut );
+				strOut = pchOut;
+				delete []pchOut;
+
+				// Care some misconverted characters.
+				// https://www.asahi-net.or.jp/~ax2s-kmtn/ref/jisx0212/index.html
+
+				strOut.Replace( _T("\x6f64\x30fb"), _T("\x00a9") );	// 8fa2ed
+			}
+
+			FreeLibrary( hDLL );
+		}
+	}
 	else{
 		SetLastError( 0 );
 
@@ -2522,10 +2614,14 @@ CMainWnd::StringFromCodePage( CStringA strIn, CAttr& attr )
 		DWORD	dwError = GetLastError();
 		if	( dwError == ERROR_NO_UNICODE_TRANSLATION ){
 			FilterError( IDS_RF_CHARSET, attr );
-			strOut = _T("<<UNREADABLE>>");
+			cchOut = ::MultiByteToWideChar( attr.m_iCharset, 0, pchIn, -1, NULL, 0 );
 		}
-		else{
+		else if	( dwError ){
+			TRACE( "Error %d in code page %d\n", dwError, attr.m_iCharset );
+		}
+		{
 			WCHAR*	pchOut = new WCHAR[cchOut];
+			memset( pchOut, 0, sizeof( *pchOut ) * cchOut );
 			::MultiByteToWideChar( attr.m_iCharset, MB_ERR_INVALID_CHARS, pchIn, -1, pchOut, cchOut );
 			strOut = pchOut;
 			delete []pchOut;
@@ -2648,9 +2744,9 @@ CMainWnd::StringFromUTF8( CStringA strIn, CAttr& attr )
 		DWORD	dwError = GetLastError();
 		if	( dwError == ERROR_NO_UNICODE_TRANSLATION ){
 			FilterError( IDS_RF_CHARSET, attr );
-			strOut = _T("<<UNREADABLE>>");
+			cchOut = ::MultiByteToWideChar( attr.m_iCharset, 0, pchIn, -1, NULL, 0 );
 		}
-		else{
+		{
 			WCHAR*	pchOut = new WCHAR[cchOut];
 			::MultiByteToWideChar( CP_UTF8, MB_ERR_INVALID_CHARS, pchIn, -1, pchOut, cchOut );
 			strOut = pchOut;
@@ -2732,17 +2828,34 @@ CMainWnd::HexToUnicode( CString& strLines )
 			nBase = 10;
 		}
 
-		WCHAR	wch = (WORD)wcstol( pch+xSkip, &pchDelim, nBase );
+		UINT	uCode = (UINT)wcstol( pch+xSkip, &pchDelim, nBase );
 		if	( *pchDelim != ';' ){
 			x += 2;
 			continue;
 		}
 
-		xSkip = 2 + ( int )( pchDelim-pch );
+		xSkip = 2 + ( int )( pchDelim-pch ) + 1;
 		strLines.Delete( x, xSkip );
-		strLines.SetAt( x, wch );
+		strLines.Insert( x, UnicodeToStr( uCode ) );
 	}
 #endif//_UNICODE
+}
+
+CString
+CMainWnd::UnicodeToStr( UINT uCode )
+{
+	TCHAR	ts[4] = {};
+
+#ifdef	_UNICODE
+	if	( uCode < 0x10000 )
+		ts[0] = uCode;
+	else{
+		ts[0] = ( ( uCode - 0x10000 ) / 0x400 ) + 0xd800;
+		ts[1] = ( ( uCode - 0x10000 ) % 0x400 ) + 0xdc00;
+	}
+#endif//_UNICODE
+
+	return	ts;
 }
 
 void
@@ -2756,8 +2869,9 @@ CMainWnd::CheckUnicode( CString& strLog, CAttr &attr )
 		int	iTrace = i;
 		UINT	uAlt;
 		DWORD	dwType = GetCharType( strLog, i, uAlt );
+		UINT	uCode = strLog[i];
 
-		// Do not accept evasive codes.
+		// Do not accept control codes.
 
 		if	( dwType == UC_CONTROLCODE ){
 			strLog.Delete( i, 1 );
@@ -2777,7 +2891,10 @@ CMainWnd::CheckUnicode( CString& strLog, CAttr &attr )
 			}
 		}
 
+		// Do not accept evasive codes.
+
 		else if	( dwType == UC_EVASIVE ){
+			FilterError( IDS_RF_EVASIVECODE, attr );
 			bTrace = true;
 		}
 #ifdef	_DEBUG
@@ -2795,7 +2912,6 @@ CMainWnd::CheckUnicode( CString& strLog, CAttr &attr )
 			TCHAR*	pch =	( dwType == UC_CONTROLCODE )?	L"Control":
 					( dwType == UC_EVASIVE )?	L"Evasive":
 									L"Unmapped";
-			UINT	uCode = strLog[iTrace];
 			if	( uCode >= 0xd800 && uCode <= 0xdbff &&
 				  strLog[iTrace+1] >= 0xdc00 && strLog[iTrace+1] <= 0xdfff ){
 				uCode =  ( strLog[iTrace+0] & 0x3ff ) << 10;
@@ -2899,49 +3015,10 @@ CMainWnd::CheckSubject( CString strLog, CAttr& attr )
 bool
 CMainWnd::CheckTalking( CString strBody, CAttr& attr )
 {
-	// Remove unnecessary texts from the body.
+	if	( attr.m_bHit )
+		return	0;
 
-	if	( !attr.m_strBoundary.IsEmpty() ){
-		int	x = strBody.Find( CString( attr.m_strBoundary ) );
-		if	( x >= 0 )
-			strBody.Delete( 0, x );
-		for	( ;; ){
-			x = strBody.Find( CString( attr.m_strBoundary ) );
-			if	( x < 0 )
-				break;
-
-			for	( ; x > 0; x-- )
-				if	( strBody[x] == '\r' )
-					break;
-			int	i;
-			for	( i = x + 2; strBody[i]; i++ )
-				if	( strBody[i] == '\n' )
-					break;
-			strBody.Delete( x, i-x );
-		}
-	}
-
-	for	( ;; ){
-		int	x = strBody.Find( _T("Content-Type: ") );
-		if	( x < 0 )
-			break;
-		int	i;
-		for	( i = x; strBody[i]; i++ )
-			if	( strBody[i] == '\n' )
-				break;
-		strBody.Delete( x, i-x );
-	}
-	for	( ;; ){
-		int	x = strBody.Find( _T("Content-Transfer-Encoding: ") );
-		if	( x < 0 )
-			break;
-		int	i;
-		for	( i = x; strBody[i]; i++ )
-			if	( strBody[i] == '\n' )
-				break;
-		strBody.Delete( x, i-x );
-	}
-	strBody.Trim();
+	int	nHit = 0x0;
 
 	// Remove tags.
 
@@ -2957,76 +3034,6 @@ CMainWnd::CheckTalking( CString strBody, CAttr& attr )
 			strBody.Delete( i, (x-i)+1 );
 		}
 	}
-
-	// Check if the body talking about registered name.
-
-	int	nHit = IsBodyTalking( strBody, attr );
-
-	// Hit but not met, it's a spam.
-
-	if	( nHit == 0x01 )
-		FilterError( IDS_RF_SENDER_FAKED, attr );
-
-	return	nHit? true: false;
-}
-
-int
-CMainWnd::IsFieldRegisterd( CString strField, CAttr& attr )
-{
-	int	nHit = 0x0;
-
-	NormalizeAlias( strField );
-
-	CString	strDomain;		
-	{
-		strDomain = (CString)attr.m_strFrom;
-		int	x = strDomain.Find( '@' );
-		if	( x >= 0 )
-			strDomain = strDomain.Mid( x+1 );
-	}
-
-	int	iName = 0;
-	while( !( nHit & 0x02 ) ){
-
-		// Check if the the registered word is in the Field.
-
-		CString	strName = m_strNames.Tokenize( _T("\n"), iName );
-		if	( iName < 0 )
-			break;
-		int	x = strName.Find( '\t' );
-		CString	strRegisteredWord   = strName.Left( x );
-		CString	strRegisteredDomain = strName.Mid( x+1 );
-		NormalizeAlias( strRegisteredWord );
-
-		int	iWord = strField.Find( strRegisteredWord );
-		if	( iWord < 0 ){
-			if	( strRegisteredWord.GetLength() > 4 ){
-				CString	strFieldL = strField;
-				strFieldL.MakeLower();
-				strRegisteredWord.MakeLower();
-				iWord = strFieldL.Find( strRegisteredWord );
-				if	( iWord < 0 )
-					continue;
-			}
-			else
-				continue;
-		}
-
-		nHit |= 0x01;
-
-		// Check if the domain is registered.
-
-		if	( IsDomainRegisterd( strDomain, strRegisteredDomain ) )
-			nHit |= 0x02;
-	}
-		
-	return	nHit;
-}
-
-int
-CMainWnd::IsBodyTalking( CString strBody, CAttr& attr )
-{
-	int	nHit = 0x0;
 
 	// Get domain name of the mail.
 
@@ -3093,9 +3100,84 @@ CMainWnd::IsBodyTalking( CString strBody, CAttr& attr )
 		}
 	}
 
-	if	( nHit == 0x01 )
-		attr.m_strTalking = strTalking;
+	// Hit but not met, it's a spam.
 
+	if	( nHit == 0x01 )
+		if	( FilterError( IDS_RF_SENDER_FAKED, attr ) )
+			attr.m_strTalking = strTalking;
+
+	return	nHit? true: false;
+}
+
+void
+CMainWnd::CheckWords( CString strLog, CAttr& attr )
+{
+	// Check if the censored word is included.
+
+	for	( int x = 0; x >= 0; ){
+		CString	strWord = m_strWords.Tokenize( L"\n", x );
+		if	( strWord.IsEmpty() )
+			break;
+		else if	( strWord.Right( 1 ) == _T("\b") ){
+			strWord = strWord.Left( strWord.GetLength()-1 );
+			if	( strLog.Find( strWord ) >= 0 ){
+				FilterError( IDS_RF_WORD, attr );
+				break;
+			}
+		}
+	}
+}
+
+int
+CMainWnd::IsFieldRegisterd( CString strField, CAttr& attr )
+{
+	int	nHit = 0x0;
+
+	NormalizeAlias( strField );
+
+	CString	strDomain;		
+	{
+		strDomain = (CString)attr.m_strFrom;
+		int	x = strDomain.Find( '@' );
+		if	( x >= 0 )
+			strDomain = strDomain.Mid( x+1 );
+	}
+
+	int	iName = 0;
+	while( !( nHit & 0x02 ) ){
+
+		// Check if the the registered word is in the Field.
+
+		CString	strName = m_strNames.Tokenize( _T("\n"), iName );
+		if	( iName < 0 )
+			break;
+		int	x = strName.Find( '\t' );
+		CString	strRegisteredWord   = strName.Left( x );
+		CString	strRegisteredDomain = strName.Mid( x+1 );
+		NormalizeAlias( strRegisteredWord );
+
+		int	iWord = strField.Find( strRegisteredWord );
+		if	( iWord < 0 ){
+			if	( strRegisteredWord.GetLength() > 4 ){
+				CString	strFieldL = strField;
+				strFieldL.MakeLower();
+				strRegisteredWord.MakeLower();
+				iWord = strFieldL.Find( strRegisteredWord );
+				if	( iWord < 0 )
+					continue;
+			}
+			else
+				continue;
+		}
+
+		nHit |= 0x01;
+
+		// Check if the domain is registered.
+
+		if	( IsDomainRegisterd( strDomain, strRegisteredDomain ) )
+			nHit |= 0x02;
+	}
+	
 	return	nHit;
 }
 
@@ -3211,6 +3293,14 @@ CMainWnd::CheckLink( CString strLog, CAttr& attr )
 			if	( attr.m_iSubType == CAttr::HTML ){
 				if	( !GetLinkInHTML( strLog, xLines, strLink, strDisplay ) )
 					continue;
+				if	( strDisplay.Left( 4 ) == L"http" ){
+					CString	strURL = strDisplay;
+					strURL.Replace( pchScheme, L"" );
+				//	if	( strURL != strLink ){
+				//		TRACE( L"'%s' linked to '%s'.\n", strURL, strLink );
+				//		FilterError( IDS_RF_LINK_FAKED, attr );
+				//	}
+				}
 			}
 			else if	( attr.m_iSubType == CAttr::Plain ){
 				GetLinkInText( strLog, xLines, strLink );
@@ -3659,7 +3749,7 @@ CMainWnd::GetCharType( CString strUC, int& iRef, UINT& uAlt )
 		uAlt = ' ';				//   are ASCII space code for patern matching,
 		dwType = UC_SPACE;			//   Keep them.
 	}
-	else if	( ch >= 0x200b && ch <= 0x200f ){	// Format codes:
+	else if	( ch >= 0x200c && ch <= 0x200f ){	// Format codes:
 		uAlt = '\0';				//   are not for patern matching,
 		dwType = UC_CONTROLCODE;		//   Detect them.
 	}						//   ( used by many phishers to evade pattern matching )
@@ -3812,7 +3902,7 @@ CMainWnd::GetCharType( CString strUC, int& iRef, UINT& uAlt )
 	}
 	else if	( ch == 0xfeff ){			// Zero-width No-break Space code:
 		uAlt = '\0';				//   is not for patern matching,
-		dwType = UC_CONTROLCODE;		//   Detect it.
+		dwType = UC_SPACE;			//   Keep it.
 	}
 	else if	( ch >= 0xff01 && ch <= 0xff5e ){	// Large ASCII letters:
 		uAlt = ch - 0xff01 + '!';		//   are ASCII letter code for patern matching,
@@ -3971,7 +4061,7 @@ CMainWnd::ReplaceByASCII( TCHAR ch )
 			L"\x1dae\x1daf"
 			L"\x1e45\x1e47\x1e49\x1e4b"
 			L"\x2099",
-		L"o\x0f2\x0f3\x0f4\x0f5\x0f6\xf8\x14d\x14f\x151\x1a1\x1d2\x1eb\x1ed\x1ff\x20d\x20f\x22b\x22d\x22f\x231"
+		L"o\x0f2\x0f3\x0f4\x0f5\x0f6\xf8\x14d\x14f\x151\x1a1\x1d2\x1eb\x1ed\x1ff\x20d\x20f\x22b\x22d\x22f\x231\x254"
 			L"\x1d52"
 			L"\x1e4d\x1e4f\x1e51\x1e53\x1ecd\x1ecf\x1ed1\x1ed3\x1ed5\x1ed7\x1ed9\x1edb\x1edd\x1edf\x1ee1\x1ee3"
 			L"\x2092",
@@ -4036,7 +4126,7 @@ CMainWnd::ReplaceByASCII( TCHAR ch )
 		L"Y\x38e\x3a5"	
 			L"\x1f59\x1f5b\x1f5d\x1f5f\x1fe8\x1fe9\x1fea\x1feb",
 		L"Z\x396",
-		L"a\x3ac\x3b1"
+		L"a\x3ac"
 			L"\x1f00\x1f01\x1f02\x1f03\x1f04\x1f05\x1f07"
 			L"\x1f70\x1f71\x1f80\x1f81\x1f82\x1f83\x1f84\x1f85\x1f87",
 		L"c\x3f2",
@@ -4260,6 +4350,20 @@ CMainWnd::SeekASCII( TCHAR** ppchTable, TCHAR ch )
 	return	ch;
 }
 
+void
+CMainWnd::DelHeaderField( CString& strMail, CString strField )
+{
+	do{
+		CString	strNoise = GetHeaderField( strMail, strField );
+		if	( strNoise.IsEmpty() )
+			break;
+
+		strNoise.Insert( 0, strField );
+		strMail.Replace( strField, _T("") );
+		strMail.Replace( strNoise, _T("") );
+	}while	( true );
+}
+
 CString
 CMainWnd::GetHeaderField( CString strMail, CString strField )
 {
@@ -4299,11 +4403,15 @@ CMainWnd::GetHeaderField( CString strMail, CString strField )
 	return	strLine;
 }
 
-void
+bool
 CMainWnd::FilterError( UINT uIdError, CAttr& attr )
 {
-	if	( IsFiltered( uIdError ) )
+	if	( IsFiltered( uIdError ) ){
 		attr.m_dwReason |= 0x0001 << ( uIdError - IDS_RF_AUTH );
+		return	true;
+	}
+	else
+		return	false;
 }
 
 bool
@@ -4315,7 +4423,11 @@ CMainWnd::IsFiltered( UINT uIdError )
 		;
 	else if	( uIdError >= IDS_RF_CHARSET && uIdError <= IDS_RF_UNMAPPEDCODE )
 		bFiltered = m_dwCode & ( 0x0001 << (uIdError-IDS_RF_CHARSET) );
+	else if	( uIdError == IDS_RF_LINK_EVASIVE )
+		bFiltered = m_dwCode & ( 0x0001 << (IDS_RF_EVASIVECODE-IDS_RF_CHARSET) );
 	else if	( uIdError == IDS_RF_DOMAIN )
+		bFiltered = !m_strDomains.IsEmpty();
+	else if	( uIdError == IDS_RF_LINK_DOMAIN )
 		bFiltered = !m_strDomains.IsEmpty();
 	else if	( uIdError == IDS_RF_FAKE_ALIAS )
 		bFiltered = !m_strNames.IsEmpty();
@@ -4325,10 +4437,8 @@ CMainWnd::IsFiltered( UINT uIdError )
 		bFiltered = m_dwSender & ( 0x0001 << (uIdError-IDS_RF_MESSAGEID) );
 	else if	( uIdError == IDS_RF_TIMEZONE )
 		bFiltered = !m_strTimes.IsEmpty();
-	else if	( uIdError == IDS_RF_LINK_DOMAIN )
-		bFiltered = !m_strDomains.IsEmpty();
-	else if	( uIdError == IDS_RF_LINK_EVASIVE )
-		bFiltered = m_dwCode & ( 0x0001 << (IDS_RF_EVASIVECODE-IDS_RF_CHARSET) );
+	else if	( uIdError == IDS_RF_WORD )
+		bFiltered = !m_strWords.IsEmpty();
 
 	return	bFiltered;
 }

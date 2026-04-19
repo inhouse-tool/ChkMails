@@ -13,11 +13,12 @@
 #define IDD_RECIPIENT                   136
 #define IDD_SENDER                      137
 #define IDD_ZONE                        138
-#define IDD_WHITE                       139
-#define IDI_IDLE                        140
-#define IDI_BUSY                        141
-#define IDI_RED                         142
-#define IDI_YELLOW                      143
+#define IDD_WORD                        140
+#define IDD_WHITE                       141
+#define IDI_IDLE                        142
+#define IDI_BUSY                        143
+#define IDI_RED                         144
+#define IDI_YELLOW                      145
 #define IDS_MB_INTRODUCE                150
 #define IDS_MB_EXIT                     151
 #define IDS_MB_POP_UNCHOSEN             152
@@ -39,19 +40,20 @@
 #define IDS_RF_CHARSET                  201
 #define IDS_RF_CONTROLCODE              202
 #define IDS_RF_EVASIVECODE              203
-#define IDS_RF_UNMAPPEDCODE             204
-#define IDS_RF_DOMAIN                   205
-#define IDS_RF_FAKE_ALIAS               206
-#define IDS_RF_RECIPIENT                207
-#define IDS_RF_MESSAGEID                208
-#define IDS_RF_CALL_BY_ADDR             209
-#define IDS_RF_FAKE_DOMAIN              210
-#define IDS_RF_LINK_FAKED               211
-#define IDS_RF_SUBJECT_FAKED            212
-#define IDS_RF_SENDER_FAKED             213
-#define IDS_RF_TIMEZONE                 214
-#define IDS_RF_LINK_DOMAIN              215
-#define IDS_RF_LINK_EVASIVE             216
+#define IDS_RF_LINK_EVASIVE             204
+#define IDS_RF_UNMAPPEDCODE             205
+#define IDS_RF_DOMAIN                   206
+#define IDS_RF_LINK_DOMAIN              207
+#define IDS_RF_FAKE_ALIAS               208
+#define IDS_RF_RECIPIENT                209
+#define IDS_RF_MESSAGEID                210
+#define IDS_RF_CALL_BY_ADDR             211
+#define IDS_RF_FAKE_DOMAIN              212
+#define IDS_RF_LINK_FAKED               213
+#define IDS_RF_SUBJECT_FAKED            214
+#define IDS_RF_SENDER_FAKED             215
+#define IDS_RF_TIMEZONE                 216
+#define IDS_RF_WORD                     217
 #define IDS_RE_DATE                     240
 #define IDS_RE_ABBR                     241
 #define IDS_RE_ENCODING                 242
@@ -112,6 +114,7 @@
 #define IDC_CHECK_SENDER_FAKESENDER     1065
 #define IDC_CHECK_SENDER_FAKEBODY       1065
 #define IDC_EDIT_SENDER_FAKEBODY        1066
+#define IDC_SPIN_SENDER_FAKEBODY        1067
 #define IDC_LIST_RECIPIENT              1070
 #define IDC_EDIT_RECIPIENT              1071
 #define IDC_BUTTON_RECIPIENT_ADD        1072
@@ -123,11 +126,13 @@
 #define IDC_LIST_TIMEZONE               1080
 #define IDC_STATIC_DST                  1081
 #define IDC_STATIC_LOCALTIME            1082
-#define IDC_LIST_WHITE                  1090
-#define IDC_BUTTON_WHITE_DEL            1091
-#define IDC_STATIC_WHITE                1092
-#define IDC_SPIN1                       1100
-#define IDC_SPIN_SENDER_FAKEBODY        1100
+#define IDC_LIST_WORD                   1090
+#define IDC_EDIT_WORD                   1091
+#define IDC_BUTTON_WORD_ADD             1092
+#define IDC_BUTTON_WORD_DEL             1093
+#define IDC_LIST_WHITE                  1100
+#define IDC_BUTTON_WHITE_DEL            1101
+#define IDC_STATIC_WHITE                1102
 #define ID_MENU_ACCOUNTS                32771
 #define ID_MENU_SETUP                   32772
 #define ID_MENU_FILTER                  32773
@@ -140,7 +145,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        180
 #define _APS_NEXT_COMMAND_VALUE         32780
-#define _APS_NEXT_CONTROL_VALUE         1101
+#define _APS_NEXT_CONTROL_VALUE         1110
 #define _APS_NEXT_SYMED_VALUE           110
 #endif
 #endif

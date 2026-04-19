@@ -11,6 +11,7 @@
 #include "RecipientPage.h"
 #include "SenderPage.h"
 #include "ZonePage.h"
+#include "WordPage.h"
 #include "WhitePage.h"
 
 class CFilterSheet : public CProperSheet
@@ -27,6 +28,7 @@ public:
 	CRecipientPage	m_pageRecipient;
 	CSenderPage	m_pageSender;
 	CZonePage	m_pageZone;
+	CWordPage	m_pageWord;
 	CWhitePage	m_pageWhite;
 
 protected:
