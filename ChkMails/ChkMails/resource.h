@@ -52,8 +52,9 @@
 #define IDS_RF_LINK_FAKED               213
 #define IDS_RF_SUBJECT_FAKED            214
 #define IDS_RF_SENDER_FAKED             215
-#define IDS_RF_TIMEZONE                 216
-#define IDS_RF_WORD                     217
+#define IDS_RF_SENDER_OPTHEADER         216
+#define IDS_RF_TIMEZONE                 217
+#define IDS_RF_WORD                     218
 #define IDS_RE_DATE                     240
 #define IDS_RE_ABBR                     241
 #define IDS_RE_ENCODING                 242
@@ -113,8 +114,9 @@
 #define IDC_CHECK_SENDER_FAKESUBJECT    1064
 #define IDC_CHECK_SENDER_FAKESENDER     1065
 #define IDC_CHECK_SENDER_FAKEBODY       1065
-#define IDC_EDIT_SENDER_FAKEBODY        1066
-#define IDC_SPIN_SENDER_FAKEBODY        1067
+#define IDC_CHECK_SENDER_OPTHEADER      1066
+#define IDC_EDIT_SENDER_FAKEBODY        1067
+#define IDC_SPIN_SENDER_FAKEBODY        1068
 #define IDC_LIST_RECIPIENT              1070
 #define IDC_EDIT_RECIPIENT              1071
 #define IDC_BUTTON_RECIPIENT_ADD        1072

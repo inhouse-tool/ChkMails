@@ -29,7 +29,7 @@ CSenderPage::OnInitDialog( void )
 {
 	CPropertyPage::OnInitDialog();
 
-	for	( int i = 0; i < 6; i++ )
+	for	( int i = 0; i < 7; i++ )
 		if	( m_dwFlags & ( 1 << i ) )
 			((CButton*)GetDlgItem( IDC_CHECK_SENDER_MESSAGEID+i ))->
 				SetCheck( BST_CHECKED );
@@ -45,7 +45,7 @@ void
 CSenderPage::OnOK( void )
 {
 	m_dwFlags = 0xffff;
-	for	( int i = 0; i < 6; i++ )
+	for	( int i = 0; i < 7; i++ )
 		if	( ((CButton*)GetDlgItem( IDC_CHECK_SENDER_MESSAGEID+i ))->
 				GetCheck() != BST_CHECKED )
 			m_dwFlags &= ~( 1 << i );

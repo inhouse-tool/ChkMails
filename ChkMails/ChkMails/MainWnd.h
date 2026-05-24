@@ -58,11 +58,12 @@ public:
 	     CStringA	m_strFrom,
 			m_strSender;
 	     CStringA	m_strZone;
-	     CString	m_strTalking;
 		int	m_nAuth;
 		bool	m_bHit;
 		DWORD	m_dwReason;
 		CString	m_strLinks;
+		CString	m_strTalking;
+		CString	m_strOptHeader;
 		CString	m_strFile;
 		CAttr( void )
 		{
@@ -177,20 +178,20 @@ protected:
 		void	PollMails( void );
 		bool	ParseMail( CStringA strMail, LPCTSTR pchFile = NULL );
 
-		CAttr	GetAttr(   CStringA strMail );
-		void	GetAuth(   CStringA strMail, CAttr& attr );
-		void	GetFrom(   CStringA strMail, CAttr& attr );
-		void	GetSender( CStringA strMail, CAttr& attr );
-		void	GetType(   CStringA strMail, CAttr& attr );
-		void	GetEncode( CStringA strMail, CAttr& attr );
-		void	GetDate(   CStringA strMail, CAttr& attr );
-		int	GetCodePage(   CStringA strMail );
-		void	CheckToCc(     CStringA strMail, CAttr& attr );
-		void	CheckMID(      CStringA strMail, CAttr& attr );
-		void	CheckReceived( CStringA strMail, CAttr& attr );
+		CAttr	GetAttr(   CStringA strHeader, LPCTSTR pchFile = NULL );
+		void	GetAuth(   CStringA strHeader, CAttr& attr );
+		void	GetFrom(   CStringA strHeader, CAttr& attr );
+		void	GetSender( CStringA strHeader, CAttr& attr );
+		void	GetType(   CStringA strHeader, CAttr& attr );
+		void	GetEncode( CStringA strHeader, CAttr& attr );
+		void	GetDate(   CStringA strHeader, CAttr& attr );
+		int	GetCodePage(   CStringA strHeader );
+		void	CheckToCc(     CStringA strHeader, CAttr& attr );
+		void	CheckMID(      CStringA strHeader, CAttr& attr );
+		void	CheckReceived( CStringA strHeader, CAttr& attr );
 		void	CheckBlackList( CStringA strSender, CAttr& attr );
 		CTime	GetTime( CStringA strDate, CAttr& attr );
-	       CStringA	GetHeaderFieldA( CStringA strMail, CStringA strField );
+	       CStringA	GetHeaderFieldA( CStringA strHeader, CStringA strField );
 	       CStringA	MakeLowerA( CStringA strSource );
 
 		CString	MakeLog( CStringA strMail, CAttr& attr );
@@ -218,6 +219,7 @@ protected:
 		void	HexToUnicode( CString& strLines );
 		CString	UnicodeToStr( UINT uCode );
 
+		void	CheckHeaderFields( CStringA strIn, CAttr& attr );
 		void	CheckUnicode(   CString& strLog,   CAttr& attr );
 		bool	CheckAlias(     CString  strLog,   CAttr& attr );
 		bool	CheckSubject(   CString  strLog,   CAttr& attr );

@@ -944,12 +944,7 @@ CMainWnd::ParseMail( CStringA strMail, LPCTSTR pchFile )
 
 		CStringA strHeader = strMail.Left( iHeader+4 );
 
-		attr = GetAttr( strHeader );
-
-		// Set the file name if given.
-
-		if	( pchFile )
-			attr.m_strFile = pchFile;
+		attr = GetAttr( strHeader, pchFile );
 
 		// Make a log of the mail.
 
@@ -957,7 +952,7 @@ CMainWnd::ParseMail( CStringA strMail, LPCTSTR pchFile )
 
 		// Leave a log of the mail to be discarded.
 
-		if	( m_bLogAll || !attr.m_dwReason )
+		if	( m_bLogAll || attr.m_dwReason )
 			SaveLog( strMail, strLog, attr );
 
 		return	!attr.m_dwReason;
@@ -974,32 +969,55 @@ CMainWnd::ParseMail( CStringA strMail, LPCTSTR pchFile )
 }
 
 CAttr
-CMainWnd::GetAttr( CStringA strMail )
+CMainWnd::GetAttr( CStringA strHeader, LPCTSTR pchFile )
 {
 	CAttr	attr;
 
-	GetAuth(   strMail, attr );
-	GetFrom(   strMail, attr );
-	GetSender( strMail, attr );
-	GetType(   strMail, attr );
-	GetEncode( strMail, attr );
-	GetDate(   strMail, attr );
-	CheckToCc(     strMail, attr );
-	CheckMID(      strMail, attr );
-	CheckReceived( strMail, attr );
+	// Set the file name if given.
+
+	if	( pchFile )
+		attr.m_strFile = pchFile;
+
+	// Set the attributes.
+
+	GetAuth(   strHeader, attr );
+	GetFrom(   strHeader, attr );
+	GetSender( strHeader, attr );
+	GetType(   strHeader, attr );
+	GetEncode( strHeader, attr );
+	GetDate(   strHeader, attr );
+	CheckToCc(     strHeader, attr );
+	CheckMID(      strHeader, attr );
+	CheckReceived( strHeader, attr );
 
 	return	attr;
 }
 
 void
-CMainWnd::GetAuth( CStringA strMail, CAttr& attr )
+CMainWnd::GetAuth( CStringA strHeader, CAttr& attr )
 {
-	// Get authencication results.
-
-	CStringA strAuth = GetHeaderFieldA( strMail, "\nAuthentication-Results: " );
-	strAuth = MakeLowerA( strAuth );
-
 	DWORD	dwAuth = 0x0;
+	strHeader.MakeLower();
+	CStringA strAuth;
+
+	int	x = 0;
+	for	( ;; ){
+		int	x2 = strHeader.Find( "\nauthentication-results: ", x );
+		if	( x2 < 0 )
+			break;
+		x = x2;
+		x += 25;
+		for	( ;; ){
+			x2 = strHeader.Find( "\r\n", x );
+			if	( x2 < 0 )
+				break;
+			strAuth += strHeader.Mid( x, x2-x );
+			if	( strHeader[x2-1] != ';' )
+				break;
+			x = x2+2;
+		}
+		strAuth += "\r\n";
+	}
 
 	// Check each result.
 
@@ -1049,11 +1067,11 @@ CMainWnd::GetAuth( CStringA strMail, CAttr& attr )
 }
 
 void
-CMainWnd::GetFrom( CStringA strMail, CAttr& attr )
+CMainWnd::GetFrom( CStringA strHeader, CAttr& attr )
 {
 	// Get nominal sender.
 
-	CStringA strFrom = GetHeaderFieldA( strMail, "\nFrom: " );
+	CStringA strFrom = GetHeaderFieldA( strHeader, "\nFrom: " );
 	if	( strFrom.IsEmpty() ){
 		return;
 	}
@@ -1113,11 +1131,11 @@ CMainWnd::GetFrom( CStringA strMail, CAttr& attr )
 }
 
 void
-CMainWnd::GetSender( CStringA strMail, CAttr& attr )
+CMainWnd::GetSender( CStringA strHeader, CAttr& attr )
 {
 	// Get actual sender from smtp.mailfrom in Authentication-Results: ( RFC 5451 ) 
 
-	CStringA strAuth = GetHeaderFieldA( strMail, "\nAuthentication-Results: " );
+	CStringA strAuth = GetHeaderFieldA( strHeader, "\nAuthentication-Results: " );
 
 	int	x = strAuth.Find( "smtp.mailfrom=" );
 	if	( x >= 0 ){
@@ -1146,9 +1164,9 @@ CMainWnd::GetSender( CStringA strMail, CAttr& attr )
 		CStringA strSender, strReceived;
 		x = 0;
 		do{
-			int	x2 = strMail.Find( "\nReceived: ", x );
+			int	x2 = strHeader.Find( "\nReceived: ", x );
 			if	( x2 < 0 ){
-				x2 = strMail.Find( "\nreceived: ", x );
+				x2 = strHeader.Find( "\nreceived: ", x );
 				if	( x2 < 0 )
 					break;
 			}
@@ -1156,8 +1174,8 @@ CMainWnd::GetSender( CStringA strMail, CAttr& attr )
 				break;
 			x = x2;
 			x += 10;
-			x2 = strMail.Find( "\r\n", x );
-			strReceived = strMail.Mid( x, x2-x );
+			x2 = strHeader.Find( "\r\n", x );
+			strReceived = strHeader.Mid( x, x2-x );
 
 			if	( !strReceived.IsEmpty() ){
 				int	i = strReceived.Find( "from " );
@@ -1186,9 +1204,9 @@ CMainWnd::GetSender( CStringA strMail, CAttr& attr )
 }
 
 void
-CMainWnd::GetType( CStringA strMail, CAttr& attr )
+CMainWnd::GetType( CStringA strHeader, CAttr& attr )
 {
-	CStringA strField = GetHeaderFieldA( strMail, "\nContent-Type: " );
+	CStringA strField = GetHeaderFieldA( strHeader, "\nContent-Type: " );
 
 	int	x = strField.Find( ';' );
 
@@ -1262,9 +1280,9 @@ CMainWnd::GetType( CStringA strMail, CAttr& attr )
 }
 
 void
-CMainWnd::GetEncode( CStringA strMail, CAttr& attr )
+CMainWnd::GetEncode( CStringA strHeader, CAttr& attr )
 {
-	CStringA strEncode = GetHeaderFieldA( strMail, "\nContent-Transfer-Encoding: " );
+	CStringA strEncode = GetHeaderFieldA( strHeader, "\nContent-Transfer-Encoding: " );
 
 	if	( strEncode.IsEmpty() )
 		;
@@ -1285,11 +1303,11 @@ CMainWnd::GetEncode( CStringA strMail, CAttr& attr )
 }
 
 void
-CMainWnd::GetDate( CStringA strMail, CAttr& attr )
+CMainWnd::GetDate( CStringA strHeader, CAttr& attr )
 {
 	// Take 'Date:'.
 
-	CStringA strDate = GetHeaderFieldA( strMail, "\nDate: " );
+	CStringA strDate = GetHeaderFieldA( strHeader, "\nDate: " );
 	if	( strDate.IsEmpty() )
 		FilterError( IDS_RF_TIMEZONE, attr );
 	else{
@@ -1325,12 +1343,12 @@ CMainWnd::GetDate( CStringA strMail, CAttr& attr )
 //efine	CP_UTF8		65001	// defined in <WinNls.h>
 
 int
-CMainWnd::GetCodePage( CStringA strMail )
+CMainWnd::GetCodePage( CStringA strHeader )
 {
 	int	iCodePage = 0;
 
 	CString	strKey = _T("MIME\\Database\\Charset\\");
-	strKey += strMail;
+	strKey += strHeader;
 	HKEY	hKey = NULL;
 	DWORD	dwResult = RegOpenKeyEx( HKEY_CLASSES_ROOT, strKey, 0, KEY_READ, &hKey );
 
@@ -1352,10 +1370,10 @@ CMainWnd::GetCodePage( CStringA strMail )
 		RegCloseKey( hKey );
 	}
 	if	( !iCodePage ){
-		if	( !strMail.CompareNoCase( "GB18030" ) )
+		if	( !strHeader.CompareNoCase( "GB18030" ) )
 			iCodePage = CP_GB18030;
 		else
-			TRACE( "code page '%s' is unknown.\n", strMail );
+			TRACE( "code page '%s' is unknown.\n", strHeader );
 	}
 	else{
 		// Apply 20932 instead of 51932 which is not supported in MultiByteToWideChar.
@@ -1368,20 +1386,20 @@ CMainWnd::GetCodePage( CStringA strMail )
 }
 
 void
-CMainWnd::CheckToCc( CStringA strMail, CAttr& attr )
+CMainWnd::CheckToCc( CStringA strHeader, CAttr& attr )
 {
 	CStringA strRecipients;
 
 	// Get the recipients.
 	{
-		CStringA strTo = GetHeaderFieldA( strMail, "\nTo: " );
+		CStringA strTo = GetHeaderFieldA( strHeader, "\nTo: " );
 		if	( !strTo.IsEmpty() )
 			strRecipients += strTo;
 	}
 
 	// Get carbon copies.
 	{
-		CStringA strCc = GetHeaderFieldA( strMail, "\nCc: " );
+		CStringA strCc = GetHeaderFieldA( strHeader, "\nCc: " );
 		if	( !strCc.IsEmpty() )
 			strRecipients += strCc;
 	}
@@ -1460,9 +1478,9 @@ CMainWnd::CheckToCc( CStringA strMail, CAttr& attr )
 }
 
 void
-CMainWnd::CheckMID( CStringA strMail, CAttr& attr )
+CMainWnd::CheckMID( CStringA strHeader, CAttr& attr )
 {
-	CStringA strMessageId = GetHeaderFieldA( strMail, "\nMessage-ID: " );
+	CStringA strMessageId = GetHeaderFieldA( strHeader, "\nMessage-ID: " );
 
 	if	( strMessageId.IsEmpty() )
 		FilterError( IDS_RF_MESSAGEID, attr );
@@ -1506,14 +1524,14 @@ CMainWnd::CheckMID( CStringA strMail, CAttr& attr )
 }
 
 void
-CMainWnd::CheckReceived( CStringA strMail, CAttr& attr )
+CMainWnd::CheckReceived( CStringA strHeader, CAttr& attr )
 {
 	// Get the last ( the first ) 'Received: '.
 
 	int	xIn = -1;
 	int	x = 0;
 	do{
-		x = strMail.Find( "\nReceived: ", x );
+		x = strHeader.Find( "\nReceived: ", x );
 		if	( x < 0 )
 			break;
 		x += 1+10;
@@ -1525,15 +1543,15 @@ CMainWnd::CheckReceived( CStringA strMail, CAttr& attr )
 	int	xOut = -1;
 	x = xIn;
 	do{
-		x = strMail.Find( "\r\n", x );
+		x = strHeader.Find( "\r\n", x );
 		x += 2;
-		if	( strMail[x] > ' ' ){
+		if	( strHeader[x] > ' ' ){
 			xOut = x;
 			break;
 		}
 	}while	( true );
 	
-	CStringA strReceived = strMail.Mid( xIn, xOut-xIn );
+	CStringA strReceived = strHeader.Mid( xIn, xOut-xIn );
 
 	// Get the time in the last 'Received:'.
 
@@ -1716,30 +1734,30 @@ CMainWnd::GetTime( CStringA strDate, CAttr& attr )
 }
 
 CStringA
-CMainWnd::GetHeaderFieldA( CStringA strMail, CStringA strField )
+CMainWnd::GetHeaderFieldA( CStringA strHeader, CStringA strField )
 {
 	CStringA strLine;
 
-	int	x = strMail.Find( strField );
+	int	x = strHeader.Find( strField );
 	if	( x < 0 ){
-		CStringA strLower = MakeLowerA( strMail );
+		CStringA strLower = MakeLowerA( strHeader );
 		x = strLower.Find(  MakeLowerA( strField ) );
 	}
 	if	( x >= 0 ){
-		int	xIn = strMail.Find( ": ", x );
+		int	xIn = strHeader.Find( ": ", x );
 		if	( xIn >= 0 ){
-			for	( ++xIn; strMail[xIn] <= ' '; xIn++ )
+			for	( ++xIn; strHeader[xIn] <= ' '; xIn++ )
 				;
 
-			strLine = strMail.Mid( xIn );
-			int	xBody = strMail.Find( "\r\n\r\n", xIn );
-			int	xOut  = strMail.Find( ": ",       xIn );
+			strLine = strHeader.Mid( xIn );
+			int	xBody = strHeader.Find( "\r\n\r\n", xIn );
+			int	xOut  = strHeader.Find( ": ",       xIn );
 			if	( xOut < 0 )
 				xOut = xBody;
 			else if	( xBody < xOut )
 				xOut = xBody;
 
-			strLine = strMail.Mid( xIn, xOut-xIn );
+			strLine = strHeader.Mid( xIn, xOut-xIn );
 
 			if	( xOut < xBody ){
 				xOut = strLine.ReverseFind( '\r' );
@@ -1800,7 +1818,6 @@ CMainWnd::MakeLog( CStringA strMail, CAttr& attr )
 	// Make a log from the mail header.
 
 	strLog = StringFromHeader( strHeader, attr );
-	int	cchHeader = strLog.GetLength();
 
 	// Check 'alias' in 'From:' and 'Subject:'.
 
@@ -2180,6 +2197,9 @@ CMainWnd::ShareSummary( CString strSummary )
 CString
 CMainWnd::StringFromHeader( CStringA strIn, CAttr& attr )
 {
+	if	( IsFiltered( IDS_RF_SENDER_OPTHEADER ) )
+		CheckHeaderFields( strIn, attr );
+
 	CString	strOut;
 	int	iCharset = attr.m_iCharset;
 
@@ -2436,22 +2456,28 @@ void
 CMainWnd::DecodeReason( CString& strLog, CAttr& attr )
 {
 	if	( !attr.m_strTalking.IsEmpty() ){
-		CString	strTalking;
-		strTalking.Format( _T("Talking-Like: %s\r\n"), (LPCTSTR)attr.m_strTalking );
-		strLog.Insert( 0, strTalking );
+		CString	strAdd;
+		strAdd.Format( _T("Talking-Like: %s\r\n"), (LPCTSTR)attr.m_strTalking );
+		strLog.Insert( 0, strAdd );
 	}
 
 	if	( !attr.m_strLinks.IsEmpty() ){
 		int	x = 0;
-		CString	strLinks;
+		CString	strAdd;
 		for	( ;; ){
 			CString	strLink = attr.m_strLinks.Tokenize( _T("\n"), x );
 			if	( strLink.IsEmpty() )
 				break;
-			strLinks += _T("Embedded-Link: ");
-			strLinks += strLink + _T("\r\n");
+			strAdd += _T("Embedded-Link: ");
+			strAdd += strLink + _T("\r\n");
 		}
-		strLog.Insert( 0, strLinks );
+		strLog.Insert( 0, strAdd );
+	}
+
+	if	( !attr.m_strOptHeader.IsEmpty() ){
+		CString	strAdd;
+		strAdd.Format( _T("Unknown-Header: %s\r\n"), (LPCTSTR)attr.m_strOptHeader );
+		strLog.Insert( 0, strAdd );
 	}
 
 	CString	strReason;
@@ -2859,6 +2885,187 @@ CMainWnd::UnicodeToStr( UINT uCode )
 }
 
 void
+CMainWnd::CheckHeaderFields( CStringA strIn, CAttr& attr )
+{	// Based on RFC 4021 and others. See below:
+	// https://www.iana.org/assignments/message-headers/message-headers.xhtml
+	// and refer below for BIMI
+	// https://datatracker.ietf.org/doc/draft-brand-indicators-for-message-identification/
+	// and for "X-" prefix, keep the below in mind...
+	// https://datatracker.ietf.org/doc/html/rfc6648
+	static	char*	apchField[] = {
+			"Accept-Language",
+			"Alternate-Recipient",
+		//	"Apparently-To",				// obsolete
+			"ARC-Authentication-Results",			// RFC 8617 ( experimental )
+			"ARC-Message-Signature",			// RFC 8617 ( experimental )
+			"ARC-Seal",					// RFC 8617 ( experimental )
+			"Archived-At",
+			"Authentication-Results",
+			"Auto-Forwarded",
+			"Autoforwarded",
+			"Auto-Submitted",
+			"Autosubmitted",
+			"BIMI-Indicator",
+			"BIMI-Location",
+			"BIMI-Selector",
+			"Cc",
+			"Comments",
+			"Content-Alternative",
+			"Content-Base",
+			"Content-Class",				// MS specific
+			"Content-Description",
+			"Content-Disposition",
+			"Content-Duration",
+			"Content-features",
+			"Content-ID",
+			"Content-Identifier",
+			"Content-Language",
+			"Content-Location",
+			"Content-MD5",
+			"Content-Return",
+			"Content-Transfer-Encoding",
+			"Content-Type",
+			"Conversion",
+			"Conversion-With-Loss",
+			"Date",
+			"Deferred-Delivery",
+			"Delivery-Date",
+			"Discarded-X400-IPMS-Extensions",
+			"Discarded-X400-MTS-Extensions",
+			"Disclose-Recipients",
+			"Disposition-Notification-Options",
+			"Disposition-Notification-To",
+			"DKIM-Signature",
+			"DL-Expansion-History",
+			"DomainKey-Signature",
+		//	"Downgraded-Cc",				// obsolete
+		//	"Downgraded-Disposition-Notification-To",	// obsolete
+			"Downgraded-Final-Recipient",
+		//	"Downgraded-From",				// obsolete
+			"Downgraded-In-Reply-To",
+		//	"Downgraded-Mail-From",				// obsolete
+			"Downgraded-Message-Id",
+			"Downgraded-Original-Recipient",
+		//	"Downgraded-Rcpt-To",				// obsolete
+			"Downgraded-References",
+		//	"Downgraded-Reply-To",				// obsolete
+		//	"Downgraded-Resent-Cc",				// obsolete
+		//	"Downgraded-Resent-From",			// obsolete
+		//	"Downgraded-Resent-Reply-To",			// obsolete
+		//	"Downgraded-Resent-Sender",			// obsolete
+		//	"Downgraded-Resent-To",				// obsolete
+		//	"Downgraded-Return-Path",			// obsolete
+		//	"Downgraded-Sender",				// obsolete
+		//	"Downgraded-To",				// obsolete
+			"Encoding",
+		//	"Encrypted",					// obsolete
+			"Envelope-From",
+			"Errors-To",					// RFC 2076 ( discouraged )
+			"Expires",
+			"Expiry-Date",
+			"Feedback-ID",					// Gmail specific
+			"From",
+			"Generate-Delivery-Report",
+			"In-Reply-To",
+			"Incomplete-Copy",
+			"Importance",
+			"Keywords",
+			"Language",
+			"Latest-Delivery-Time",
+			"List-Archive",
+			"List-Help",
+			"List-ID",
+			"List-Owner",
+			"List-Post",
+			"List-Subscribe",
+			"List-Unsubscribe",
+			"List-Unsubscribe-Post",
+			"Message-Context",
+			"Message-ID",
+			"Message-Id",					// @bma.mpse.jp
+			"Message-Type",
+			"MIME-Version",
+		//	"MMHS-Exempted-Address", etc.			// RFC 6477
+			"MT-Priority",					// RFC 6758
+			"Organization",
+			"Original-Encoded-Information-Types",
+			"Original-From",
+			"Original-Message-ID",
+			"Original-Recipient",
+			"Original-Subject",
+			"Originator-Return-Address",
+			"PICS-Label",
+			"Precedence",					// RFC 2076 ( discouraged )
+			"Prevent-NonDelivery-Report",
+			"Priority",
+			"Received",
+			"References",
+			"Reply-By",
+			"Reply-To",
+			"Require-Recipient-Valid-Since",		// RFC 7293
+			"Resent-Cc",
+			"Resent-Date",
+			"Resent-From",
+			"Resent-Message-ID",
+			"Resent-Reply-To",
+			"Resent-Sender",
+			"Resent-To",
+			"Return-Path",
+			"Sender",
+			"Sensitivity",
+			"Solicitation",
+			"Subject",
+			"Supersedes",
+			"Thread-Index",					// MS specific
+			"Thread-Topic",					// MS specific
+			"TLS-Report-Domain",
+			"TLS-Report-Submitter",
+			"TLS-Required",
+			"To",
+			"User-Agent",
+			"VBR-Info",					// RFC 5518
+			"X400-Content-Identifier",
+			"X400-Content-Return",
+			"X400-Content-Type",
+			"X400-MTS-Identifier",
+			"X400-Originator",
+			"X400-Received",
+			"X400-Recipients",
+			"X400-Trace",
+			NULL };
+	int	x = 0;
+	for	( ;; ){
+		int	i = x;
+		x = strIn.Find( "\r\n", x );
+		if	( x < 0 )
+			break;
+		x += 2;
+		CStringA strLine = strIn.Mid( i, x-i );
+		if	( strLine[0] <= ' ' )
+			continue;
+
+		i = strLine.Find( ':' );
+		CStringA strField = strLine.Left( i );
+
+		if	( strField[1] == '-' )
+			if	( strField[0] == 'X' )
+				continue;
+			else if	( strField[0] == 'x' )
+				continue;
+
+		for	( i = 0; apchField[i]; i++ )
+			if	( strField == apchField[i] )
+				break;
+		if	( !apchField[i] ){
+			FilterError( IDS_RF_SENDER_OPTHEADER, attr );
+			if	( !attr.m_strOptHeader.IsEmpty() )
+				attr.m_strOptHeader += _T(", ");
+			attr.m_strOptHeader += CString( strField );
+		}
+	}
+}
+
+void
 CMainWnd::CheckUnicode( CString& strLog, CAttr &attr )
 {
 #ifdef	_UNICODE
@@ -2918,7 +3125,7 @@ CMainWnd::CheckUnicode( CString& strLog, CAttr &attr )
 				uCode |= ( strLog[iTrace+1] & 0x3ff );
 				uCode += 0x10000;
 			}
-			TRACE( L"%s U+%04x as '%s'\n", pch, uCode, strLog.Mid( xS, xE-xS ) );
+		//	TRACE( L"%s U+%04x as '%s'\n", pch, uCode, strLog.Mid( xS, xE-xS ) );
 		}
 #endif//_DEBUG
 	}
@@ -2973,6 +3180,11 @@ CMainWnd::CheckAlias( CString strLog, CAttr& attr )
 
 		strAlias.Remove( '"' );
 
+		if	( strTo == strAlias ){
+			FilterError( IDS_RF_CALL_BY_ADDR, attr );
+			break;
+		}
+#if	0	// some mailer's defaults hit this
 		x = strTo.Find( '@' );
 		CString	strUser = strTo.Left( x );
 
@@ -2986,6 +3198,7 @@ CMainWnd::CheckAlias( CString strLog, CAttr& attr )
 			break;
 
 		FilterError( IDS_RF_CALL_BY_ADDR, attr );
+#endif
 	}while	( 0 );
 
 	return	nHit? true: false;
@@ -3035,6 +3248,17 @@ CMainWnd::CheckTalking( CString strBody, CAttr& attr )
 		}
 	}
 
+	// Remove combining characters.
+
+	for	( WCHAR chCombining = 0x0300; chCombining <= 0x036f; chCombining++ ){
+		int	x;
+		while	( ( x = strBody.Find( chCombining ) ) >= 0 )
+			strBody.Delete( x );
+	}
+
+	CString	strBodyL = strBody;
+	strBodyL.MakeLower();
+
 	// Get domain name of the mail.
 
 	CString	strDomain;		
@@ -3047,7 +3271,7 @@ CMainWnd::CheckTalking( CString strBody, CAttr& attr )
 
 	// Check the domain name.
 
-	CString	strTalking;
+	CString	strTalking, strTalkingL;
 
 	int	iName = 0;
 	while	( !( nHit & 0x02 ) ){
@@ -3055,15 +3279,18 @@ CMainWnd::CheckTalking( CString strBody, CAttr& attr )
 		if	( iName < 0 )
 			break;
 
+		// Take a registered domain and its name.
+
 		int	x = strName.Find( '\t' );
 		CString	strRegisteredWord   = strName.Left( x );
 		CString	strRegisteredDomain = strName.Mid( x+1 );
 		NormalizeAlias( strRegisteredWord );
 
-		CString	strBodyL = strBody;
-		strBodyL.MakeLower();
 		CString	strRegisteredWordL = strRegisteredWord;
 		strRegisteredWordL.MakeLower();
+
+		// Search the name in the body text.
+		// ( in lower case for the name longer than 4 letters )
 
 		x = 0;
 		int	n = 0;
@@ -3092,10 +3319,11 @@ CMainWnd::CheckTalking( CString strBody, CAttr& attr )
 			if	( IsDomainRegisterd( strDomain, strRegisteredDomain ) )
 				nHit |= 0x02;
 
-			if	( strTalking.Find( strRegisteredWord ) < 0 ){
+			if	( strTalkingL.Find( strRegisteredWordL ) < 0 ){
 				if	( !strTalking.IsEmpty() )
 					strTalking += _T(", ");
-				strTalking += strRegisteredWord;
+				strTalking  += strRegisteredWord;
+				strTalkingL += strRegisteredWordL;
 			}
 		}
 	}
@@ -3236,6 +3464,7 @@ CMainWnd::NormalizeAlias( CString& strAlias )
 	strAlias.Replace( L" ",           L"" );
 	strAlias.Replace( UC_REPLACEMENT, L"" );
 	strAlias.Trim();
+
 #endif//_UNICODE
 }
 
@@ -4382,21 +4611,20 @@ CMainWnd::GetHeaderField( CString strMail, CString strField )
 				;
 
 			strLine = strMail.Mid( xIn );
-			int	xBody = strMail.Find( L"\r\n\r\n", xIn );
-			int	xOut  = strMail.Find( L": ",       xIn );
-			if	( xOut < 0 )
-				xOut = xBody;
-			else if	( xBody < xOut )
-				xOut = xBody;
+			int	xBody = strLine.Find( L"\r\n\r\n" );
+			strLine = strLine.Left( xBody+2 );
 
-			strLine = strMail.Mid( xIn, xOut-xIn );
-
-			if	( xOut < xBody ){
-				xOut = strLine.ReverseFind( '\r' );
-				if	( xOut >= 0 )
-					strLine = strLine.Left( xOut );
-				strLine.Replace( L"\r\n\t", L" " );
+			int	xOut = 0;			
+			for	( ;; ){
+				xOut = strLine.Find( L"\r\n", xOut );
+				TCHAR	ch = strLine[xOut+2];
+				if	( !ch || ch > ' ' )
+					break;
+				else
+					xOut += 2;
 			}
+
+			strLine = strLine.Left( xOut );
 		}
 	}
 
@@ -4433,7 +4661,7 @@ CMainWnd::IsFiltered( UINT uIdError )
 		bFiltered = !m_strNames.IsEmpty();
 	else if	( uIdError == IDS_RF_RECIPIENT )
 		bFiltered = !m_strRecipients.IsEmpty();
-	else if	( uIdError >= IDS_RF_MESSAGEID && uIdError <= IDS_RF_SENDER_FAKED )
+	else if	( uIdError >= IDS_RF_MESSAGEID && uIdError <= IDS_RF_SENDER_OPTHEADER )
 		bFiltered = m_dwSender & ( 0x0001 << (uIdError-IDS_RF_MESSAGEID) );
 	else if	( uIdError == IDS_RF_TIMEZONE )
 		bFiltered = !m_strTimes.IsEmpty();
