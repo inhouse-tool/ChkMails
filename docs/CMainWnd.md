@@ -121,9 +121,11 @@
 [`StringToUTF8`](#stringtoutf8)
 [`LFtoCRLF`](#lftocrlf)
 [`HexToUnicode`](#hextounicode)
+[`UnicodeToStr`](#unicodetostr)
 
 #### ログチェック関連
 
+[`CheckHeaderFields`](#checkheaderfields)
 [`CheckUnicode`](#checkunicode)
 [`CheckAlias`](#checkalias)
 [`CheckSubject`](#checksubject)
@@ -1897,6 +1899,36 @@ LF 改行を CR/LF 改行に入れ替えます.
 ログが読みやすくなるように入れてみました.
 
 [`StringFromBody`](#stringfrombody) からのみ呼ばれています.
+
+
+## `UnicodeToStr`
+
+UNICODE ( [UTF-16LE](https://ja.wikipedia.org/wiki/UTF-16) ) 文字一つを文字列に変換します.
+
+単に当たられた文字コードを文字列の先頭に据えて '\0' で締めくくるだけのようなものですが,
+`U+10000` を超えるコードポイントに対しては,
+[サロゲートペア](https://ja.wikipedia.org/wiki/Unicode#サロゲートペア) の文字列を生成します.<br>
+( むしろその手当てのためだけにあるような関数です. )
+
+[`HexToUnicode`](#hextounicode) からのみ呼ばれています.
+
+
+## `CheckHeaderFields`
+
+メールヘッダーにある各ヘッダーフィールドが, 標準的に綴られているかチェックします.
+
+* いまさらこれを使ってくるのはおかしいというレベルの古い定義は除き,
+* まだ実験段階 ( experimental ) だけと新しもの好きなら使うかもしれない新しい定義を認め,
+* RFC では定義されていないけど某大手が堂々と使ってくるローカルな定義は認め,
+* キャピタライズが微妙に違うけどそう綴ってくる某配信代行業者が実在するローカルな定義は認め,
+* 頭が `X-` で始まっていれば何でも認め, <sub>( この際 [RFC 6648](https://datatracker.ietf.org/doc/html/rfc6648)
+の言い分に対しては「そうは言っても世の中は付いて行けてないよ。」というスタンス )</sub>
+
+というルールで,
+与えられたメールヘッダーの中身を全てチェックし,
+ルールから外れたヘッダーフィールドを見つけた場合は `CAttr` に「破棄理由」としてその旨を書いて報告を上げます.
+
+[`StringFromHeader`](#stringfromheader) からのみ呼ばれています.
 
 
 ## `CheckUnicode`
