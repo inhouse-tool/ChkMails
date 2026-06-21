@@ -1,5 +1,8 @@
-# TLS1.2 ‚É‚Â‚¢‚Ä<br>
-<sup>( ChkMails ‰”Å‚Ìo‚½ 2025”N‰“ª‚É [`CParaSocket`](CparaSocket.md) ‚ÅƒAƒiƒEƒ“ƒX‚µ‚Ä‚¢‚½ŒÃ‚¢Œ©‰ğ )</sup>
+# TLS1.2 ‚É‚Â‚¢‚Ä
+
+> [!CAUTION]
+ChkMails ‰”Å‚Ìo‚½ 2025”N‰“ª‚É [`CParaSocket`](CparaSocket.md) ‚ÅƒAƒiƒEƒ“ƒX‚µ‚Ä‚¢‚½ŒÃ‚¢Œ©‰ğ‚Å‚·.
+ÅV‚ÌŒ©‰ğ‚Í[‚±‚¿‚ç](TLS1.3.md).
 
 Œ‹˜_‚©‚çŒ¾‚¦‚Î, –{•i‚Í TLS1.2 ‚ÅƒtƒBƒbƒNƒX‚µ‚Ä‚¨‚è, TLS1.3 ‚Í‚Ü‚¾ƒTƒ|[ƒg‚µ‚Ä‚¨‚è‚Ü‚¹‚ñ.
 
@@ -71,8 +74,8 @@ POP3 ‚Æ‚µ‚Ä‚Íè‡‚ªi‚Ü‚¸, ‚±‚¿‚ç‚ª‰½‚à‘—M‚µ‚È‚¢‚Ü‚ÜŠÔØ‚ê‚ÅƒT[ƒo[‚©‚çØ’f‚
 ‚±‚ÌÀŒ±“_‚Å‚ÌŠÖ˜Aƒ‰ƒCƒuƒ‰ƒŠ[‚Ì”Å”‚Í:
 
 ```
-C:Windows\System32\secur32.dll            10.0.26100.1    (WinBuild.160101.0800)
-C:Windows\System32\sspicli.dll            10.0.26100.2454 (WinBuild.160101.0800)
+C:\Windows\System32\secur32.dll            10.0.26100.1    (WinBuild.160101.0800)
+C:\Windows\System32\sspicli.dll            10.0.26100.2454 (WinBuild.160101.0800)
 ```
 
 ‚Æ‚È‚Á‚Ä‚¨‚è,
