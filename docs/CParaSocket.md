@@ -47,8 +47,16 @@
 [`CloseTLS`](#closetls)
 [`FinishTLS`](#finishtls)
 
-[`EnqueueData`](#enqueuedata)
-[`DequeueData`](#dequeuedata)
+[`SendBackTLS`](#sendbacktls)
+[`ConsumeTLS`](#consumetls)
+[`SeekBufTLS`](#seekbuftls)
+
+[`EnqueueTLS`](#enqueuetls)
+[`DequeueTLS`](#dequeuetls)
+
+#### ”Ä—pŠÖ”
+
+[`GetWinVer`](#getwinver)
 
 
 ## ŠT—v
@@ -96,7 +104,7 @@ POP3 ‚Å‚à POP3S ‚Å‚à‚â‚é‚±‚Æ‚Í“¯‚¶‚Å‚·.
 | ƒ|[ƒg”Ô† | ƒT[ƒrƒX |
 | --- | --- |
 | 443 | [HTTPS](https://ja.wikipedia.org/wiki/HTTPS) |
-| 465 | [SMPTS](https://ja.wikipedia.org/wiki/SMTPS) |
+| 465 | [SMTPS](https://ja.wikipedia.org/wiki/SMTPS) |
 | 993 | [IMAPS](https://ja.wikipedia.org/wiki/Internet_Message_Access_Protocol)
 | 995 | [POP3S](https://ja.wikipedia.org/wiki/Post_Office_Protocol#ˆÃ†‰»)
 
@@ -129,10 +137,7 @@ POP3 ‚Å‚à POP3S ‚Å‚à‚â‚é‚±‚Æ‚Í“¯‚¶‚Å‚·.
 
 ‚±‚Ì class ‚Ì destructor ‚Å‚·.
 
-‰Ò“­’†‚ÉŠm•Û‚µ‚½ƒƒ‚ƒŠ[‚ğŠJ•ú‚µ‚Ä,
-Šî’ê class
-[`CAsyncSocket`](https://learn.microsoft.com/ja-jp/cpp/mfc/reference/casyncsocket-class)
-‚Ì destructor ‚Åƒ\ƒPƒbƒg‚ğ”jŠü‚µ‚Ü‚·.
+‰Ò“­’†‚ÉŠm•Û‚µ‚½ƒƒ‚ƒŠ[‚ğŠJ•ú‚µ‚Ü‚·.
 
 
 ## `Connect`
@@ -346,14 +351,14 @@ Socket ‚Ìó‘Ô•Ï‰»‚ğƒAƒvƒŠ‘w‚É’Ê’m‚µ‚Ü‚·.
 
 ‚±‚ÌŠÖ”‚ª”²‚¯‚é‚Ü‚Å‚És‚¤ˆ—“à—e‚ÍˆÈ‰º‚Ì’Ê‚è‚Å‚·:
 
+1. [`GetWinVer`](#getwinver) ‚Å Windows&reg; ‚Ìƒo[ƒWƒ‡ƒ“‚ğ“Ç‚İ,
+Windows&reg;11ˆÈ~‚È‚ç TLS1.3 ‚ğ,
+Windows&reg;10ˆÈ‘O‚È‚ç TLS1.2 ‚ğƒ`ƒ‡ƒCƒX.
 1. [`AcquireCredentialsHandle`](https://learn.microsoft.com/ja-jp/windows/win32/secauthn/acquirecredentialshandle--schannel)
 ‚Å TLS ‚Ì’ÊM‚ğs‚¤€”õ‚ğ®‚¦‚é.
 1. [`InitializeSecurityContext`](https://learn.microsoft.com/ja-jp/windows/win32/secauthn/initializesecuritycontext--schannel)
 ‚Å, Client Hello ‚ÌƒƒbƒZ[ƒW‚ğì¬‚·‚é.
-1. [`CAsyncSocket::Send`](https://learn.microsoft.com/ja-jp/cpp/mfc/reference/casyncsocket-class#send)
-‚Å Client Hello ‚ÌƒƒbƒZ[ƒW‚ğ‘—M‚·‚é.
-1. [`FreeContextBuffer`](https://learn.microsoft.com/ja-jp/windows/win32/api/sspi/nf-sspi-freecontextbuffer)
-‚ğŒÄ‚ñ‚Å, ‘—Mƒoƒbƒtƒ@\‚ğŠJ•ú.
+1. [`SendBackTLS`](#sendbacktls) ‚ÅClient Hello ‚ÌƒƒbƒZ[ƒW‚ğ•ÔM‚·‚é.
 1. uTLS’iŠKv‚ğ `2` ‚Éi‚ß‚é.
 
 
@@ -378,6 +383,7 @@ Socket ‚Ìó‘Ô•Ï‰»‚ğƒAƒvƒŠ‘w‚É’Ê’m‚µ‚Ü‚·.
 –{ class ‚Íu”ñ“¯Šúv‚ğMğ‚É‚µ‚Ä‚¢‚é‚Ì‚Å,
 ‘±‚«‚Í‚Â‚Ã‚«‚ÌŒ»•¨‚ğóM‚µ‚½‚Æ‚«‚Ì [`OnReceive`](#onreceive) ‚ğ‚«‚Á‚©‚¯‚Én‚ß‚é‚±‚Æ‚É‚µ‚Ä,
 ‚±‚ÌŠÖ”‚Í‚¢‚Á‚½‚ñ”²‚¯‚Ü‚·.
+‚È‚Ì‚Å‚±‚ÌŠÖ”‚Í‰½‰ñ‚©ŒÄ‚Î‚ê‚é‚±‚Æ‚É‚È‚è‚Ü‚·.
 
 ‚±‚ÌŠÖ”‚Ì’S“–ƒtƒF[ƒY‚ªI‚í‚é‚Ü‚Å‚És‚¤ˆ—“à—e‚ÍˆÈ‰º‚Ì’Ê‚è‚Å‚·:
 
@@ -385,32 +391,38 @@ Socket ‚Ìó‘Ô•Ï‰»‚ğƒAƒvƒŠ‘w‚É’Ê’m‚µ‚Ü‚·.
 ‚ÅƒT[ƒo[‚©‚ç‚ÌƒƒbƒZ[ƒW‚ğóM‚·‚é.
 1. uƒZƒLƒ…ƒŠƒeƒB[ƒg[ƒNƒ“‚Ì‚â‚èæ‚èv‚Æ‚¢‚¤‚¨‘è‚ÅóMƒƒbƒZ[ƒW‚ğ
 [`InitializeSecurityContext`](https://learn.microsoft.com/ja-jp/windows/win32/secauthn/initializesecuritycontext--schannel).
-1. `SECBUFFER_EXTRA` ‚ª‚ ‚Á‚½‚çuˆê‚ÉóM‚µ‚½ƒf[ƒ^v‚Æ‚¢‚¤‚±‚Æ‚ÅuˆÃ†ƒoƒbƒtƒ@v‚É’Ç‰Á.
-1. u‚Å‚«‚½v‚ª•Ô‚Á‚Ä‚«‚½‚çuTLS’iŠKv‚ğ `3` ‚Éi‚ß‚Ä,
-uÚ‘±Š®—¹v‚Æ [`NotifyState`](#notifystate).
-1. u‚à‚Á‚Æv‚ª•Ô‚Á‚Ä‚«‚½‚ç, Ÿ‚ÌóM‚ğ‘Ò‚Â‚½‚ß‚±‚Ìê‚ÍI‚í‚è‚É‚·‚é.
-1. u‚Â‚Ã‚­v‚ª•Ô‚Á‚Ä‚«‚½‚ç, •ÔM‚·‚×‚«ƒf[ƒ^‚ª“Y‚¦‚ç‚ê‚Ä‚¢‚½‚ç‚»‚ê‚ğ
-[`CAsyncSocket::Send`](https://learn.microsoft.com/ja-jp/cpp/mfc/reference/casyncsocket-class#send)‚µ‚Ä‚©‚ç
-[`FreeContextBuffer`](https://learn.microsoft.com/ja-jp/windows/win32/api/sspi/nf-sspi-freecontextbuffer)
-‚ğŒÄ‚ñ‚Å, ‘—Mƒoƒbƒtƒ@\‚ğŠJ•ú.
+1. u‚Å‚«‚½v‚Ü‚½‚Íu‚Â‚Ã‚­v‚ª•Ô‚Á‚Ä‚«‚½‚ç, ˆ—‘±s.
+1. u‚à‚Á‚Æv‚ª•Ô‚Á‚Ä‚«‚½‚ç, Ÿ‚ÌóM‚ğ‘Ò‚Â‚½‚ß‚±‚Ìê‚Í”²‚¯‚é.
+1. ‚»‚êˆÈŠO‚¾‚Æ‘z’èŠO‚È‚Ì‚Åu¸”sv‚Æ”»’è‚µ‚Ä”²‚¯‚é.
 
-‚Æ‚¢‚¤‚±‚Æ‚Å,
-ƒAƒvƒŠ‘w‚É–Ù‚Á‚½‚Ü‚Ü…–Ê‰º‚Å‚©‚È‚è‚Ì‚â‚èæ‚è‚ğŒo‚Ä, Œ‹˜_‚ª‚Å‚½‚Æ‚±‚ë‚Å‚Í‚¶‚ß‚Ä
-uÚ‘±Š®—¹v‚ÆƒAƒvƒŠ‘w‚É‚¨’m‚ç‚¹‚·‚é‚Ì‚Å‚·.
+‚Æ‚µ‚½ã‚Å, [`ConsumeTLS`](#consumetls) ‚ÅuˆÃ†ƒoƒbƒtƒ@v‚ği‚ß‚Ä,
+‚³‚«‚Ù‚Çu‚Å‚«‚½v‚ª•Ô‚Á‚Ä‚«‚Ä‚¢‚½‚ç,
 
-‚Æ‚±‚ë‚Åã‹L‚Ìˆ—‚ğI‚¦‚½Œã, ‚³‚ç‚ÉóMƒf[ƒ^‚ªc‚Á‚Ä‚¢‚éê‡‚ª‚ ‚è‚Ü‚·‚ª
+1. [`QueryContextAttributes()`](https://learn.microsoft.com/ja-jp/windows/win32/secauthn/querycontextattributes--schannel)
+‚ğ `SECPKG_ATTR_STREAM_SIZES`
+‚ÅŒÄ‚ñ‚Å[’ÊMã‚ÌŠeíƒuƒƒbƒNƒTƒCƒY](https://learn.microsoft.com/ja-jp/windows/win32/api/sspi/ns-sspi-secpkgcontext_streamsizes)‚ğæ“¾.
+1. ƒuƒƒbƒNƒTƒCƒY‚ª‰Šú’l‚æ‚è‘å‚«‚©‚Á‚½‚ç, ‰ü‚ß‚ÄuˆÃ†ƒoƒbƒtƒ@v‚ğŠm•Û‚µ’¼‚µ.
+1. uTLS’iŠKv‚ğ `3` ‚Éi‚ß‚Ä,
+1. uÚ‘±Š®—¹v‚Æ [`NotifyState`](#notifystate).
+
+‚Æ‚¢‚¤’iæ‚è‚ğ“¥‚İ‚Ü‚·.
+
+‚»‚Ìã‚Å, Å‰‚Ì”»’è‚Åu¸”sv‚Æ‚È‚ç‚È‚©‚Á‚½ê‡‚Í,
+
+*uo—Íƒoƒbƒtƒ@v‚É‰½‚©—­‚Ü‚Á‚Ä‚¢‚½‚ç‚»‚Ì“à—e‚ğ [`SendBackTLS`](#sendbacktls) ‚Å•ÔM.
+
+u¸”sv‚Æ”»’è‚µ‚Ä‚¢‚½ê‡‚Í,
+
+* [`FinishTLS`](#finishtls) ‚Å TLS ‚ğ•Ğ•t‚¯‚ÄI—¹.
+
+‚Æ‚µ‚Ü‚·.
+
+‘S‘Ì“I‚É‚ÍuTLS ‚Æ‚µ‚Ä‚ÌÚ‘±v‚ªŠ®—¹‚·‚é‚Ü‚Å‚Ìè‡‚ği‚ß‚Ä‚¢‚é‚Ì‚Å‚·‚ª,
+uÚ‘±‚ªŠ®—¹‚µ‚½‚ç‚à‚¤‰½‚©óM‚µ‚Ä‚¢‚½v‚Æ‚¢‚¤‚±‚Æ‚à‚ ‚è
 ( ƒT[ƒo[‚©‚çÅ‰‚Ìˆ¥A‚ğ‘—‚Á‚Ä‚­‚é [POP3](https://ja.wikipedia.org/wiki/Post_Office_Protocol)
 ‚Ìê‡‚Í‘å’ï‚»‚¤‚È‚è‚Ü‚·‚ª ),
-‚»‚Ìˆ—‚ÍˆÈ‰º‚Ì’Ê‚è‚Å‚·:
-
-1. uƒf[ƒ^v‚Æ‚¢‚¤‚¨‘è‚Å—­‚Ü‚Á‚Ä‚¢‚éuˆÃ†ƒoƒbƒtƒ@v‚ğ
-[`DecryptMessage`](https://learn.microsoft.com/ja-jp/windows/win32/secauthn/decryptmessage--schannel).
-1. •œ†‚Å‚«‚½‚ç, ‚»‚ÌƒƒbƒZ[ƒW‚ğ¡Œã‚Ì“Ç‚İo‚µ‚É”õ‚¦‚Ä [`EnqueueData`](#enqueuedata).
-1. •œ†‚³‚ê‚È‚©‚Á‚½c‚è‚ª‚ ‚Á‚½‚ç, ‚»‚Ì•ª‚ÍuˆÃ†ƒoƒbƒtƒ@v‚É–ß‚µ‚Ä‚¨‚­.
-1. u‚È‚ñ‚©óM‚µ‚½v‚Æ [`NotifyState`](#notifystate).
-
-u”ñ“¯Šúv‚ÈƒAƒvƒŠ‘w‚Æ‚µ‚Ä‚Í, ‚±‚Ìu‚È‚ñ‚©óM‚µ‚½v‚Æ‚¢‚¤’Ê’m‚ğó‚¯‚Ä,
-“– class ‚Ì [`Receive`](#receive) ‚ğŒÄ‚Ño‚·è”¤‚É‚È‚Á‚Ä‚¢‚Ü‚·.
+u‚È‚ñ‚©óM‚µ‚½v‚ÆƒAƒvƒŠ‘w‚É’Ê’m‚µ‚Ä,
+‚»‚ÌŒã‚ÌƒAƒvƒŠ‘w‚Å‚Ì‚â‚èæ‚è‚Ì‚«‚Á‚©‚¯‚Æ‚µ‚Ä‚¢‚Ü‚·.
 
 
 ## `OnReceiveTLS`
@@ -424,17 +436,25 @@ Socket ‚Ìó‘Ô•Ï‰»‚ğƒAƒvƒŠ‘w‚É’Ê’m‚µ‚Ü‚·.
 1. uˆÃ†ƒoƒbƒtƒ@v‚ª‚¢‚Á‚Ï‚¢‚¾‚Á‚½‚ç, ‰½‚à‚¹‚¸‚É‹A‚é.
 1. [`CAsyncSocket::Receive`](https://learn.microsoft.com/ja-jp/cpp/mfc/reference/casyncsocket-class#receive)
 ‚ÅˆÃ†‰»‚³‚ê‚½ƒƒbƒZ[ƒW‚ğóM.
-1. ‰½‚àóM‚Å‚«‚È‚©‚Á‚½‚ç‹A‚é.
-1. uˆÃ†ƒoƒbƒtƒ@v‚ÉóMƒf[ƒ^‚ªc‚Á‚Ä‚¢‚éŠÔ, ˆÈ‰º‚ğŒJ‚è•Ô‚µ:
+1. ‰½‚àóM‚Å‚«‚È‚©‚Á‚½‚ç, [`FinishTLS`](#finishtls) ‚Å TLS ‚ğ•Ğ•t‚¯‚ÄI—¹.
+
+‚Æ‚µ‚½ã‚Å, ‚ ‚Æ‚ÍuˆÃ†ƒoƒbƒtƒ@v‚Ì’†g‚ªs‚«‚é‚Ü‚Å, ˆÈ‰º‚ğŒJ‚è•Ô‚µ‚Ü‚·.
+
 1. uƒf[ƒ^v‚Æ‚¢‚¤‚¨‘è‚Å—­‚Ü‚Á‚Ä‚¢‚éuˆÃ†ƒoƒbƒtƒ@v‚ğ
 [`DecryptMessage`](https://learn.microsoft.com/ja-jp/windows/win32/secauthn/decryptmessage--schannel).
-1. u‚Å‚«‚½v‚ª•Ô‚Á‚Ä‚«‚½‚ç, ‚»‚ê‚ğ [`EnqueueData`](#enqueuedata) ‚µ‚Ä,<br>
-`SECBUFFER_EXTRA` ‚ª‚ ‚Á‚½‚çuˆê‚ÉŠª‚«‚ñ‚¾ƒf[ƒ^v‚ÆŒ©‚È‚µ‚ÄuˆÃ†ƒoƒbƒtƒ@v‚É’Ç‰Á‚µ,<br>
-•œ†‚µ‚«‚ê‚Ä‚È‚¢ƒf[ƒ^‚ªc‚Á‚Ä‚¢‚½‚ç 5. ‚©‚çŒJ‚è•Ô‚·‚¯‚Ç, ‚»‚¤‚Å‚È‚¯‚ê‚Î<br>
-u‚È‚ñ‚©óM‚µ‚½v‚Æ [`NotifyState`](#notifystate) ‚µ‚ÄI—¹.
+1. u‚Å‚«‚½v‚ª•Ô‚Á‚Ä‚«‚½‚ç,
+	1. ‚»‚ê‚ğ [`EnqueueTLS`](#enqueuetls) ‚µ‚Ä‚¨‚­.
+	1. [`ConsumeTLS`](#consumetls) ‚ÅuˆÃ†ƒoƒbƒtƒ@v‚ği‚ß‚é.
+	1. u‚È‚ñ‚©óM‚µ‚½v‚Æ [`NotifyState`](#notifystate) ‚µ‚Ä”²‚¯‚é.
 1. u‚¨‚í‚èv‚ª•Ô‚Á‚Ä‚«‚½‚ç, ¡‚Ü‚ÅóM‚µ‚½ƒf[ƒ^‚ğ‚È‚©‚Á‚½‚±‚Æ‚É‚·‚é.
-1. u‚à‚Á‚Æv‚ª•Ô‚Á‚Ä‚«‚½‚ç, Ÿ‚ÌóM‚ğ‘Ò‚Â‚½‚ß‚±‚Ìê‚ÍI‚í‚è‚É‚·‚é.
-1. ‚»‚êˆÈŠO‚ª•Ô‚Á‚Ä‚«‚½‚ç, [`FinishTLS`](#finishtls) ‚Å TLS ‚ğ•Ğ•t‚¯‚ÄI—¹.
+1. u‚à‚Á‚Æv‚ª•Ô‚Á‚Ä‚«‚½‚ç, Ÿ‚ÌóM‚ğ‘Ò‚Â‚½‚ß‚±‚Ìê‚Í”²‚¯‚é.
+1. uÄƒlƒSv‚ª•Ô‚Á‚Ä‚«‚½‚ç, `SECBUFFER_EXTRA` ‚ğ’T‚µ‚Ä, ‚à‚µ‚ ‚Á‚½‚ç,
+	1. `SECBUFFER_EXTRA` ‚É•Ô‚³‚ê‚½•ª‚ğuƒg[ƒNƒ“v‚Æ‚¢‚¤‚¨‘è‚Å
+[`InitializeSecurityContext`](https://learn.microsoft.com/ja-jp/windows/win32/secauthn/initializesecuritycontext--schannel).
+	1. u‚Å‚«‚½v‚Ü‚½‚Íu‚Â‚Ã‚­v‚ª•Ô‚Á‚Ä‚«‚½‚ç, o—Íƒoƒbƒtƒ@‚É‚Å‚«‚½ƒf[ƒ^‚ğ [`SendBackTLS`](#sendbacktls) ‚Å•ÔM.
+	1. ‚»‚êˆÈŠO‚ª•Ô‚Á‚Ä‚«‚½‚ç, u¸”sv‚Æ”»’è.
+1. ‚»‚êˆÈŠO‚ª•Ô‚Á‚Ä‚«‚½‚ç,u¸”sv‚Æ”»’è.
+1. u¸”sv‚Æ”»’è‚³‚ê‚Ä‚¢‚½‚ç, [`FinishTLS`](#finishtls) ‚Å TLS ‚ğ•Ğ•t‚¯‚Ä”²‚¯‚é.
 
 ‚Â‚Ü‚è, ˆÃ†‰»‚³‚ê‚½ƒƒbƒZ[ƒW‚ÌóM‚ğÏ‚Ü‚¹‚½Œã,
 ‚»‚Ì•œ†‚ªŠ®—¹‚µ‚Ä‚Í‚¶‚ß‚Äu‚È‚ñ‚©óM‚µ‚½v‚ÆƒAƒvƒŠ‘w‚É‚¨’m‚ç‚¹‚·‚é‚Ì‚Å‚·.
@@ -449,15 +469,20 @@ Socket ‚Ìó‘Ô•Ï‰»‚ğƒAƒvƒŠ‘w‚É’Ê’m‚µ‚Ü‚·.
 
 [`Receive`](#receive) ‚©‚çŒÄ‚Î‚ê, TLS ‚©‚ç“¾‚Ä•œ†‚³‚ê‚½óMƒƒbƒZ[ƒW‚ğˆø‚«æ‚è‚Ü‚·.
 
-ˆø”‚Å“n‚³‚ê‚½óMƒoƒCƒg”‚ğ–‚½‚·‚Ü‚Å, ˆÈ‰º‚ğŒJ‚è•Ô‚µ‚Ü‚·:
+ˆø”‚Å“n‚³‚ê‚½óMƒoƒCƒg”‚ğ‚ª `0` ‚Å‚È‚¯‚ê‚Î, ˆÈ‰º‚ğÀs‚µ‚Ü‚·:
 
-1. u•œ†ƒoƒbƒtƒ@v‚É‰½‚©“ü‚Á‚Ä‚¢‚éê‡‚Í, “ü‚Á‚Ä‚¢‚é•ª‚¾‚¯ [`DequeueData`](#dequeuedata).
+1. u•œ†ƒoƒbƒtƒ@v‚É‰½‚©“ü‚Á‚Ä‚¢‚éê‡‚Í, “ü‚Á‚Ä‚¢‚é•ª‚¾‚¯ [`DequeueTLS`](#dequeuetls).
 1. u•œ†ƒoƒbƒtƒ@v‚ª‹ó‚¾‚Á‚½ê‡‚Í, ‰½‚©óM‚·‚é‚Ü‚Å
 [`WaitForSingleObject`](https://learn.microsoft.com/ja-jp/windows/win32/api/synchapi/nf-synchapi-waitforsingleobject)
 
-‚»‚µ‚Ä•œ†‚µ‚½ƒoƒCƒg” (  ˆø”‚Å“n‚³‚ê‚½óMƒoƒCƒg” ) ‚ğ•Ô‚µ‚Ü‚·.
+‚»‚µ‚Ä•œ†‚µ‚½ƒoƒCƒg”‚ğ•Ô‚µ‚Ü‚·.
 <br>
 ˆø”‚Å“n‚³‚ê‚½ƒ|ƒCƒ“ƒ^[‚Ì’†g‚Í, •œ†‚µ‚½ƒƒbƒZ[ƒW‚Å–‚½‚³‚ê‚Ä‚¢‚Ü‚·.
+
+–‘O‚É[`IOCtl( FIONREAD )`](#ioctl) ‚Å•œ†Ï‚İ‚Ìƒf[ƒ^‚ÌƒoƒCƒg”‚ğ”cˆ¬‚µ‚Ä‚©‚ç,
+‚»‚ÌƒoƒCƒg”•ª‚ÅŒÄ‚Î‚ê‚é‚±‚Æ‚ğ—ç‹V‚Æl‚¦‚Ä‚¢‚Ü‚·.<br>
+‚»‚Ìè‡‚ğ“¥‚ñ‚Å‚¢‚È‚¢–³—ç‚ÈŒÄ‚Ño‚µ‚ğ‚³‚ê‚½ê‡‚Í,
+İŒÉ‚É‚ ‚é‚¾‚¯‚ÌƒoƒCƒg”‚ğ•Ô‚·‚±‚Æ‚É‚È‚è‚Ü‚·.
 
 
 ## `SendTLS`
@@ -475,9 +500,9 @@ Socket ‚Ìó‘Ô•Ï‰»‚ğƒAƒvƒŠ‘w‚É’Ê’m‚µ‚Ü‚·.
 1. u‚Å‚«‚½v‚ª•Ô‚Á‚Ä‚«‚½‚ç, ‚»‚ê‚ğ
 [`CAsyncSocket::Send`](https://learn.microsoft.com/ja-jp/cpp/mfc/reference/casyncsocket-class#send).
 1. ‘—Mƒoƒbƒtƒ@‚ğŠJ•ú‚·‚é.
-1. u‚Å‚«‚½vˆÈŠO‚ª•Ô‚Á‚Ä‚«‚½‚ç, u‚È‚ñ‚©¸”s‚µ‚½v‚Æ [`NotifyState`](#notifystate) ‚µ‚ÄI—¹.
+1. u‚Å‚«‚½vˆÈŠO‚ª•Ô‚Á‚Ä‚«‚Ä‚¢‚½‚ç, u‚È‚ñ‚©¸”s‚µ‚½v‚Æ [`NotifyState`](#notifystate) ‚µ‚ÄI—¹.
 
-‚»‚µ‚Ä‘—M‚µ‚½ƒoƒCƒg” (  ˆø”‚Å“n‚³‚ê‚½‘—MƒoƒCƒg” ) ‚ğ•Ô‚µ‚Ü‚·.
+‚»‚µ‚Ä‘—M‚µ‚½ƒoƒCƒg” (  ˆø”‚Å“n‚³‚ê‚½‘—MƒoƒCƒg”FˆÃ†‰»‘O‚ÌƒoƒCƒg” ) ‚ğ•Ô‚µ‚Ü‚·.
 <br>
 ‘—M‚·‚éƒƒbƒZ[ƒW‚Í, ‘S‚ÄˆÃ†‰»‚³‚ê‚Ä‚¢‚Ü‚·.
 
@@ -491,40 +516,12 @@ Socket ‚Ìó‘Ô•Ï‰»‚ğƒAƒvƒŠ‘w‚É’Ê’m‚µ‚Ü‚·.
 æ•û‚©‚çØ’f‚³‚ê‚½ê‡‚Í, ‚·‚Å‚É TCP ŠK‘w‚ÅØ’f‚³‚ê‚Ä‚¨‚è,
 ‚±‚ÌŠÖ”‚ª’S“–‚µ‚Ä‚¢‚éuTLS Ú‘±‚ğI—¹‚³‚¹‚év‚Æ‚¢‚¤d–‚»‚Ì‚à‚Ì‚ª•s—v‚¾‚©‚ç‚Å‚·.
 
-1. uƒZƒLƒ…ƒŠƒeƒB[ƒg[ƒNƒ“‚Ì‚â‚èæ‚èv‚Æ‚¢‚¤‚¨‘è‚ÅƒVƒƒƒbƒgƒ_ƒEƒ“ƒƒbƒZ[ƒW‚ğ
+1. ƒVƒƒƒbƒgƒ_ƒEƒ“‚Ìƒg[ƒNƒ“‚ğ
+[`ApplyControlToken`](https://learn.microsoft.com/ja-jp/windows/win32/api/sspi/nf-sspi-applycontroltoken).
+1. ‚»‚Ìƒg[ƒNƒ“‚ğuƒZƒLƒ…ƒŠƒeƒB[ƒg[ƒNƒ“‚Ì‚â‚èæ‚èv‚Æ‚¢‚¤‚¨‘è‚Å
 [`InitializeSecurityContext`](https://learn.microsoft.com/ja-jp/windows/win32/secauthn/initializesecuritycontext--schannel).
-1. u‚Å‚«‚½v‚ª•Ô‚Á‚Ä‚«‚½‚ç, ‚»‚ê‚ğ
-[`CAsyncSocket::Send`](https://learn.microsoft.com/ja-jp/cpp/mfc/reference/casyncsocket-class#send).
-1. 50[ms] ‚Ù‚Ç‘Ò‚Â.
-1. [`FreeContextBuffer`](https://learn.microsoft.com/ja-jp/windows/win32/api/sspi/nf-sspi-freecontextbuffer)
-‚ğŒÄ‚ñ‚Å, ‘—Mƒoƒbƒtƒ@\‚ğŠJ•ú.
+1. u‚Å‚«‚½v‚ª•Ô‚Á‚Ä‚«‚½‚ç, ‚»‚ê‚ğ [`SendBackTLS`](#sendbacktls).
 1. [`FinishTLS`](#finishtls) ‚ğŒÄ‚ñ‚Å, ¡‚Ü‚Å•Û‚µ‚Ä‚«‚½ TLS —p‚Ì‘Œ¹‚ğŠJ•ú.
-
-‚±‚±‚Å‹^–â‚ğ‚½‚ê‚é‚Ì‚ª 3. ‚Ìu‘Ò‚Âv‚Å‚µ‚å‚¤‚©.
-Œ‹˜_‚©‚çŒ¾‚¤‚Æ•Ê‚É‘Ò‚½‚È‚­‚Ä‚à‰½‚Ìxá‚à‚ ‚è‚Ü‚¹‚ñ.
-‚½‚¾, ‚±‚±‚Å‚¿‚å‚Á‚Æ‘Ò‚Â‚Æ
-[Wireshark](https://ja.wikipedia.org/wiki/Wireshark)
-‚Æ‚©‚ÅƒLƒƒƒvƒ`ƒƒ[‚µ‚½ƒƒO‚ª‚«‚ê‚¢‚ÉI‚í‚é‚©‚ç, ‚Æ‚¢‚¤‚¾‚¯‚Ì——R‚Å“ü‚ê‚Ä‚¢‚Ü‚·.
-
-‚±‚±‚É‘Ò‚¿ŠÔ‚ğ‹²‚Ü‚È‚¢‚Æ,
-‚½‚¾‚¿‚É [`Close`](#close) ‚É–ß‚è
-[`CAsyncSocket::Close`](https://learn.microsoft.com/en-us/cpp/mfc/reference/casyncsocket-class#close)
-‚ª TCP Ú‘±‚ğØ’f‚·‚é‚±‚Æ‚É‚È‚è‚Ü‚·.
-‚±‚¿‚ç‚©‚ç‘—M‚µ‚½ƒVƒƒƒbƒgƒ_ƒEƒ“ƒƒbƒZ[ƒWuEncrypted Alert: Close Notifyv‚É‘Î‚·‚é TCP ACK ‚ğ‘Ò‚½‚¸‚É‚Å‚·.
-‚»‚ñ‚È¸—ç‚ÈØ’f‚ÌŒ‹‰Ê, ƒLƒƒƒvƒ`ƒƒ[‚µ‚½ƒƒO‚ª‰˜‚¢‚±‚Æ‚É‚È‚é‚Ì‚Å‚·.
-( Wireshark ‚Å‚Í uTCP Dup ACKv‚Æw“E‚³‚ê‚Ü‚·. ACK ‚ª“Í‚©‚È‚©‚Á‚½‚Æ”»’f‚µ‚½ƒT[ƒo[‚ªÄ‘—‚·‚é‚©‚ç‚Å‚·. )
-
-u”ñ“¯Šúv‚Åu[event driven](https://ja.wikipedia.org/wiki/ƒCƒxƒ“ƒg‹ì“®Œ^ƒvƒƒOƒ‰ƒ~ƒ“ƒO)v‚ğ•WÔ‚µ‚Ä‚¢‚éˆÈã,
-u‘Ò‚¿ŠÔ‚ğ‹²‚Şv‚È‚ñ‚Äsˆ×‚Í‚¢‚©‚ª‚È‚à‚Ì‚©‚Æ‚¢‚¤‹C‚à‚µ‚Ü‚·‚ª,
-‚±‚±ƒAƒvƒŠŠK‘w‚Å‚ÍuTCP ŠK‘wv‚Ì ACK ‚ğ‘Ò‚Â‚·‚×‚Í‚È‚¢<sup>*</sup>‚Ì‚Å,
-u‘Ò‚¿ŠÔ‚ğ‹²‚Şv‚Åè‚ğ‘Å‚Á‚Ä‚¢‚éŸ‘æ‚Å‚·.
-<br>
-<sub>
-*
-Œµ–§‚É‚Íu‚È‚­‚Í‚È‚¢v‚Ì‚Å‚·‚ª,
-u‚¦? ‚»‚ñ‚È‚±‚Æ‚Ì‚½‚ß‚É‚»‚±‚Ü‚Å‚·‚é?v‚Æ‚¢‚¤è’i‚É‘i‚¦‚é‚±‚Æ‚É‚È‚é‚Ì‚Å,
-í¯“I‚Èè’i‚ÅŠÔ‚É‡‚í‚¹‚Ä‚¢‚Ü‚·.
-</sub>
 
 
 ## `FinishTLS`
@@ -544,7 +541,68 @@ TLS ‚ğI—¹‚µ‚æ‚¤‚Æ‚·‚é‚ ‚¿‚±‚¿‚©‚çŒÄ‚Î‚ê, ‚»‚ê‚Ü‚Å‰^—p‚µ‚Ä‚«‚½ TLS —p‚Ì‘Œ¹‚ğŠJ•
 ³íI—¹‚Å‚È‚©‚Á‚½ê‡‚Í‚»‚Ì|‚ğ [`NotifyState`](#notifystate) ‚·‚é‚±‚Æ‚à ( ‚Â‚¢‚Å‚É ) ‚â‚Á‚Ä‚¢‚Ü‚·.
 
 
-## `EnqueueData`
+## `SendBackTLS`
+
+uo—Íƒoƒbƒtƒ@v‚Ì’†g‚ğƒT[ƒo[‚É•Ô‘—‚µ‚Ü‚·.
+
+[`InitializeSecurityContext`](https://learn.microsoft.com/ja-jp/windows/win32/secauthn/initializesecuritycontext--schannel) ‚â
+[`DecryptMessage`](https://learn.microsoft.com/ja-jp/windows/win32/secauthn/decryptmessage--schannel)
+‚Åì‚Á‚Ä‚à‚ç‚Á‚½uo—Íƒoƒbƒtƒ@v‚Ì“à—e‚ğƒT[ƒo[‚É‘—M‚µ‚Ü‚·.
+
+‚±‚Ìƒoƒbƒtƒ@‚Íg—pŒã
+ [`FreeContextBuffer`](https://learn.microsoft.com/ja-jp/windows/win32/api/sspi/nf-sspi-freecontextbuffer)
+‚ğŒÄ‚ñ‚ÅŠJ•ú‚·‚é•K—v‚ª‚ ‚é‚Ì‚Å,
+‚»‚Ìˆ—‚ª˜R‚ê‚È‚¢‚æ‚¤ê—p‚ÌŠÖ”‚Æ‚µ‚Äİ‚¯‚Ü‚µ‚½.
+<br>
+<sup>
+( TLS1.3 ‚Ö‚Ì‘Î‰‚Å, ‚ ‚¿‚±‚¿‚Éu•Ô‘—‚·‚év‚Æ‚¢‚¤ˆ—‚ª‹²‚Ü‚Á‚½‚Ì‚Å. )</sup>
+
+
+## `ConsumeTLS`
+
+uˆÃ†ƒoƒbƒtƒ@v‚Ì’†g‚ği‚ß‚Ü‚·.
+
+‚â‚Á‚Ä‚¢‚é‚±‚Æ‚ÍuˆÃ†ƒoƒbƒtƒ@v‚ÌƒLƒ…[ ( queue ) ‚ğ,
+u“ü—Íƒoƒbƒtƒ@v‚Ì `SECBUFFER_EXTRA` •ª‚ğc‚µ‚Äui‚ß‚év‚±‚Æ‚Å‚·.
+
+‚»‚Ìui‚ß‚évˆ—‚ğÀÛ‚Éƒƒ‚ƒŠ‚ÌƒRƒs[‚ğs‚¤ `MoveMemory()` ‚ÅÀ‘•‚µ‚Ä‚¢‚é‚Æ‚±‚ë‚ª,
+‚à‚¤‚¿‚å‚Á‚Æ CPU ‚É—D‚µ‚­‚Å‚«‚È‚©‚Á‚½‚©‚Æv‚í‚¹‚È‚¢‚Å‚à‚ ‚è‚Ü‚¹‚ñ‚ª,
+POP3 ‚®‚ç‚¢‚È‚ç‰½‚Ì–â‘è‚à‚È‚¢‚Ì‚Å, ‚¦‚Á‚¿‚ç‚¨‚Á‚¿‚çƒRƒs[‚³‚¹‚Ä‚¢‚Ü‚·.
+
+‚à‚Á‚Æ‘å—e—Ê‚Ìƒf[ƒ^‚ğˆµ‚¤ê‡ ( HTTPS ‚Æ‚© ) ‚Í,
+‚±‚Ì `MoveMemory()` ‚ğ ring buffer ‚Æ‚©‚É’u‚«Š·‚¦‚é‚Æ,
+­‚µ‚Í CPU ‚Ì”­”M—Ê‚àŒ¸‚é‚©‚à‚µ‚ê‚Ü‚¹‚ñ.
+<br>
+<sup>
+( HTTPS ‚·‚é‚È‚ç [WinHTTP](https://learn.microsoft.com/ja-jp/windows/win32/winhttp/about-winhttp)
+‚Å‚â‚é•û‚ª‚æ‚Á‚Û‚Ç‰¤“¹‚Á‚Ä‚à‚ñ‚Å‚·‚¯‚Ç. )
+</sup>
+
+‚±‚±‚ÅŒ¾‚Á‚Ä‚¢‚éuconsumev‚Æ‚Í,
+ƒf[ƒ^’ÊMŠÖŒW‚Ì‹ZpÒ‚ªƒf[ƒ^‚ğuH‚í‚¹‚év“I‚Èƒjƒ…ƒAƒ“ƒX‚Å‚æ‚­g‚¤Œ¾‚¢‰ñ‚µ‚Å‚·‚©‚Ë.
+
+
+## `SeekBufTLS`
+
+u“ü—Íƒoƒbƒtƒ@v‚Ì’†‚©‚çw’è‚Ìƒ^ƒCƒv‚ğ‚Â‚à‚Ì‚ğ’T‚µ‚Ü‚·.
+
+‚±‚±‚ÅŒ¾‚¤u“ü—Íƒoƒbƒtƒ@v‚ÍÅ‘å 4‚Â•À‚ñ‚¾”z—ñ‚Åg‚í‚ê‚é‚±‚Æ‚ª‚Ù‚Æ‚ñ‚Ç‚È‚Ì‚Å‚·‚ª,
+‚»‚Ì 4‚Â‚Ì‚¤‚¿, ˆø”‚Æ‚µ‚Ä—^‚¦‚½ƒ^ƒCƒv‚Ì‚à‚Ì‚ª‰½”Ô–Ú‚É‚ ‚é‚Ì‚©‚ğƒCƒ“ƒfƒbƒNƒX‚Å•Ô‚µ‚Ü‚·.
+
+ÀÛ‚±‚Ì 4‚Â‚Í:
+
+`[0]: SECBUFFER_STREAM_HEADER`<br>
+`[1]: SECBUFFER_DATA`<br>
+`[2]: SECBUFFER_STREAM_TRAILER`<br>
+`[3]: SECBUFFER_EXTRA`<br>
+
+‚Æ•À‚Ô‚±‚Æ‚ª‘½‚¢‚Ì‚Å‚·‚ª,
+ƒR[ƒhƒŒƒrƒ…[‚Éµ‘Ò‚µ‚½ Copilot ‚³‚ñ‚ª,
+u‚»‚¤‚¢‚¤æ“üŠÏ‚Í‚¢‚©‚ñ‚È‚ v“I‚È‚±‚Æ‚ğ‹Â‚é‚Ì‚Å,
+‚¢‚¿‚¢‚¿ŒŸõ‚·‚é‚±‚Æ‚É‚µ‚Ü‚µ‚½.
+
+
+## `EnqueueTLS`
 
 u•œ†ƒoƒbƒtƒ@v‚Ì––”ö‚Éƒf[ƒ^‚ğ’Ç‰Á‚µ‚Ü‚·.
 
@@ -558,7 +616,12 @@ FIFO ‚ÌƒLƒ…[Œ`®‚Æ‚È‚Á‚Ä‚¢‚Ü‚·.
 
 ’Ç‰Á‚µ‚½•ª, ƒLƒ…[‚É•Û‚³‚ê‚Ä‚¢‚éƒf[ƒ^‚Í‘‚¦‚Ü‚·.
 
-## `DequeueData`
+‚»‚Ìu’Ç‰Ávˆ—‚ğÀÛ‚Éƒƒ‚ƒŠ‚ÌƒRƒs[‚ğs‚¤ `CopyMemory()` ‚ÅÀ‘•‚µ‚Ä‚¢‚é‚Æ‚±‚ë‚ª,
+‚à‚¤‚¿‚å‚Á‚Æ CPU ‚É—D‚µ‚­‚Å‚«‚È‚©‚Á‚½‚©‚Æv‚í‚¹‚È‚¢‚Å‚à‚ ‚è‚Ü‚¹‚ñ‚ª,
+POP3 ‚®‚ç‚¢‚È‚ç‰½‚Ì–â‘è‚à‚È‚¢‚Ì‚Å, ‚¦‚Á‚¿‚ç‚¨‚Á‚¿‚çƒRƒs[‚³‚¹‚Ä‚¢‚Ü‚·.
+
+
+## `DequeueTLS`
 
 u•œ†ƒoƒbƒtƒ@v‚Ìæ“ª‚©‚ç‚©‚çƒf[ƒ^‚ğæ‚èo‚µ‚Ü‚·.
 
@@ -571,6 +634,63 @@ FIFO ‚ÌƒLƒ…[Œ`®‚Æ‚È‚Á‚Ä‚¢‚Ü‚·.
 FIFO ‚ÌƒLƒ…[Œ`®‚Æ‚È‚Á‚Ä‚¢‚Ü‚·.
 
 æ‚èo‚µ‚½•ª, ƒLƒ…[‚É•Û‚³‚ê‚Ä‚¢‚éƒf[ƒ^‚ÍŒ¸‚è, c‚Á‚Ä‚¢‚éƒf[ƒ^‚Íæ“ª‚ÉŒü‚¯‚ÄˆÚ“®‚µ‚Ü‚·.
+
+
+‚»‚Ìuæ‚èo‚µvˆ—‚ğÀÛ‚Éƒƒ‚ƒŠ‚ÌƒRƒs[‚ğs‚¤ `CopyMemory()` ‚ÅÀ‘•‚µ‚Ä‚¢‚é‚Æ‚±‚ë‚ª,
+‚à‚¤‚¿‚å‚Á‚Æ CPU ‚É—D‚µ‚­‚Å‚«‚È‚©‚Á‚½‚©‚Æv‚í‚¹‚È‚¢‚Å‚à‚ ‚è‚Ü‚¹‚ñ‚ª,
+POP3 ‚®‚ç‚¢‚È‚ç‰½‚Ì–â‘è‚à‚È‚¢‚Ì‚Å, ‚¦‚Á‚¿‚ç‚¨‚Á‚¿‚çƒRƒs[‚³‚¹‚Ä‚¢‚Ü‚·.
+
+## `GetWinVer`
+
+Windows&reg; ‚Ìƒo[ƒWƒ‡ƒ“‚ğ•Ô‚µ‚Ü‚·.
+
+Windows&reg;11ŠÂ‹«‰º‚Å‚Í–ß‚è’l‚ª `11`,
+Windows&reg;10ŠÂ‹«‰º‚Å‚Í–ß‚è’l‚ª `10` ‚Æ‚È‚é‚¾‚¯‚ÌŠÖ”‚Å‚·.<br>
+<sup>( «—ˆ Windows&reg;12 ŠÂ‹«‰º‚Å `11` ‚Æ•Ô‚é‚© `12` ‚Æ•Ô‚é‚©‚Í•s–¾‚Å‚·‚ª,
+‚¢‚¸‚ê‚É‚¹‚æ `11ˆÈã` ‚ª•Ô‚é‚±‚Æ‚É‚È‚è‚Ü‚·. )</sup>
+
+‚²—˜—p’†‚Ì Windows&reg; ‚Ìƒo[ƒWƒ‡ƒ“‚ğŠm‚©‚ß‚é•û–@‚Ìˆê‚Â‚É,
+
+* ‚½‚¾ƒRƒ}ƒ“ƒhƒvƒƒ“ƒvƒg‚ğ—§‚¿ã‚°‚é
+
+‚Æ‚¢‚¤‚à‚Ì‚ª‚ ‚è‚Ü‚·.
+‚æ‚­Œ©‚é‚Æ, —§‚¿ã‚ª‚Á‚½ƒRƒ}ƒ“ƒhƒvƒƒ“ƒvƒg‚Ì‚¢‚¿‚Î‚ñã‚Ìs‚É,
+ƒo[ƒWƒ‡ƒ“‚ªo‚Ä‚¢‚é‚Ì‚É‹C‚Ã‚«‚Ü‚·.
+
+```
+Microsoft Windows [Version 10.0.26200.8655]
+(c) Microsoft Corporation. All rights reserved.
+
+C:\Users\In-house.Tool>
+```
+
+Windows&reg;11 ‚ğg‚Á‚Ä‚¢‚Ä‚à `10.0.‚È‚ñ‚Æ‚©.‚©‚ñ‚Æ‚©` ‚Æo‚Ä‚«‚Ü‚·.
+‚±‚±‚Åo‚Ä‚­‚é”š•À‚Ñ‚Í Windows&reg; ‚Ì“à•”ƒo[ƒWƒ‡ƒ“‚¾‚»‚¤‚Å,
+uWindows&reg;11v‚Æ–Á‘Å‚Á‚Ä‚¢‚Ä‚à, ’†g‚Í‚µ‚å‚¹‚ñ Windows&reg;10 ‚ÌˆŸí‚Å‚ ‚é‚Æ‚¢‚¤“à•”–î‚ªŒ©‚¦‚Ä‚µ‚Ü‚Á‚Ä‚¢‚Ü‚·.
+“–ŠÖ”‚Å‚Í‚±‚Ì `10` ( ƒƒWƒƒ[ƒo[ƒWƒ‡ƒ“ ) ‚ğŠm”F‚µ‚½‚ç,
+Ÿ‚Í`‚È‚ñ‚Æ‚©`‚Ì•”•ª ( ƒrƒ‹ƒh”Ô† ) ‚ğŠm”F‚µ‚Ä,
+`10` ‚Æ•Ô‚·‚×‚«‚© `11` ‚Æ•Ô‚·‚×‚«‚©‚ğŒˆ’è‚µ‚Ü‚·.
+“¯‚¶ƒƒWƒƒ[ƒo[ƒWƒ‡ƒ“ `10` ‚Å‚à
+ƒrƒ‹ƒh”Ô†‚ª `22000` ˆÈã‚È‚Ì‚ªuWindows&reg;11v‚È‚ñ‚¾‚»‚¤‚Å‚·.
+
+‚Æ‚±‚ë‚Å, ƒRƒ}ƒ“ƒhƒvƒƒ“ƒvƒg‚ğo‚µ‚½‚Â‚¢‚Å‚É
+`winver`
+‚Æ‚¢‚¤ƒRƒ}ƒ“ƒh‚ğ‘Å‚¿‚Ş‚Æ,
+```
+C:\Users\In-house.Tool>winver
+
+C:\Users\In-house.Tool>
+```
+
+ƒo[ƒWƒ‡ƒ“‚ğƒOƒ‰ƒtƒBƒJƒ‹‚É•\¦‚µ‚Ä‚«‚Ü‚·.
+‚±‚¿‚ç‚Å‚Í `10.0.‚È‚ñ‚Æ‚©.‚©‚ñ‚Æ‚©` ‚Æ‚©Œ¾‚í‚¸‚É,
+`‚È‚ñ‚Æ‚©.‚©‚ñ‚Æ‚©` ‚¾‚¯‚Éi‚Á‚½•\¦‚ğ‚µ‚Ü‚·‚Ë.
+
+![](../pics/WinVer.png)
+
+­X—]’k‚ª’·‚­‚È‚è‚Ü‚µ‚½.
+–{ŠÖ”‚Í TLS1.3 ‚Éi‚Ş‚×‚«‚© TLS1.2 ‚É‚Æ‚Ç‚ß‚Ä‚¨‚­‚×‚«‚©‚ğŒˆ‚ß‚é‚½‚ß,
+[`OnConnectTLS1`](#onconnecttls1) ‚©‚çŒÄ‚Î‚ê‚Ä‚¢‚Ü‚·.
 
 
 ## “®ì—á
@@ -667,80 +787,12 @@ Frame No.10 ‚ª‚»‚Ì‰“š‚Å‚·<br>
 
 ## TLS1.3 ‚É‚Â‚¢‚Ä
 
-Œ‹˜_‚©‚çŒ¾‚¦‚Î, –{•i‚Í TLS1.2 ‚ÅƒtƒBƒbƒNƒX‚µ‚Ä‚¨‚è, TLS1.3 ‚Í‚Ü‚¾ƒTƒ|[ƒg‚µ‚Ä‚¨‚è‚Ü‚¹‚ñ.
+“–ƒAƒvƒŠ‚ÍuWindows&reg; 10 ‚Æ Windows&reg; 11 —¼•û‚É‘Î‰Iv‚ğ•WÔ‚µ‚Ä‚¢‚½‚Ì‚Å,
+‰”Å“–‚Í Windows&reg; 10 ‚Å‚Í“®‚©‚È‚¢ [TLS1.3 ‚ÍŠÜ‚ß‚¸, TLS1.2 ‚¾‚¯‚Ì“®ì‚Éi‚è‚Ü‚µ‚½.](TLS1.2.md) 
 
-2025”N 2ŒŒ»İ‚Ì
-[Microsoft&reg; ‚ÌŒöŠJî•ñ](https://learn.microsoft.com/ja-jp/windows/win32/secauthn/protocols-in-tls-ssl--schannel-ssp-)‚É‚æ‚é‚Æ,
-Windows&reg;10 (22H2) ‚Å‚Í TLS1.3 ‚ÍuƒTƒ|[ƒg‘ÎÛŠOv‚Å, TLS1.2 ‚ªu—LŒøv‚¾‚»‚¤‚Å‚·.
-
-[“¯ŒöŠJî•ñ](https://learn.microsoft.com/ja-jp/windows/win32/secauthn/protocols-in-tls-ssl--schannel-ssp-)‚É‚æ‚é‚Æ,
-Windows&reg;11 ‚Å‚ÍÅ‰‚Á‚©‚ç TLS1.3 ‚ªu—LŒøv‚¾‚»‚¤‚È‚Ì‚Å,
-
-* Windows&reg;11 ‹@‚Å TLS1.3 ‘Î‰‚Ì[POP3S](https://ja.wikipedia.org/wiki/Post_Office_Protocol#ˆÃ†‰»)ƒT[ƒo[
-
-‚Æ‚¢‚¤ğŒ‚ÅÀŒ±‚µ‚Ä‚İ‚Ü‚µ‚½.
-
-‚»‚ÌŒ‹‰Ê, ’ÊM‚É¸”s‚µ‚Ü‚µ‚½.
-
-‚±‚Ìó‹µ‚ÉŠÓ‚İ‚Ä,
-
-* Windows&reg; ‚Å‚Í TLS1.3 ‚Í‚Ü‚¾‘‚¢
-
-‚ÆŒ‹˜_•t‚¯,
-–{•i‚Å‚ÍuTLS1.2ŒÅ’èv‚Éİ’è‚µ‚Ä‚¨‚è‚Ü‚·.
-( Version 1.0.3.209 )
-
-
-### ÀŒ±‚ÌÚ×
-
-TLS1.2 / 1.3 ‚ÌØ‚è•ª‚¯‚Í,
-À‘•ã‚Å‚Í,
-[`AcquireCredentialsHandle`](https://learn.microsoft.com/ja-jp/windows/win32/secauthn/acquirecredentialshandle--schannel)
-‚Ìˆø” `PVOID pAuthData` ‚É
-[`SCHANNEL_CRED`](https://learn.microsoft.com/ja-jp/windows/win32/api/schannel/ns-schannel-schannel_cred)
-‚ğ—^‚¦‚é‚©,
-[`SCH_CREDENTIALS`](https://learn.microsoft.com/ja-jp/windows/win32/api/schannel/ns-schannel-sch_credentials)
-‚ğ—^‚¦‚é‚©‚ÅŒˆ‚Ü‚é‚æ‚¤‚Å‚·.
-<sub>
-‰ğ‚è‚É‚­‚Á!
-</sub>
-
-[`SCHANNEL_CRED`](https://learn.microsoft.com/ja-jp/windows/win32/api/schannel/ns-schannel-schannel_cred)
-‚Ìƒy[ƒW‚É‚Íu‘ã‚í‚è‚É[`SCH_CREDENTIALS`](https://learn.microsoft.com/ja-jp/windows/win32/api/schannel/ns-schannel-sch_credentials)‚ğg‚¦v
-“I‚È‚±‚Æ‚ª‘‚¢‚Ä‚ ‚é‚Ì‚Å,
-‚±‚Ì•Ó‚Ìî•ñ‚ğM‚¶‚ÄÀ‘•‚ği‚ß‚é‚Æ, ©‘R‚É TLS1.3 ‚É‘Î‰‚·‚é‚±‚Æ‚É‚È‚è‚Ü‚·.
-
-‚Æ‚±‚ë‚ª, ‚±‚ê‚ğÀÛ‚É“®‚©‚µ‚Ä‚İ‚é‚Æ,
-[`OnConnectTLS2`](#onconnecttls2)
-‚Åis‚ª~‚Ü‚Á‚Ä‚µ‚Ü‚¢‚Ü‚µ‚½.
-
-[`OnConnectTLS2`](#onconnecttls2)
-‚É‚¨‚¢‚Ä, ÅŒã‚É
-[`InitializeSecurityContext`](https://learn.microsoft.com/ja-jp/windows/win32/secauthn/initializesecuritycontext--schannel)
-‚©‚ç•Ô‚Á‚Ä‚­‚é–ß‚è’l‚Í `SEC_E_OK` ‚Å, ˆêŒ©³íI—¹‚µ‚Ä‚¢‚é‚æ‚¤‚ÉŒ©‚¦‚Ü‚·.
-‚ª, ‚»‚Ì‚Æ‚«Šù‚ÉóMƒoƒbƒtƒ@\‚É—­‚Ü‚Á‚Ä‚¢‚é‚Í‚¸‚Ì POP3 ƒƒbƒZ[ƒW‚É‘Î‚µ‚Ä,
-`SECBUFFER_EXTRA` ‚ğŒŸo‚µ‚Ü‚¹‚ñ.
-’P‚É³íI—¹‚·‚é‚¾‚¯‚Å‚·.
-
-Œ‹‰Ê,
-POP3 ‚Æ‚µ‚Ä‚Íè‡‚ªi‚Ü‚¸, ‚±‚¿‚ç‚ª‰½‚à‘—M‚µ‚È‚¢‚Ü‚ÜŠÔØ‚ê‚ÅƒT[ƒo[‚©‚çØ’f‚³‚ê‚ÄI‚í‚è‚Ü‚·.
-
-‚Æ‚¢‚¤‚í‚¯‚Å
-—á‚Ì[ŒöŠJî•ñ](https://learn.microsoft.com/ja-jp/windows/win32/secauthn/protocols-in-tls-ssl--schannel-ssp-)
-‚ÍƒAƒe‚É‚È‚ç‚¸, Œ»“_ ( 2025”N2ŒŒ»İ ) ‚Å‚Í Windows&reg;11 ‚Å‚à TLS1.3 ‚ÌƒTƒ|[ƒg‚Í
-( ­‚È‚­‚Æ‚à[POP3S](https://ja.wikipedia.org/wiki/Post_Office_Protocol#ˆÃ†‰»)‚É‚¨‚¢‚Ä‚Í )
-‚Ü‚¾‚È‚ñ‚¾‚ë‚¤, ‚Æ‚Ì”»’f‚ğ‰º‚µ, –{•i‚Å‚Í TLS1.2 ‚É—¯‚ß‚Ä‚ ‚è‚Ü‚·.
+‚»‚ñ‚È 2025”N‰“ª‚©‚çŒ“ú‚Í—¬‚ê,
+Windows&reg; 10 ‚ÌƒTƒ|[ƒg‚àI—¹‚µ‚Ü‚µ‚½.
+‚Â‚Ü‚è TLS1.3 ‚ğ”rœ‚·‚éŒö®‚È——R‚à‚È‚­‚È‚Á‚½‚í‚¯‚Å‚·.
+‚Æ‚¢‚¤—‹ü‚Å [TLS1.3 ‚à‰ğ‹Ö‚µ‚Ä‚ ‚è‚Ü‚·.](TLS1.3.md)
 <br>
-<sub>
-( •Ê‚É TLS1.2 ‚Å‚à¢‚ç‚È‚¢‚Ì‚Å, ‚»‚ê‚Ù‚Ç TLS1.3 ‚É‚Í‚±‚¾‚í‚Á‚Ä‚¢‚Ü‚¹‚ñ. ã‹L‚ÌŒoˆÜ‚ª‹C‚É“ü‚è‚Ü‚¹‚ñ‚ª. )
-</sub>
-
-‚±‚ÌÀŒ±“_‚Å‚ÌŠÖ˜Aƒ‰ƒCƒuƒ‰ƒŠ[‚Ì”Å”‚Í:
-
-```
-C:Windows\System32\secure32.dll           10.0.26100.1    (WinBuild.160101.0800)
-C:Windows\System32\sspicli.dll            10.0.26100.2454 (WinBuild.160101.0800)
-```
-
-‚Æ‚È‚Á‚Ä‚¨‚è,
-‚±‚Ì•Ó‚ª‰ü”Å‚³‚ê‚½‚çÄŠm”F‚µ‚Ä‚İ‚éŠ‘¶‚Å‚·.
+<sup>( –¢—û‚ª‚Ü‚µ‚­‚à, Windows&reg;10‚Å‰Ò“­‚µ‚Ä‚¢‚éê‡‚Í TLS1.2 ‚ğƒL[ƒv‚·‚é‚æ‚¤SŠ|‚¯‚Ä‚Í‚¢‚Ü‚·‚ª. )</sup>
