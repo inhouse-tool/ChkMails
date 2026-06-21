@@ -65,14 +65,10 @@ Microsoft が TLS 1.3 を Schannel に実装した際、
 [`InitializeSecurityContext`](https://learn.microsoft.com/ja-jp/windows/win32/secauthn/initializesecuritycontext--schannel)
 や
 [`DecryptMessage`](https://learn.microsoft.com/ja-jp/windows/win32/secauthn/decryptmessage--schannel)
-の説明ページのいちばん下に添えられている「必要条件」のところにある DLL から来ています.<br>
-> <sup>( 厳密にはこの DLL の中に TLS の機能が入っているわけではなさそうですが, こちらから呼び出す API はこの DLL に入っているので. )</sup>
-<br>
-> この呼び方で話が通じなかったら「[Schannel](https://learn.microsoft.com/ja-jp/windows/win32/com/schannel)
-のアレ」とか「[SSPI](https://learn.microsoft.com/ja-jp/windows/win32/secauthn/sspi)
-のアレ」とか, 表現方法を変えてみた方がいいかもしれません.<br>
-> <sup>( Gemini さんや Copilot さんには「secur32 のアレ」で話は通じましたけどね. 
-あと, [「secur32」ですよ.「secure32」じゃないです](https://devblogs.microsoft.com/oldnewthing/20110721-00/?p=10093)からね. )</sup>
+の説明ページのいちばん下に添えられている「必要条件」のところにある DLL から来ています.
+> <br><sup>( 厳密にはこの DLL の中に TLS の機能が入っているわけではなさそうですが, こちらから呼び出す API はこの DLL に入っているので. )</sup><br>
+> この呼び方で話が通じなかったら「[Schannel](https://learn.microsoft.com/ja-jp/windows/win32/com/schannel)のアレ」とか「[SSPI](https://learn.microsoft.com/ja-jp/windows/win32/secauthn/sspi)のアレ」とか, 表現方法を変えてみた方がいいかもしれません.<br>
+> <sup>( Gemini さんや Copilot さんには「secur32 のアレ」で話は通じましたけどね. あと, [「secur32」ですよ.「secure32」じゃないです](https://devblogs.microsoft.com/oldnewthing/20110721-00/?p=10093)からね. )</sup>
 
 
 ## 接続
