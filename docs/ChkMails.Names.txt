@@ -1,4 +1,4 @@
-AEON		aeon.co.jp
+﻿AEON		aeon.co.jp
 ANA		ana.co.jp
 ANA		amadeus.com
 Amazon		amazon.com

@@ -2468,32 +2468,32 @@ HTML 記述の場合, 埋め込まれたリンクは
 下記のように行われます.
 
 ```
-> +OK provider.ne.jp POP3 server ready.
-< USER pochi.the.cat@provider.ne.jp
-> +OK please send PASS command
-< PASS *************
-> +OK pochi.the.cat@provider.ne.jp is welcome here
-< STAT
-> +OK 3 19864
-< RETR 1
-> +OK 4444 octets
-Return-Path: <中略>
-.
-< RETR 2
-> +OK 12210 octets
-Return-Path: <中略>
-.
-< DELE 2
-> +OK messege 2 deleted
-< RETR 3
-> +OK 3210 octets
-Return-Path: <中略>
-.
-< QUIT
-> +OK pochi.the.cat@provider.ne.jp POP3 server signing off.
+◀ +OK provider.ne.jp POP3 server ready.
+▶ USER pochi.the.cat@provider.ne.jp
+◀ +OK please send PASS command
+▶ PASS *************
+◀ +OK pochi.the.cat@provider.ne.jp is welcome here
+▶ STAT
+◀ +OK 3 19864
+▶ RETR 1
+◀ +OK 4444 octets
+　 Return-Path: <中略>
+　 .
+▶ RETR 2
+◀ +OK 12210 octets
+　 Return-Path: <中略>
+　 .
+▶ DELE 2
+◀ +OK messege 2 deleted
+▶ RETR 3
+◀ +OK 3210 octets
+　 Return-Path: <中略>
+　 .
+▶ QUIT
+◀ +OK pochi.the.cat@provider.ne.jp POP3 server signing off.
 ```
 
-左端の `>` と `<` は送受の方向を示すために加えたものだとご理解ください. `>` が受信メッセージ, `<` が送信メッセージです.
+左端の `◀` と `▶` は送受の方向を示すために加えたものだとご理解ください. `◀` が受信メッセージ, `▶` が送信メッセージです.
 「非同期」(
 で「[event driven](https://ja.wikipedia.org/wiki/イベント駆動型プログラミング)」というか「message driven」)
 なので, このやり取りを一気に行うわけではありません.
@@ -2504,29 +2504,29 @@ Return-Path: <中略>
 
 | `m_iPhase` | 送受 | メッセージ |
 | :-: | --: | --- |
-| `1` | `>` | `+OK provider.ne.jp POP3 server ready.                    ` |
-| `1` | `<` | `USER pochi.the.cat@provider.ne.jp                        ` |
-| `2` | `>` | `+OK please send PASS command                             ` |
-| `2` | `>` | `PASS *************                                       ` |
-| `3` | `>` | `+OK pochi.the.cat@provider.ne.jp is welcome here         ` |
-| `3` | `<` | `STAT                                                     ` |
-| `4` | `>` | `+OK 3 19864                                              ` |
-| `5` | `<` | `RETR 1                                                   ` |
-| `6` | `>` | `+OK 4444 octets                                          ` |
-| `6` | `>` | `Return-Path: <中略>                                      ` |
-| `6` | `>` | `.                                                        ` |
-| `7` | `<` | `RETR 2                                                   ` |
-| `6` | `>` | `+OK 12210 octets                                         ` |
-| `6` | `>` | `Return-Path: <中略>                                      ` |
-| `6` | `>` | `.                                                        ` |
-| `6` | `<` | `DELE 2                                                   ` |
-| `7` | `>` | `+OK messege 2 deleted                                    ` |
-| `7` | `<` | `RETR 3                                                   ` |
-| `6` | `>` | `+OK 12210 octets                                         ` |
-| `6` | `>` | `Return-Path: <中略>                                      ` |
-| `6` | `>` | `.                                                        ` |
-| `7` | `<` | `QUIT                                                     ` |
-| `8` | `>` | `+OK pochi.the.cat@provider.ne.jp POP3 server signing off.` |
+| `1` | `◀` | `+OK provider.ne.jp POP3 server ready.                    ` |
+| `1` | `▶` | `USER pochi.the.cat@provider.ne.jp                        ` |
+| `2` | `◀` | `+OK please send PASS command                             ` |
+| `2` | `◀` | `PASS *************                                       ` |
+| `3` | `◀` | `+OK pochi.the.cat@provider.ne.jp is welcome here         ` |
+| `3` | `▶` | `STAT                                                     ` |
+| `4` | `◀` | `+OK 3 19864                                              ` |
+| `5` | `▶` | `RETR 1                                                   ` |
+| `6` | `◀` | `+OK 4444 octets                                          ` |
+| `6` | `◀` | `Return-Path: <中略>                                      ` |
+| `6` | `◀` | `.                                                        ` |
+| `7` | `▶` | `RETR 2                                                   ` |
+| `6` | `◀` | `+OK 12210 octets                                         ` |
+| `6` | `◀` | `Return-Path: <中略>                                      ` |
+| `6` | `◀` | `.                                                        ` |
+| `6` | `▶` | `DELE 2                                                   ` |
+| `7` | `◀` | `+OK messege 2 deleted                                    ` |
+| `7` | `▶` | `RETR 3                                                   ` |
+| `6` | `◀` | `+OK 12210 octets                                         ` |
+| `6` | `◀` | `Return-Path: <中略>                                      ` |
+| `6` | `◀` | `.                                                        ` |
+| `7` | `▶` | `QUIT                                                     ` |
+| `8` | `◀` | `+OK pochi.the.cat@provider.ne.jp POP3 server signing off.` |
 
 ということになります.
 
