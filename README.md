@@ -1,4 +1,4 @@
-# ChkMails<br><sup><sup>Version 1.1.12.524</sup></sup>
+# ChkMails<br><sup><sup>Version 1.1.13.621</sup></sup>
 
 メールが届いているかチェックしてお知らせする常駐アプリです.
 
@@ -252,23 +252,37 @@ Windows&reg; のデフォルト動作として初回起動時のちょっとし�
 
 ```
 Authentication-Results: mx.provider.ne.jp;
- spf=pass smtp.mailfrom=pochi.the.cat@provider.ne.jp;
- sender-id=pass header.From=pochi.the.cat@provider.ne.jp
+ dmarc=pass header.from=provider.ne.jp;
+ dkim=pass header.i=pochi.the.cat@provider.ne.jp;
+ spf=pass smtp.mailfrom=provider.ne.jp
 ```
 
 この例の場合, 受信者側のプロバイダーが提供している認証は,
-[SPF](https://ja.wikipedia.org/wiki/Sender_Policy_Framework) と
-[Sender-ID](https://ja.wikipedia.org/wiki/Sender_ID) の2つのようです.
-( 逆に言えば [DKIM](https://ja.wikipedia.org/wiki/DKIM) と
-[DMARC](https://ja.wikipedia.org/wiki/DMARC) はサポートされていないようです. )
+[DMARC](https://ja.wikipedia.org/wiki/DMARC) と
+[DKIM](https://ja.wikipedia.org/wiki/DKIM) と
+[SPF](https://ja.wikipedia.org/wiki/Sender_Policy_Framework)
+の3つのようです.
+( 逆に言えば
+[Sender-ID](https://ja.wikipedia.org/wiki/Sender_ID) 
+ はサポートされていないようです. )
 `Authentication-Results:` はプロバイダーが付けている情報なので,
 送信者によって偽造できません,
 客観的に信じられる情報です.
+<br>
+<sup>
+( ※ 偽造はできませんが, 認証上の問題がなかったように見せかけることはできるのです.
+これについては[後述](#authentication-issues). )
+</sup>
 
 そして, 上記の例では
-`spf=pass` と `sender-id=pass` となっているので, SPF と Sender-ID の両方が pass しています.
+`dmarc=pass` と `dkim=pass` と `spf=pass` となっているので,
+DMARC と DKIM と SPF の 3つが pass しています.
 なので,
-このメールは `pochi.the.cat@provider.ne.jp` 名義の送信者が `pochi.the.cat@provider.ne.jp` から送ったものに間違いないと,
+このメールは
+
+* `pochi.the.cat@provider.ne.jp` 名義の送信者が<br>`pochi.the.cat@provider.ne.jp` から送ったもの
+
+に間違いないと,
 プロバイダーが認証済みということです.<br>
 <sub>(「なに当たり前のこと言ってんだ?」と思われる向きもあろうかと存じますが,
 世の中には「メール配信代行業者」というものがあって,
@@ -282,15 +296,15 @@ Authentication-Results: mx.provider.ne.jp;
 となっています.
 ( 逆に言えば「pass しそこないが許されるのは 1つまで」ということです. )
 
-上記のメールの例では「pass しそこなった認証」は `0` ( 2つとも pass している ) なので,
+上記のメールの例では「pass しそこなった認証」は `0` ( 3つとも pass している ) なので,
 このメールは破棄されず届きます.
 
-上記の画面にあるプロバイダーの例では DKIM や DMARC は提供されていませんが,
-それらは「pass しそこなった認証」にカウントされません.
+上記の画面にあるプロバイダーの例では Sender-ID は提供されていませんが,
+それは「pass しそこなった認証」にカウントされません.
 
 ところで,
 「pass しそこないが許されるのは 1つまで」に対して
-「1つでもひっかかったらダメだろ?」
+「1つでも引っかかったらダメだろ?」
 と思われる向きもあろうかとは存じますが,
 居るんですよ, マジで.
 [1つぐらい引っかかってしまう送信者](Examples.md#authentication-results-が全ては-pass-していない正当なメールの例)ってのが.<br>
@@ -331,10 +345,38 @@ Authentication-Results: mx.provider.ne.jp;
 これらに関しては 1つでもあればアウトとして扱っています.
 「1つまではセーフ」といった生ぬるい判定はしません.
 
-この認証によるスパムメールの「区別」は, 何らの先入観もない正当なもので, 「差別」にはあたりません.
-この「区別」に基づいて, メールに注意喚起のマークを付けたり, いっそメールを自動削除してくれたりを,
-サービスとして提供してくれているプロバイダーもあると思います.
-実際, コレがあるだけでもスパムメールがぐっと減ります.
+
+#### [&nbsp;… authentication issues](#readme)
+
+上の「認証を pass しなかった数」による判定を補うべく,
+以下のチェックに引っかかったメールも破棄します.
+
+
+1. 'Received:' from unrelated domain<br>
+メール送信時の認証手順に小細工を施して, `Received:` に信用度の高い無関係のドメインを騙っている.
+<br>
+<sup>
+( 業界では[HELO spoofing](https://www.google.com/search?q=helo+spoofing)とか呼ばれています. )
+</sup>
+
+1. DMARC 'From:' unrelated domain<br>
+DMRAC 未対応な無関係のドメインを `From:` に騙って, `dmarc=fail` を回避している.
+<br>
+<sup>
+( 勝手に騙られたドメインの[IPレピュテーション](https://www.google.com/search?q=IPレピュテーション)もガタ落ちというものです. )
+</sup>
+
+デフォルトで上記 2つとも ON にしてあります.<br>
+人間が目視確認しようとしても目がつらいばかりですが,
+コンピューターから見ると判りやすい痕跡がメールヘッダーに残ります.
+わざわざ「私はスパムです。」と言ってくれているようなもんです.
+見逃す手はないでしょう.
+
+ところで,
+これらの認証によるスパムメールの「区別」は, 何らの先入観もない正当なもので, 「差別」にはあたりません.
+こうした「区別」に基づいて, メールに注意喚起のマークを付けたり, いっそメールを自動削除してくれたりを,
+サービスとして提供してくれているプロバイダーもあります.
+実際, この「区別」があるだけでもスパムメールがぐっと減ります.
 
 が, 「減る」だけです. この認証だけではハネられないスパムメールというのも存在します.
 それで当アプリでは, 追加の「区別」や, さらに踏み込んだ「差別」を用意しています.
@@ -1024,6 +1066,8 @@ ON にすると, 着信したメールの概要を下記のように画面の隅
 | `Discard-Reason:` | 意味 |
 | --- | --- |
 | `Authentication Failure`		| [Authentication](#authentication) で不合格			|
+| `Received from Unrelated Domain`	| [Authentication](#authentication) の「`Received:`に騙った無関係のドメイン」を検出	|
+| `DMARC from Unrelated Domain`		| [Authentication](#authentication) の「`From:`に騙った無関係のドメイン」を検出	|
 | `Coded in Unreadable Charset`		| [Coding](#coding) の「読めない文字セット」を検出		|
 | `Coded with Doubtful Control Code`	| [Coding](#coding) の「疑わしい制御文字」を検出			|
 | `Coded with Evasive Encoding`		| [Coding](#coding) の「回避的な文字コード」を検出		|
