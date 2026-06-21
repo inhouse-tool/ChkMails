@@ -354,17 +354,11 @@ DMARC と DKIM と SPF の 3つが pass しています.
 
 1. 'Received:' from unrelated domain<br>
 メール送信時の認証手順に小細工を施して, `Received:` に信用度の高い無関係のドメインを騙っている.
-<br>
-<sup>
-( 業界では[HELO spoofing](https://www.google.com/search?q=helo+spoofing)とか呼ばれています. )
-</sup>
+<br><sup>( 業界では[HELO spoofing](https://www.google.com/search?q=helo+spoofing)とか呼ばれています. )</sup>
 
 1. DMARC 'From:' unrelated domain<br>
 DMRAC 未対応な無関係のドメインを `From:` に騙って, `dmarc=fail` を回避している.
-<br>
-<sup>
-( 勝手に騙られたドメインの[IPレピュテーション](https://www.google.com/search?q=IPレピュテーション)もガタ落ちというものです. )
-</sup>
+<br><sup>( 勝手に騙られたドメインの[IPレピュテーション](https://www.google.com/search?q=IPレピュテーション)もガタ落ちというものです. )</sup>
 
 デフォルトで上記 2つとも ON にしてあります.<br>
 人間が目視確認しようとしても目がつらいばかりですが,
