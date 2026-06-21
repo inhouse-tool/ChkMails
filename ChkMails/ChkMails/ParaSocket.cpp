@@ -25,7 +25,6 @@ CParaSocket::CParaSocket( void )
 
 	m_nPort      = 0;
 	m_bReceiving = false;
-	m_hReceived  = CreateEvent( NULL, FALSE, FALSE, NULL );
 
 	m_iTLS        = 0;
 	SecInvalidateHandle( &m_hCred );
@@ -44,12 +43,6 @@ CParaSocket::~CParaSocket( void )
 		delete[] m_pbDecrypted;
 	if	( m_pbEncrypted )
 		delete[] m_pbEncrypted;
-	if	( m_iTLS )
-		FinishTLS( 0 );
-
-	CloseHandle( m_hReceived );
-
-	CAsyncSocket::~CAsyncSocket();
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -200,24 +193,44 @@ CParaSocket::NotifyState( void )
 
 #pragma comment( lib, "Secur32.lib" )
 
+#define	FLAGS_CRED	(SCH_USE_STRONG_CRYPTO | SCH_CRED_AUTO_CRED_VALIDATION | SCH_CRED_NO_DEFAULT_CREDS)
+#define	FLAGS_ISC	(ISC_REQ_ALLOCATE_MEMORY | ISC_REQ_CONFIDENTIALITY | ISC_REQ_REPLAY_DETECT | ISC_REQ_SEQUENCE_DETECT | ISC_REQ_STREAM)
+
 bool
 CParaSocket::OnConnectTLS1( void )
 {
-	bool	bDone = true;
+	// Clear count of the encrypted data.
+
+	m_cbEncrypted = 0;
+
+	// Choice either SCH_CREDENTIALS ( TLS 1.3 ) or SCHANNEL_CRED ( TLS 1.2 ).
+
+	void*	pAuthData = NULL;
+	SCH_CREDENTIALS	cred13 = { 0 };
+	SCHANNEL_CRED	cred12 = { 0 };
+
+	if	( GetWinVer() >= 11 ){
+		cred13.dwVersion = SCH_CREDENTIALS_VERSION;
+		cred13.dwFlags = FLAGS_CRED;
+		pAuthData = &cred13;
+	}
+	else{
+		cred12.dwVersion = SCHANNEL_CRED_VERSION;
+		cred12.dwFlags = FLAGS_CRED;
+		pAuthData = &cred12;
+	}
 
 	// Acquire a handle to preexisting credentials.
 
-	SCHANNEL_CRED	cred = { 0 };
-	cred.dwVersion = SCHANNEL_CRED_VERSION;
-	cred.dwFlags = SCH_USE_STRONG_CRYPTO | SCH_CRED_AUTO_CRED_VALIDATION | SCH_CRED_NO_DEFAULT_CREDS;
-
 	SECURITY_STATUS	status =
 	AcquireCredentialsHandle( NULL, UNISP_NAME, SECPKG_CRED_OUTBOUND, NULL,
-						&cred, NULL, NULL, &m_hCred, NULL );		
+						pAuthData, NULL, NULL, &m_hCred, NULL );		
 	if	( status != SEC_E_OK ){
 		SetLastError( status );
 		return	false;
 	}
+
+	bool	bDone = false;
 
 	do{
 		// Prepare the buffer for the outgoing message.
@@ -229,45 +242,18 @@ CParaSocket::OnConnectTLS1( void )
 
 		// Initialize the security context.
 
-		DWORD	dwFlags = ISC_REQ_USE_SUPPLIED_CREDS | ISC_REQ_ALLOCATE_MEMORY | ISC_REQ_CONFIDENTIALITY |
-				ISC_REQ_REPLAY_DETECT | ISC_REQ_SEQUENCE_DETECT | ISC_REQ_STREAM;
+		DWORD	dwFlags = FLAGS_ISC;
 		status =
-		InitializeSecurityContext( &m_hCred, NULL, m_strHost.GetBuffer(), dwFlags,
+		InitializeSecurityContext( &m_hCred, NULL, (TCHAR*)m_strHost.GetString(), dwFlags,
 						0, 0, NULL, 0, &m_hContext, &descOut, &dwFlags, NULL );
 		
-		// Completed, but must do it again: Send 'Client Hello'.
+		// Continue: Send 'Client Hello'.
 
-		if	( status == SEC_I_CONTINUE_NEEDED ){
-			char*	pbBuffer = (char*)asbOut[0].pvBuffer;
-			int	cbBuffer  =       asbOut[0].cbBuffer;
-
-			while	( cbBuffer > 0 ){
-				m_cbEncrypted = 0;
-				int	cbSent = CAsyncSocket::Send( pbBuffer, cbBuffer );
-				if	( cbSent <= 0 ){
-					bDone = false;
-					break;
-				}
-				cbBuffer -= cbSent;
-				pbBuffer += cbSent;
-			}
-
-			if	( asbOut[0].pvBuffer )
-				FreeContextBuffer( asbOut[0].pvBuffer );
-
-			if	( !bDone )
-				break;
-		}
-
-		// Others ( failed ): Quit.
-
-		else{
-			bDone = false;
-			break;
-		}
+		if	( status == SEC_I_CONTINUE_NEEDED )
+			bDone = SendBackTLS( asbOut[0].pvBuffer, asbOut[0].cbBuffer );
 	}while	( 0 );
 
-	// Done: Go ahead to the next stage to wait 'Server hello".
+	// Done: Go ahead to the next stage to wait 'Server hello'.
 
 	if	( bDone )
 		m_iTLS = 2;
@@ -287,7 +273,14 @@ CParaSocket::OnConnectTLS2( void )
 
 	// Receive 'Server Hello'.
 
-	m_cbEncrypted += CAsyncSocket::Receive( m_pbEncrypted +m_cbEncrypted, m_cbPacketMax -m_cbEncrypted );
+	int	cbReceived = CAsyncSocket::Receive( m_pbEncrypted +m_cbEncrypted, m_cbPacketMax -m_cbEncrypted );
+	if	( cbReceived <= 0 ){
+		if	( cbReceived < 0 )
+			FinishTLS( cbReceived );
+		return	false;
+	}
+
+	m_cbEncrypted += cbReceived;
 
 	// Prepare the buffers for the incoming message.
 
@@ -304,7 +297,6 @@ CParaSocket::OnConnectTLS2( void )
 
 	SecBuffer	asbOut[1] = { 0 };
 	asbOut[0].BufferType = SECBUFFER_TOKEN;
-
 	SecBufferDesc descOut = { SECBUFFER_VERSION, _countof( asbOut ), asbOut };
 
 	// Initialize the security context.
@@ -312,121 +304,56 @@ CParaSocket::OnConnectTLS2( void )
 	SECURITY_STATUS	status;
 
 	do{
-		DWORD	dwFlags = ISC_REQ_USE_SUPPLIED_CREDS | ISC_REQ_ALLOCATE_MEMORY | ISC_REQ_CONFIDENTIALITY |
-				ISC_REQ_REPLAY_DETECT | ISC_REQ_SEQUENCE_DETECT | ISC_REQ_STREAM;
+		DWORD	dwFlags = FLAGS_ISC;
 		status =
-		InitializeSecurityContext( &m_hCred, &m_hContext, NULL, dwFlags,
+		InitializeSecurityContext( &m_hCred, &m_hContext, (TCHAR*)m_strHost.GetString(), dwFlags,
 						0, 0, &descIn, 0, NULL, &descOut, &dwFlags, NULL );
 
-		// If any extra data has received, keep it in the buffer.
+		// Done: Continue.
 
-		if	( asbIn[1].BufferType == SECBUFFER_EXTRA ){
-			int	cbExtra = asbIn[1].cbBuffer;
-			MoveMemory( m_pbEncrypted, m_pbEncrypted + (m_cbEncrypted -cbExtra), cbExtra );
-			m_cbEncrypted = cbExtra;
-		}
-		else if	( status == SEC_E_INCOMPLETE_MESSAGE )
+		if	( status == SEC_E_OK ||
+			  status == SEC_I_CONTINUE_NEEDED )
 			;
-		else{
-			m_cbEncrypted = 0;
-		}
-		// 0x9a
 
-		// Completed: Get the size of each block of the stream,
-		//		then go ahead to the next stage to wait the app do something.
+		// Imcomplete: Do next time.
 
-		if	( status == SEC_E_OK ){
-			QueryContextAttributes( &m_hContext, SECPKG_ATTR_STREAM_SIZES, &m_cbsContext );
-			m_iTLS = 3;
-			m_nState = SOCK_STATE_CONNECTED;
-			NotifyState();
-
+		else if	( status == SEC_E_INCOMPLETE_MESSAGE )
 			break;
-		}
 
-		// Incomplete: Continue.
-
-		else if	( status == SEC_E_INCOMPLETE_MESSAGE ){
-			break;
-		}
-
-		// Completed, but must do it again: Send the response.
-
-		else if	( status == SEC_I_CONTINUE_NEEDED ){
-			char*	pbBuffer = (char*)asbOut[0].pvBuffer;
-			int	cbBuffer  =       asbOut[0].cbBuffer;
-
-			if	( pbBuffer ){
-				while	( cbBuffer ){
-					int	cbSent = CAsyncSocket::Send( pbBuffer, cbBuffer );
-					if	( cbSent <= 0 ){
-						bDone = false;
-						break;
-					}
-					cbBuffer -= cbSent;
-					pbBuffer += cbSent;
-				}
-				FreeContextBuffer( asbOut[0].pvBuffer );
-			}
-
-			if	( !bDone )				
-				break;
-		}
-
-		// Others ( failed ): Quit.
+		// Others: It's failed.
 
 		else{
 			bDone = false;
-			TRACE( "CParaSocket::OnConnectTLS2: Failed in error 0x%08x\n", status );
 			break;
+		}
+	
+		// Consume currently received data.
+
+		ConsumeTLS( &descIn );
+
+		// Completed: Get the sizes of each block of the stream.
+
+		if	( status == SEC_E_OK ){
+			QueryContextAttributes( &m_hContext, SECPKG_ATTR_STREAM_SIZES, &m_cbsContext );
+
+			DWORD	cbPacket = m_cbsContext.cbHeader + m_cbsContext.cbMaximumMessage + m_cbsContext.cbTrailer;
+			if	( cbPacket > m_cbPacketMax ){
+				m_cbPacketMax = cbPacket;
+				delete[]	m_pbEncrypted;
+				m_pbEncrypted = new BYTE[m_cbPacketMax];
+			}
+
+			m_iTLS = 3;
+			m_nState = SOCK_STATE_CONNECTED;
+			NotifyState();
 		}
 	}while	( 0 );
 
-	// Done: If some message has received, decrypt it.
+	// Done: Send handshke response if any.
 
 	if	( bDone ){
-		if	( m_cbEncrypted ){
-
-			// Prepare the buffers for decrypting the message.
-
-			asbIn[0].BufferType = SECBUFFER_DATA;
-			asbIn[0].pvBuffer   = m_pbEncrypted;
-			asbIn[0].cbBuffer   = m_cbEncrypted;
-			asbIn[1].BufferType = SECBUFFER_EMPTY;
-			asbIn[2].BufferType = SECBUFFER_EMPTY;
-			asbIn[3].BufferType = SECBUFFER_EMPTY;
-
-			// Decrypt the message.
-
-			status = DecryptMessage( &m_hContext, &descIn, 0, NULL );
-
-			// Store the decrypted message.
-
-			if	( status == SEC_E_OK ){
-				EnqueueData( (BYTE*)asbIn[1].pvBuffer, asbIn[1].cbBuffer );
-
-				int	cbUnprocessd = 0;
-				for	( int i = 0; i < _countof( asbIn ); i++ )
-					if	( asbIn[i].BufferType == SECBUFFER_EXTRA ){
-						cbUnprocessd = asbIn[i].cbBuffer;
-						break;
-					}
-				int	cbValid = m_cbEncrypted - cbUnprocessd;
-
-				if	( !cbUnprocessd ){
-					MoveMemory( m_pbEncrypted, m_pbEncrypted +cbValid, m_cbEncrypted -cbValid );
-					m_cbEncrypted -= cbValid;
-				}
-
-				m_nState = SOCK_STATE_RECEIVED;
-				NotifyState();
-
-				if	( m_bReceiving ){
-					m_bReceiving = false;
-					SetEvent( m_hReceived );
-				}
-			}
-		}
+		if	( asbOut[0].cbBuffer > 0 )
+			bDone = SendBackTLS( asbOut[0].pvBuffer, asbOut[0].cbBuffer );
 	}
 
 	// Failed: Clean up.
@@ -440,7 +367,7 @@ CParaSocket::OnConnectTLS2( void )
 void
 CParaSocket::OnReceiveTLS( void )
 {
-	// Do nothing if the buffer was full.
+	// Do nothing if the buffer is full.
 
 	if	( m_cbEncrypted == m_cbPacketMax )
 		return;
@@ -448,51 +375,52 @@ CParaSocket::OnReceiveTLS( void )
 	// Receive encrypted data.
 
 	int	cbReceived = CAsyncSocket::Receive( m_pbEncrypted + m_cbEncrypted, m_cbPacketMax - m_cbEncrypted, 0 );
-	if	( cbReceived <= 0 )
+	if	( cbReceived <= 0 ){
+		if	( cbReceived < 0 )
+			FinishTLS( cbReceived );
 		return;
+	}
 
 	m_cbEncrypted += cbReceived;
 
+	// Consume encrypted data.
+
 	while	( m_cbEncrypted ){
 
-		// Prepare the buffers for decrypting the message.
+		bool	bDone = true;
 
-		SecBuffer asbIn[4] = {};
+		// Prepare the buffers to decrypt the encrypted data.
+
+		SecBuffer asbIn[4] = { 0 };
+
 		asbIn[0].BufferType = SECBUFFER_DATA;
 		asbIn[0].pvBuffer   = m_pbEncrypted;
 		asbIn[0].cbBuffer   = m_cbEncrypted;
 		asbIn[1].BufferType = SECBUFFER_EMPTY;
 		asbIn[2].BufferType = SECBUFFER_EMPTY;
 		asbIn[3].BufferType = SECBUFFER_EMPTY;
+
 		SecBufferDesc descIn = { SECBUFFER_VERSION, _countof( asbIn ), asbIn };
 
-		// Decrypt the message.
+		// Decrypt the data.
 
 		SECURITY_STATUS status = DecryptMessage( &m_hContext, &descIn, 0, NULL );
 
 		// Completed: Store the decrypted message.
 
 		if	( status == SEC_E_OK ){
-			EnqueueData( (BYTE*)asbIn[1].pvBuffer, asbIn[1].cbBuffer );
-
 			// Check if unprocessed data is implicated.
 			// See https://learn.microsoft.com/en-us/windows/win32/secauthn/extra-buffers-returned-by-schannel
 
-			int	cbUnprocessd = 0;
-			if	( asbIn[3].BufferType == SECBUFFER_EXTRA )
-				cbUnprocessd = asbIn[3].cbBuffer;
+			int	i = SeekBufTLS( &descIn, SECBUFFER_DATA );
+			if	( i >= 0 && asbIn[i].cbBuffer > 0 )
+				EnqueueTLS( (BYTE*)asbIn[i].pvBuffer, asbIn[i].cbBuffer );
 
-			int	cbValid = m_cbEncrypted - cbUnprocessd;
-
-			MoveMemory( m_pbEncrypted, m_pbEncrypted + cbValid, m_cbEncrypted - cbValid );
-			m_cbEncrypted -= cbValid;
-			if	( cbUnprocessd )
-				continue;
-			else{
-				m_nState = SOCK_STATE_RECEIVED;
-				NotifyState();
-				break;
-			}
+			(void)ConsumeTLS( &descIn );
+			
+			m_nState = SOCK_STATE_RECEIVED;
+			NotifyState();
+			break;
 		}
 
 		// Session closed: Abandon encrypted data.
@@ -502,15 +430,64 @@ CParaSocket::OnReceiveTLS( void )
 			break;
 		}
 
-		// Need more data: Wait for the next OnReceive.
+		// Need more data: Wait for the next time.
 
-		else if	( status == SEC_E_INCOMPLETE_MESSAGE ){
+		else if	( status == SEC_E_INCOMPLETE_MESSAGE )
 			break;
+
+		// Another context required: Apply the returned Extra as a token for a new context. ( TLS 1.3 )
+
+		else if	( status == SEC_I_RENEGOTIATE ){
+			void*	pbExtra = NULL;
+			DWORD	cbExtra = 0;
+
+			int	i = SeekBufTLS( &descIn, SECBUFFER_EXTRA );
+			if	( i >= 0 ){
+				pbExtra = asbIn[i].pvBuffer;
+				cbExtra = asbIn[i].cbBuffer;
+			}
+			if	( !pbExtra )
+				continue;
+
+			asbIn[0].BufferType = SECBUFFER_TOKEN;
+			asbIn[0].pvBuffer   = pbExtra;
+			asbIn[0].cbBuffer   = cbExtra;
+			asbIn[1].BufferType = SECBUFFER_EMPTY;
+			asbIn[1].pvBuffer   = NULL;
+			asbIn[1].cbBuffer   = 0;
+			asbIn[2].BufferType = SECBUFFER_EMPTY;
+			asbIn[2].pvBuffer   = NULL;
+			asbIn[2].cbBuffer   = 0;
+			asbIn[3].BufferType = SECBUFFER_EMPTY;
+			asbIn[3].pvBuffer   = NULL;
+			asbIn[3].cbBuffer   = 0;
+
+			SecBuffer	asbOut[1] = { 0 };
+			asbOut[0].BufferType = SECBUFFER_TOKEN;
+			SecBufferDesc descOut = { SECBUFFER_VERSION, _countof( asbOut ), asbOut };
+
+			DWORD	dwFlags = FLAGS_ISC;
+			status =
+			InitializeSecurityContext( &m_hCred, &m_hContext, (TCHAR*)m_strHost.GetString(), dwFlags,
+							0, SECURITY_NATIVE_DREP, &descIn, 0, NULL, &descOut, &dwFlags, NULL );
+
+			if	( status == SEC_E_OK ||
+				  status == SEC_I_CONTINUE_NEEDED ){
+				ConsumeTLS( &descIn );
+				bDone = SendBackTLS( asbOut[0].pvBuffer, asbOut[0].cbBuffer );
+			}
+			else
+				bDone = false;
 		}
 
-		// Others: Quit.
+		// Others: It's failed.
 
-		else{
+		else
+			bDone = false;
+
+		// Failed: Clean up.
+
+		if	( !bDone ){
 			FinishTLS( status );
 			break;
 		}
@@ -522,21 +499,16 @@ CParaSocket::ReceiveTLS( BYTE* pbData, DWORD cbData )
 {
 	int	cbRecv = 0;
 
-	while	( cbData != 0 )
+	if	( cbData != 0 )
 		if	( m_cbDecrypted ){
 			int	cbToGet = min( cbData, m_cbDecrypted );
-			BYTE*	pbGet = DequeueData( cbToGet );
+			BYTE*	pbGet = DequeueTLS( cbToGet );
 			CopyMemory( pbData, pbGet, cbToGet );
 			delete[] pbGet;
 
 			pbData += cbToGet;
 			cbData -= cbToGet;
 			cbRecv += cbToGet;
-		}
-		else{
-			m_bReceiving = true;
-			WaitForSingleObject( m_hReceived, INFINITE );
-			continue;
 		}
 
 	return	cbRecv;
@@ -553,10 +525,10 @@ CParaSocket::SendTLS( BYTE* pbData, DWORD cbData )
 		if	( m_cbPacketMax ){
 			char*	pbSend = new char[m_cbPacketMax];
 
-			// Prepare the buffers for encrypting the message.
+			// Prepare the buffers to encrypt the message.
 
 			SecBuffer asbOut[3];
-			asbOut[0].BufferType = SECBUFFER_STREAM_HEADER;
+			asbOut[0].BufferType = SECBUFFER_TOKEN;
 			asbOut[0].pvBuffer   = pbSend;
 			asbOut[0].cbBuffer   = m_cbsContext.cbHeader;
 			asbOut[1].BufferType = SECBUFFER_DATA;
@@ -572,7 +544,7 @@ CParaSocket::SendTLS( BYTE* pbData, DWORD cbData )
 			CopyMemory( asbOut[1].pvBuffer, pbData, cbToPut );
 			SECURITY_STATUS	status = EncryptMessage( &m_hContext, 0, &descOut, 0 );
 
-			// Send the encrypted message.
+			// Done: Send the encrypted data.
 
 			if	( status == SEC_E_OK ){
 				int	cbTotal = asbOut[0].cbBuffer + asbOut[1].cbBuffer + asbOut[2].cbBuffer;
@@ -585,13 +557,15 @@ CParaSocket::SendTLS( BYTE* pbData, DWORD cbData )
 					else
 						cbDone += cbSent;
 				}
-				if	( cbSent != -1 ){
+				if	( cbSent != SOCKET_ERROR ){
 					pbData += cbToPut;
 					cbData -= cbToPut;
 				}
 			}
 
 			delete[] pbSend;
+
+			// Failed: Clean up.
 
 			if	( status != SEC_E_OK ){
 				FinishTLS( status );
@@ -629,28 +603,17 @@ CParaSocket::CloseTLS( void )
 
 	// Initialize the security context.
 
-	DWORD	dwFlags = ISC_REQ_ALLOCATE_MEMORY | ISC_REQ_CONFIDENTIALITY |
-				ISC_REQ_REPLAY_DETECT | ISC_REQ_SEQUENCE_DETECT | ISC_REQ_STREAM;
+	DWORD	dwFlags = FLAGS_ISC;
 	status =
-	InitializeSecurityContext( &m_hCred, &m_hContext, NULL, dwFlags,
-					0, 0, &descOut, 0, NULL, &descOut, &dwFlags, NULL );
+	InitializeSecurityContext( &m_hCred, &m_hContext, (TCHAR*)m_strHost.GetString(), dwFlags,
+					0, 0, NULL, 0, NULL, &descOut, &dwFlags, NULL );
 
-	// Send 'Close Notify'.
+	// Done: Send 'Close Notify'.
 
-	if	( status == SEC_E_OK ){
-		char*	pbBuffer = (char*)asbOut[0].pvBuffer;
-		int	cbBuffer = asbOut[0].cbBuffer;
-		while	( cbBuffer ){
-			int	cbSent = CAsyncSocket::Send( pbBuffer, cbBuffer, 0 );
-			if	( cbSent <= 0 )
-				break;
-			pbBuffer += cbSent;
-			cbBuffer -= cbSent;
+	if	( status == SEC_E_OK )
+		(void)SendBackTLS( asbOut[0].pvBuffer, asbOut[0].cbBuffer );
 
-			Sleep( 50 );	// Insert a time to receive a TCP ACK. ( just for a clean capture log :-)
-		}
-		FreeContextBuffer( asbOut[0].pvBuffer );
-	}
+	// Clean up anyway.
 
 	FinishTLS( status );
 }
@@ -674,8 +637,66 @@ CParaSocket::FinishTLS( SECURITY_STATUS status )
 	}
 }
 
+bool
+CParaSocket::SendBackTLS( void* pbData, DWORD cbData )
+{
+	bool	bDone = true;
+
+	if	( pbData ){
+		BYTE*	pbSend = (BYTE*)pbData;
+
+		while	( cbData > 0 ){
+			int	cbSent = CAsyncSocket::Send( pbSend, cbData );
+			if	( cbSent <= 0 ){
+				bDone = false;
+				break;
+			}
+
+			cbData -= cbSent;
+			pbSend += cbSent;
+		}
+
+		FreeContextBuffer( pbData );
+	}
+
+	return	bDone;
+}
+
+bool
+CParaSocket::ConsumeTLS( SecBufferDesc* pDesc )
+{
+	bool		bDone = true;
+	SecBuffer*	pBuffers = pDesc->pBuffers;
+
+	int	cbExtra = 0;
+	int	i = SeekBufTLS( pDesc, SECBUFFER_EXTRA );
+	if	( i >= 0 )
+		cbExtra = pBuffers[i].cbBuffer;
+
+	{
+		int	cbConsumed = m_cbEncrypted - cbExtra;
+		MoveMemory( m_pbEncrypted, m_pbEncrypted + cbConsumed, cbExtra );
+		m_cbEncrypted = cbExtra;
+	}
+
+	return	bDone;
+}
+
+int
+CParaSocket::SeekBufTLS( SecBufferDesc* pDesc, DWORD dwType )
+{
+	SecBuffer*	pBuffers = pDesc->pBuffers;
+	DWORD		cBuffers = pDesc->cBuffers;
+
+	for	( int i = 0; i < (int)cBuffers; i++ )
+		if	( pBuffers[i].BufferType == dwType )
+			return	i;
+
+	return	-1;
+}
+
 void
-CParaSocket::EnqueueData( BYTE* pbData, DWORD cbData )
+CParaSocket::EnqueueTLS( BYTE* pbData, DWORD cbData )
 {
 	int	cbNew = m_cbDecrypted +cbData;
 	BYTE*	pbNew = new BYTE[cbNew];
@@ -689,7 +710,7 @@ CParaSocket::EnqueueData( BYTE* pbData, DWORD cbData )
 }
 
 BYTE*
-CParaSocket::DequeueData( DWORD cbData )
+CParaSocket::DequeueTLS( DWORD cbData )
 {
 	int	cbNew = m_cbDecrypted -cbData;
 	BYTE*	pbNew = cbNew? new BYTE[cbNew]: NULL;
@@ -704,4 +725,37 @@ CParaSocket::DequeueData( DWORD cbData )
 	m_cbDecrypted = cbNew;
 
 	return	pbData;
+
+// Consider using a ring buffer
+// if you think that physical memory copying is expensive.
+}
+
+DWORD
+CParaSocket::GetWinVer( void )
+{
+	DWORD	dwMajor = 0, dwMinor = 0;
+	DWORD	dwBuild = 0;
+
+	HMODULE	hNT = LoadLibraryEx( _T("ntdll.dll"), NULL, LOAD_LIBRARY_SEARCH_SYSTEM32 );
+	if	( hNT ){
+		void	(WINAPI *RtlGetNtVersionNumbers)( LPDWORD major, LPDWORD minor, LPDWORD build ) =
+			(void (WINAPI *)( LPDWORD major, LPDWORD minor, LPDWORD build ))
+			GetProcAddress( hNT, "RtlGetNtVersionNumbers" );
+		
+		RtlGetNtVersionNumbers( &dwMajor, &dwMinor, &dwBuild );
+		dwBuild &= ~0xF0000000;	// Mask 'build type'.
+		FreeLibrary( hNT );
+	}
+
+	DWORD	dwWinVer = dwMajor;
+
+	if	( dwMajor == 10 )
+		if	( dwBuild >= 22000 )
+			dwWinVer = 11;
+
+	return	dwWinVer;
+
+// Use RtlGetVersion (wdm.h)
+// or apply GetFileVersionInfo (winver.h) to kernel32.dll
+// if you don't want to use undocumented API like RtlGetNtVersionNumbers.
 }

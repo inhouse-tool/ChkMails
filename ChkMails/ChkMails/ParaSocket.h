@@ -50,7 +50,6 @@ protected:
 		int	m_nPort;
 		CString	m_strHost;
 		bool	m_bReceiving;
-		HANDLE	m_hReceived;
 		int	m_iTLS;
 
 	    CredHandle	m_hCred;
@@ -73,6 +72,12 @@ protected:
 		void	CloseTLS( void );
 		void	FinishTLS( SECURITY_STATUS status );
 
-		void	EnqueueData( BYTE* pbData, DWORD cbData );
-		BYTE*	DequeueData( DWORD cbData );
+		bool	ConsumeTLS( SecBufferDesc* pDesc );
+		int	SeekBufTLS( SecBufferDesc* pDesc, DWORD dwType );
+
+		bool	SendBackTLS( void* pbData, DWORD cbData );
+		void	EnqueueTLS( BYTE* pbData, DWORD cbData );
+		BYTE*	DequeueTLS( DWORD cbData );
+
+		DWORD	GetWinVer( void );
 };
