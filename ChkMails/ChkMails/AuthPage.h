@@ -12,6 +12,7 @@ public:
 
 		int	m_nAuth;
 		DWORD	m_dwFlags;
+		DWORD	m_dwUsed;
 
 protected:
 	virtual	BOOL	OnInitDialog( void );

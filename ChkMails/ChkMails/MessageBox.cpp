@@ -171,7 +171,7 @@ CMessageBox::FillDialog( BYTE* pb, DLGTEMPLATE* pTemp, UINT nType )
 
 	// Title array
 	DWORD	cb = ( strCaption.GetLength()+1 ) * (int)sizeof( WCHAR );
-	memcpy( pw, strCaption.GetBuffer(), cb );
+	memcpy( pw, strCaption.GetString(), cb );
 	pw += strCaption.GetLength()+1;
 
 	// Font size
@@ -334,7 +334,7 @@ CMessageBox::FillText( BYTE* pb, DLGTEMPLATE* pTemp, UINT nType, LPCTSTR lpszPro
 
 	// Resource array:
 	DWORD	cb = ( strText.GetLength()+1 ) * (int)sizeof( WCHAR );
-	memcpy( pw, strText.GetBuffer(), cb );	// TEXT of the given prompt
+	memcpy( pw, strText.GetString(), cb );	// TEXT of the given prompt
 	pw += strText.GetLength()+1;
 
 	// Title array:
@@ -401,7 +401,7 @@ CMessageBox::FillButtons( BYTE* pb, DLGTEMPLATE* pTemp, UINT nType )
 
 		// Resource array:
 		DWORD	cb = ( strButton[i].GetLength()+1 ) * (int)sizeof( WCHAR );
-		memcpy( pw, strButton[i].GetBuffer(), cb );	// TEXT of the button
+		memcpy( pw, strButton[i].GetString(), cb );	// TEXT of the button
 		pw += strButton[i].GetLength()+1;
 
 		// Title array:

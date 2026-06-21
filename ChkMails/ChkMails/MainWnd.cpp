@@ -339,8 +339,6 @@ CMainWnd::OnGetSender( WPARAM wParam, LPARAM lParam )
 	CStringA strMail( (char*)lParam );
 
 	CAttr	attr = GetAttr( strMail );
-	if	( attr.m_dwReason )
-		return	(LRESULT)0;
 
 	if	( attr.m_strSender.IsEmpty() )
 		attr.m_strSender = attr.m_strFrom;
@@ -352,7 +350,7 @@ CMainWnd::OnGetSender( WPARAM wParam, LPARAM lParam )
 	strPair += "\n";
 
 	char*	pchAnswer = new char[strPair.GetLength()+1];
-	memcpy( pchAnswer, strPair.GetBuffer(), strPair.GetLength()+1 );
+	memcpy( pchAnswer, strPair.GetString(), strPair.GetLength()+1 );
 
 	return	(LRESULT)pchAnswer;
 }
@@ -421,7 +419,7 @@ CMainWnd::OnMenuAbout( void )
 	strText.Replace( L"(C)", L"\x00a9" );
 #endif//_UNICODE
 
-	AfxMessageBox( strText.GetBuffer(), MB_ICONMASK, MB_OK );
+	AfxMessageBox( strText.GetString(), MB_ICONMASK, MB_OK );
 }
 
 #include "AccountDlg.h"
@@ -480,7 +478,8 @@ CMainWnd::OnMenuFilter( void )
 	CFilterSheet	sheet( IDS_CAPT_FILTER, this, 0 );
 
 	sheet.m_pageAuth     .m_nAuth         = m_nAuth;
-	sheet.m_pageAuth     .m_dwFlags       = m_dwAuthCache;
+	sheet.m_pageAuth     .m_dwFlags       = m_dwAuth;
+	sheet.m_pageAuth     .m_dwUsed        = m_dwAuthCache;
 	sheet.m_pageCode     .m_dwFlags       = m_dwCode;
 	sheet.m_pageCode     .m_strFont       = m_strCodeFont;
 	sheet.m_pageDomain   .m_strDomains    = m_strDomains;
@@ -503,6 +502,10 @@ CMainWnd::OnMenuFilter( void )
 
 	if	( sheet.m_pageAuth  .m_nAuth            != m_nAuth ){
 		m_nAuth         = sheet.m_pageAuth        .m_nAuth;
+		bUpdate = true;
+	}
+	if	( sheet.m_pageAuth  .m_dwFlags          != m_dwAuth ){
+		m_dwAuth        = sheet.m_pageAuth        .m_dwFlags;
 		bUpdate = true;
 	}
 	if	( sheet.m_pageCode  .m_dwFlags          != m_dwCode ){
@@ -843,6 +846,7 @@ CMainWnd::LoadFilters( void )
 	CChkMailsApp*	pApp = (CChkMailsApp*)AfxGetApp();
 
 	m_nAuth         = pApp->GetProfileInt(    _T("Filters"), _T("AuthFail"),   2 );
+	m_dwAuth        = pApp->GetProfileInt(    _T("Filters"), _T("AuthFlag"),   0x0003 );
 	m_dwAuthCache   = pApp->GetProfileInt(    _T("Filters"), _T("AuthBits"),   0x0000 );
 	m_dwCode        = pApp->GetProfileInt(    _T("Filters"), _T("Code"),       0xffff );
 	m_strCodeFont   = pApp->GetProfileString( _T("Filters"), _T("CodeFont"),   _T("") );
@@ -870,6 +874,7 @@ CMainWnd::SaveFilters( void )
 	CChkMailsApp*	pApp = (CChkMailsApp*)AfxGetApp();
 
 	pApp->WriteProfileInt(    _T("Filters"), _T("AuthFail"),   m_nAuth );
+	pApp->WriteProfileInt(    _T("Filters"), _T("AuthFlag"),   m_dwAuth );
 	pApp->WriteProfileInt(    _T("Filters"), _T("AuthBits"),   m_dwAuthCache );
 	pApp->WriteProfileInt(    _T("Filters"), _T("Code"),       m_dwCode );
 	pApp->WriteProfileString( _T("Filters"), _T("CodeFont"),   m_strCodeFont );
@@ -996,7 +1001,7 @@ CMainWnd::GetAttr( CStringA strHeader, LPCTSTR pchFile )
 void
 CMainWnd::GetAuth( CStringA strHeader, CAttr& attr )
 {
-	DWORD	dwAuth = 0x0;
+	DWORD	dwAuthCache = 0x0;
 	strHeader.MakeLower();
 	CStringA strAuth;
 
@@ -1018,6 +1023,7 @@ CMainWnd::GetAuth( CStringA strHeader, CAttr& attr )
 		}
 		strAuth += "\r\n";
 	}
+	attr.m_strAuth = strAuth;
 
 	// Check each result.
 
@@ -1048,22 +1054,22 @@ CMainWnd::GetAuth( CStringA strHeader, CAttr& attr )
 				;
 			else
 				attr.m_nAuth++;
-			dwAuth |= (1<<i);
+			dwAuthCache |= (1<<i);
 		}
 		xTag = 0;
 	}
 
 	// Save the cache if the new result was added.
 
-	if	( dwAuth != m_dwAuthCache ){
-		m_dwAuthCache |= dwAuth;
+	if	( dwAuthCache != m_dwAuthCache ){
+		m_dwAuthCache |= dwAuthCache;
 		SaveSettings();
 	}
 
 	// Claim error if the result was not good enough.
 
 	if	( attr.m_nAuth >= m_nAuth )
-		FilterError( IDS_RF_AUTH, attr );
+		FilterError( IDS_RF_AUTH_FAILURE, attr );
 }
 
 void
@@ -1528,38 +1534,25 @@ CMainWnd::CheckReceived( CStringA strHeader, CAttr& attr )
 {
 	// Get the last ( the first ) 'Received: '.
 
-	int	xIn = -1;
-	int	x = 0;
-	do{
-		x = strHeader.Find( "\nReceived: ", x );
-		if	( x < 0 )
-			break;
-		x += 1+10;
-		xIn = x;
-	}while	( true );
-	if	( xIn < 0 )
+	CStringA strReceived = Get1stReceivedA( strHeader );
+	if	( strReceived.IsEmpty() )
 		return;
-
-	int	xOut = -1;
-	x = xIn;
-	do{
-		x = strHeader.Find( "\r\n", x );
-		x += 2;
-		if	( strHeader[x] > ' ' ){
-			xOut = x;
-			break;
-		}
-	}while	( true );
-	
-	CStringA strReceived = strHeader.Mid( xIn, xOut-xIn );
 
 	// Get the time in the last 'Received:'.
 
-	x = strReceived.ReverseFind( ';' );
+	int	x = strReceived.ReverseFind( ';' );
+	if	( x < 0 )
+		return;
+
 	CStringA strTime = strReceived.Mid( x+1 );
 	strTime.Trim();
 	CAttr	attrTime;
 	CTime	time = GetTime( strTime, attrTime );
+
+	// Not header only: Called to get the time. So finish here.
+
+	if	( strHeader.Right( 4 ) != "\r\n\r\n" )
+		return;
 
 	// Check if the time zone is unreliale.
 
@@ -1575,7 +1568,7 @@ CMainWnd::CheckReceived( CStringA strHeader, CAttr& attr )
 			}
 		}
 
-		// Check if the time in the last 'Received:' is in the past of 'Date:'.
+		// Check if the time in the 1st 'Received:' is in the past of 'Date:'.
 
 		if	( time < attr.m_time ){
 
@@ -1589,6 +1582,76 @@ CMainWnd::CheckReceived( CStringA strHeader, CAttr& attr )
 			}
 		}
 	}
+
+	CStringA strSendDomain;
+
+	do{
+		int	xIn = strReceived.Find( "from " );
+		if	( xIn < 0 )
+			break;
+		xIn += 5;
+		int	xOut = strReceived.Find( "(", xIn );
+		if	( xOut < 0 )
+			break;
+
+		CStringA strSender = strReceived.Mid( xIn, xOut-xIn );
+		strSender.Trim();
+		strSendDomain = DomainOfA( strSender );
+
+	}while	( false );
+	if	( strSendDomain.IsEmpty() )
+		return;
+
+	// Check if it is noted as "Authenticated sender:" with unrelated domain.
+	// ( i.e. HELO spoofing )
+
+	do{
+		if	( !IsFiltered( IDS_RF_AUTH_RECEIVED ) )
+			break;
+
+		CStringA strTag = "Authenticated sender: ";
+		int	x = strReceived.Find( strTag );
+		if	( x < 0 )
+			break;
+
+		CStringA strAuth = strReceived.Mid( x+strTag.GetLength() );
+		x = strAuth.Find( ')' );
+		if	( x < 0 )
+			x = strAuth.Find( '\r' );
+		strAuth = strAuth.Left( x );
+		x = strAuth.Find( '@' );
+		if	( x >= 0 )
+			strAuth.Delete( 0, x+1 );
+		strAuth.Trim();
+
+		if	( strReceived.Find( "with ESMTPSA" ) < 0 &&
+			  strReceived.Find( "with ESMTPA"  ) < 0 )
+			break;
+
+		CStringA strAuthDomain = DomainOfA( strAuth );
+
+		if	( strAuthDomain != strSendDomain )
+			FilterError( IDS_RF_AUTH_RECEIVED, attr );
+
+	}while	( false );
+
+	// Check if 'From:' is unrelated with the sender and does not support DMARC.
+	// ( i.e. Direct Domain Spoofing targetting a domain which does not support DMARC )
+
+	do{
+		if	( !IsFiltered( IDS_RF_AUTH_DMARC ) )
+			break;
+
+		CStringA strFromDomain = DomainOfA( attr.m_strFrom );
+		if	( strFromDomain == strSendDomain )
+			break;
+
+		if	( attr.m_strAuth.Find( "dmarc=none" ) >= 0 &&
+			  attr.m_strAuth.Find( "dkim=pass" ) >= 0 &&
+			  attr.m_strAuth.Find( "spf=pass" ) >= 0 )
+			FilterError( IDS_RF_AUTH_DMARC, attr );
+
+	}while	( false );
 }
 
 void
@@ -1670,7 +1733,7 @@ CMainWnd::GetTime( CStringA strDate, CAttr& attr )
 		else
 			strDate.Delete( 0, x+2 );
 
-		char*	pchDate = strDate.GetBuffer();
+		char*	pchDate = (char*)strDate.GetString();
 		char*	pch = NULL;
 		nDay = strtol( pchDate, &pch, 10 );
 		pch++;
@@ -1734,6 +1797,70 @@ CMainWnd::GetTime( CStringA strDate, CAttr& attr )
 }
 
 CStringA
+CMainWnd::Get1stReceivedA( CStringA strHeader )
+{
+	int	xIn = -1;
+	int	x = 0;
+	do{
+		x = strHeader.Find( "\nReceived: ", x );
+		if	( x < 0 )
+			break;
+		x += 11;
+		xIn = x;
+	}while	( true );
+	if	( xIn < 0 )
+		return	NULL;
+
+	int	xOut = -1;
+	x = xIn;
+	do{
+		x = strHeader.Find( "\r\n", x );
+		x += 2;
+		if	( strHeader[x] > ' ' ){
+			xOut = x;
+			break;
+		}
+	}while	( true );
+	
+	return	strHeader.Mid( xIn, xOut-xIn );
+}
+
+CStringA
+CMainWnd::DomainOfA( CStringA strHost )
+{
+	CStringA strPath = strHost;
+	{
+		int	x = strPath.Find( '@' );
+		if	( x >= 0 )
+			strPath.Delete( 0, x+1 );
+	}
+
+	CStringA strDomain;
+	int	iDomain = 0;
+
+	for	( ;; ){
+		int	x = strPath.ReverseFind( '.' );
+		CStringA strLabel = strPath.Mid( x );
+		strDomain.Insert( 0, strLabel );
+		if	( ++iDomain == 1 )
+			;
+		else if	( strLabel.GetLength() > 4 )
+			break;
+		else if	( iDomain > 3 )
+			break;
+
+		if	( x < 0 )
+			break;
+		strPath = strPath.Left( x );
+	}
+
+	if	( strDomain[0] == '.' )
+		strDomain.Delete( 0, 1 );
+
+	return	strDomain;
+}
+
+CStringA
 CMainWnd::GetHeaderFieldA( CStringA strHeader, CStringA strField )
 {
 	CStringA strLine;
@@ -1751,6 +1878,8 @@ CMainWnd::GetHeaderFieldA( CStringA strHeader, CStringA strField )
 
 			strLine = strHeader.Mid( xIn );
 			int	xBody = strHeader.Find( "\r\n\r\n", xIn );
+			if	( xBody < 0 )
+				xBody = strHeader.GetLength();
 			int	xOut  = strHeader.Find( ": ",       xIn );
 			if	( xOut < 0 )
 				xOut = xBody;
@@ -1788,13 +1917,15 @@ CMainWnd::MakeLowerA( CStringA strSource )
 {
 	CStringA strDst = strSource;
 
-	char*	pchSrc = strSource.GetBuffer();
+	char*	pchSrc = (char*)strSource.GetString();
 	char*	pchDst = strDst.GetBuffer();
 
 	for	( ; *pchSrc; pchSrc++, pchDst++ ){
 		if	( *pchSrc >= 'A' && *pchSrc <= 'Z' )
 			*pchDst = *pchSrc + ( 'a' - 'A' );
 	}
+
+	strDst.ReleaseBuffer();
 
 	return	strDst;
 }
@@ -1926,7 +2057,7 @@ CMainWnd::SaveLog( CStringA strMail, CString strLog, CAttr& attr )
 		{
 			CFile	f;
 			if	( f.Open( strFile, CFile::modeWrite | CFile::modeCreate | CFile::shareExclusive ) )
-				f.Write( strMail.GetBuffer(), strMail.GetLength() );
+				f.Write( strMail.GetString(), strMail.GetLength() );
 		}
 		if	( CFile::GetStatus( strFile, fs ) ){
 			fs.m_ctime = time;
@@ -1960,7 +2091,7 @@ CMainWnd::SaveLog( CStringA strMail, CString strLog, CAttr& attr )
 			if	( f.Open( strFile, CFile::modeWrite | CFile::modeCreate | CFile::shareExclusive ) ){
 				f.Write( &dwBOM, 3 );
 				CStringA strLogFile = StringToUTF8( (CStringW)strLog, attr );
-				f.Write( strLogFile.GetBuffer(), strLogFile.GetLength() );
+				f.Write( strLogFile.GetString(), strLogFile.GetLength() );
 			}
 		}
 		if	( CFile::GetStatus( strFile, fs ) ){
@@ -2187,7 +2318,7 @@ CMainWnd::ShareSummary( CString strSummary )
 		if	( m_hSummary ){
 			void*	pView = MapViewOfFileEx( m_hSummary, FILE_MAP_WRITE, 0, 0, 0, NULL );
 			if	( pView ){
-				memcpy( (BYTE*)pView, strSummary.GetBuffer(), cb );
+				memcpy( (BYTE*)pView, strSummary.GetString(), cb );
 				UnmapViewOfFile( pView );
 			}
 		}
@@ -2257,7 +2388,7 @@ CMainWnd::StringFromHeader( CStringA strIn, CAttr& attr )
 			//	( CStringA::Find as above may fail just after an encoded binary code. We use memcmp as bellow. )
 			{
 				x = 0;
-				BYTE*	pb = (BYTE*)strIn.GetBuffer();
+				BYTE*	pb = (BYTE*)strIn.GetString();
 				for	( x = 0; pb[x]; x++ )
 					if	( !memcmp( pb+x, "?=", 2 ) )
 						break;
@@ -2405,7 +2536,8 @@ CMainWnd::StringFromPart( CStringA strIn, CAttr& attr )
 		// Merge attributes.
 
 		attr.m_dwReason   |= attrPart.m_dwReason;
-		attr.m_strLinks   += attrPart.m_strLinks;
+		if	( attr.m_strLinks  .Find( attrPart.m_strLinks   ) < 0 )
+			attr.m_strLinks   += attrPart.m_strLinks;
 		if	( attr.m_strTalking.Find( attrPart.m_strTalking ) < 0 )
 			attr.m_strTalking += attrPart.m_strTalking;
 	}
@@ -2482,8 +2614,8 @@ CMainWnd::DecodeReason( CString& strLog, CAttr& attr )
 
 	CString	strReason;
 	DWORD	dwReason = attr.m_dwReason;
-	for	( UINT uID = IDS_RF_AUTH; uID <= IDS_RF_WORD; uID++ ){
-		UINT	uBit = 1<<(uID-IDS_RF_AUTH);
+	for	( UINT uID = IDS_RF_AUTH_FAILURE; uID <= IDS_RF_WORD; uID++ ){
+		UINT	uBit = 1<<(uID-IDS_RF_AUTH_FAILURE);
 		if	( dwReason & uBit ){
 			CString	strError;
 			(void)strError.LoadString( uID );
@@ -2552,7 +2684,7 @@ CMainWnd::DecodeQuoted( CStringA strEncoded )
 	CStringA strDecoded;
 
 	CByteArray	ba;
-	char*	pch = strEncoded.GetBuffer();
+	char*	pch = (char*)strEncoded.GetString();
 	while	( *pch ){
 		BYTE	b;
 		if	( *pch == '=' ){
@@ -2612,7 +2744,7 @@ CMainWnd::StringFromCodePage( CStringA strIn, CAttr& attr )
 
 			if	( ConvertINetString ){
 				DWORD	dwMode = 0;
-				char*	pchIn = strIn.GetBuffer();
+				char*	pchIn = (char*)strIn.GetString();
 				int	cchOut = -1;
 
 				ConvertINetString( &dwMode, attr.m_iCharset, CP_UTF16_LE, pchIn, NULL, NULL, &cchOut );
@@ -2634,7 +2766,7 @@ CMainWnd::StringFromCodePage( CStringA strIn, CAttr& attr )
 	else{
 		SetLastError( 0 );
 
-		char*	pchIn = strIn.GetBuffer();
+		char*	pchIn = (char*)strIn.GetString();
 		int	cchOut = ::MultiByteToWideChar( attr.m_iCharset, MB_ERR_INVALID_CHARS, pchIn, -1, NULL, 0 );
 
 		DWORD	dwError = GetLastError();
@@ -2764,7 +2896,7 @@ CMainWnd::StringFromUTF8( CStringA strIn, CAttr& attr )
 	else{
 		SetLastError( 0 );
 
-		char*	pchIn = strIn.GetBuffer();
+		char*	pchIn = (char*)strIn.GetString();
 		int	cchOut = ::MultiByteToWideChar( CP_UTF8, MB_ERR_INVALID_CHARS, pchIn, -1, NULL, 0 );
 
 		DWORD	dwError = GetLastError();
@@ -2793,7 +2925,7 @@ CMainWnd::StringToUTF8( CStringW strIn, CAttr& attr )
 #endif//_UNICODE
 	// Convert UTF-16 to UTF-8.
 
-	WCHAR*	pchIn = strIn.GetBuffer();
+	WCHAR*	pchIn = (WCHAR*)strIn.GetString();
 	int	cchOut =
 	::WideCharToMultiByte( CP_UTF8, 0, pchIn, -1, NULL,        0, NULL, NULL );
 	CHAR*	pchOut = new CHAR[cchOut];
@@ -2839,7 +2971,7 @@ CMainWnd::HexToUnicode( CString& strLines )
 		if	( x < 0 )
 			break;
 
-		TCHAR*	pch = strLines.GetBuffer();
+		TCHAR*	pch = (TCHAR*)strLines.GetString();
 		TCHAR*	pchDelim = NULL;
 		int	xSkip = 0;
 		int	nBase = 0;
@@ -3559,6 +3691,8 @@ CMainWnd::CheckLink( CString strLog, CAttr& attr )
 				int	x = strPath.FindOneOf( L"?#<" );
 				if	( x >= 0 )
 					strPath = strPath.Left( x );
+				if	( strPath[0] == '@' )
+					break;
 				x = strPath.ReverseFind( '.' );
 				if	( x < 0 )
 					break;
@@ -3814,7 +3948,7 @@ CMainWnd::SetLinkVisible( CString& strLink, CAttr& attr )
 		if	( x > n-2 )
 			break;
 
-		TCHAR*	pch = strLink.GetBuffer();
+		TCHAR*	pch = (TCHAR*)strLink.GetString();
 		pch += x+1;
 		if	( isspace( pch[0] ) || isspace( pch[1] ) ){
 			x += 2;
@@ -4111,6 +4245,10 @@ CMainWnd::GetCharType( CString strUC, int& iRef, UINT& uAlt )
 				dwType = UC_EVASIVE;			//   Watch them.
 			}
 			else if	( uch >= 0x1f200 && uch <= 0x1ffff ){	// Symbols:
+				uAlt = '\0';				//   are not for patern matching,
+				dwType = UC_SYMBOL;			//   Ignore them.
+			}
+			else if	( uch >= 0xe0100 && uch <= 0xe01ef ){	// Variation Selector codes:
 				uAlt = '\0';				//   are not for patern matching,
 				dwType = UC_SYMBOL;			//   Ignore them.
 			}
@@ -4635,7 +4773,7 @@ bool
 CMainWnd::FilterError( UINT uIdError, CAttr& attr )
 {
 	if	( IsFiltered( uIdError ) ){
-		attr.m_dwReason |= 0x0001 << ( uIdError - IDS_RF_AUTH );
+		attr.m_dwReason |= 0x0001 << ( uIdError - IDS_RF_AUTH_FAILURE );
 		return	true;
 	}
 	else
@@ -4647,8 +4785,10 @@ CMainWnd::IsFiltered( UINT uIdError )
 {
 	bool	bFiltered = true;
 
-	if	( uIdError == IDS_RF_AUTH )
+	if	( uIdError == IDS_RF_AUTH_FAILURE )
 		;
+	else if	( uIdError >= IDS_RF_AUTH_RECEIVED && uIdError <= IDS_RF_AUTH_DMARC )
+		bFiltered = m_dwAuth & ( 0x0001 << (uIdError-IDS_RF_AUTH_RECEIVED) );
 	else if	( uIdError >= IDS_RF_CHARSET && uIdError <= IDS_RF_UNMAPPEDCODE )
 		bFiltered = m_dwCode & ( 0x0001 << (uIdError-IDS_RF_CHARSET) );
 	else if	( uIdError == IDS_RF_LINK_EVASIVE )
@@ -4742,7 +4882,7 @@ CMainWnd::RespondPOP( CStringA strMessage )
 			}
 			else{
 				str = m_aAccount[m_iUser].m_strUser;
-				strCommand.Format( "USER %s\r\n", str.GetBuffer() );
+				strCommand.Format( "USER %s\r\n", str.GetString() );
 				m_strMail.Empty();
 				m_iPhase++;
 			}
@@ -4750,7 +4890,7 @@ CMainWnd::RespondPOP( CStringA strMessage )
 		case	2:	// Sent USER: to send PASS
 			if	( strMessage.Left( 3 ) == "+OK" ){
 				str = m_aAccount[m_iUser].m_strPass;
-				strCommand.Format( "PASS %s\r\n", str.GetBuffer() );
+				strCommand.Format( "PASS %s\r\n", str.GetString() );
 				m_iPhase++;
 			}
 			else{
@@ -4852,7 +4992,7 @@ CMainWnd::RespondPOP( CStringA strMessage )
 	if	( !m_pSocket )
 		;
 	else if	( !strCommand.IsEmpty() )
-		m_pSocket->Send( (void*)strCommand.GetBuffer(), strCommand.GetLength() );
+		m_pSocket->Send( (void*)strCommand.GetString(), strCommand.GetLength() );
 
 #ifdef	DBGOUTPUT
 	if	( !strCommand.IsEmpty() ){//DBG
@@ -4933,7 +5073,7 @@ CMainWnd::ReadFromEML( LPCTSTR pchFolder )
 		}
 		while	( bWorking ){
 			bWorking = finder.FindNextFile();
-			strFile.Format( _T("%s%s"), strPath.GetBuffer(), finder.GetFileName().GetBuffer() );
+			strFile.Format( _T("%s%s"), strPath.GetString(), finder.GetFileName().GetString() );
 			CFileTime ft;
 			ft.m_strFile = strFile;
 			ft.m_time = 0;
@@ -4945,9 +5085,9 @@ CMainWnd::ReadFromEML( LPCTSTR pchFolder )
 				fIn.Read( pch, cch );
 				pch[cch] = '\0';
 				CAttr	attr;
-				GetDate( pch, attr );
-				CheckReceived( pch, attr );
-				ft.m_time = attr.m_time;
+			//	GetDate( pch, attr );		// Don't trust Date: in the mail header.
+				CheckReceived( pch, attr );	// Get date and time of the first Received.
+				ft.m_time = attr.m_time;	// as file date and time.
 				delete	[] pch;
 			}
 

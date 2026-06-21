@@ -58,6 +58,7 @@ public:
 	     CStringA	m_strFrom,
 			m_strSender;
 	     CStringA	m_strZone;
+	     CStringA	m_strAuth;
 		int	m_nAuth;
 		bool	m_bHit;
 		DWORD	m_dwReason;
@@ -92,6 +93,7 @@ protected:
 		bool	m_bLogAll;
 
 		int	m_nAuth;
+		DWORD	m_dwAuth;
 		DWORD	m_dwCode;
 		CString	m_strCodeFont;
 		CString	m_strDomains;
@@ -191,6 +193,8 @@ protected:
 		void	CheckReceived( CStringA strHeader, CAttr& attr );
 		void	CheckBlackList( CStringA strSender, CAttr& attr );
 		CTime	GetTime( CStringA strDate, CAttr& attr );
+	       CStringA	Get1stReceivedA( CStringA strHeader );
+	       CStringA	DomainOfA( CStringA strHost );
 	       CStringA	GetHeaderFieldA( CStringA strHeader, CStringA strField );
 	       CStringA	MakeLowerA( CStringA strSource );
 

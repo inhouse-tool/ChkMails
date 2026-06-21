@@ -19,6 +19,7 @@ CAuthPage::CAuthPage( void )
 {
 	m_nAuth = 0;
 	m_dwFlags = 0;
+	m_dwUsed = 0;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -33,10 +34,14 @@ CAuthPage::OnInitDialog( void )
 	pCombo->SetCurSel( m_nAuth );
 
 	for	( int i = 0; i < 4; i++ )
-		if	( m_dwFlags & ( 1 << i ) )
+		if	( m_dwUsed & ( 1 << i ) )
 			;
 		else
 			GetDlgItem( IDC_STATIC_AUTH_SENDERID+i )->EnableWindow( FALSE );
+
+	for	( int i = 0; i < 2; i++ )
+		if	( m_dwFlags & ( 1 << i ) )
+			((CButton*)GetDlgItem( IDC_CHECK_AUTH_RECEIVED+i ))->SetCheck( BST_CHECKED );
 
 	return	TRUE;
 }
@@ -46,4 +51,10 @@ CAuthPage::OnOK( void )
 {
 	CComboBox*	pCombo = (CComboBox*)GetDlgItem( IDC_COMBO_AUTH );
 	m_nAuth = pCombo->GetCurSel();
+
+	m_dwFlags = 0xffff;
+	for	( int i = 0; i < 2; i++ )
+		if	( ((CButton*)GetDlgItem( IDC_CHECK_AUTH_RECEIVED+i ))->
+				GetCheck() != BST_CHECKED )
+			m_dwFlags &= ~( 1 << i );
 }

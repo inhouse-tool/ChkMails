@@ -9,10 +9,10 @@
 #define new DEBUG_NEW
 #endif
 
-#ifdef	UNICODE
+#ifdef	_UNICODE
 #define	strcpy_s	wcscpy_s
 #define	atoi		_wtoi
-#endif//UNICODE
+#endif//_UNICODE
 
 IMPLEMENT_DYNAMIC( CSetupDlg, CDialog )
 
@@ -92,7 +92,7 @@ CSetupDlg::OnOK( void )
 	CString	str;
 
 	GetDlgItem( IDC_EDIT_POLL    )->GetWindowText( str );
-	m_nPoll = atoi( str.GetBuffer() );
+	m_nPoll = atoi( str.GetString() );
 	if	( m_nPoll <= 0 )
 		m_nPoll = 1;
 
@@ -102,7 +102,7 @@ CSetupDlg::OnOK( void )
 
 	GetDlgItem( IDC_EDIT_LOGPATH )->GetWindowText( m_strLogPath );
 	GetDlgItem( IDC_EDIT_LOGS    )->GetWindowText( str );
-	m_nLog = atoi( str.GetBuffer() );
+	m_nLog = atoi( str.GetString() );
 	m_bLogAll = ((CComboBox*)GetDlgItem( IDC_COMBO_LOG ))->GetCurSel() == 1;
 
 	bool	bPut = ((CButton*)GetDlgItem( IDC_CHECK_STARTUP ))->GetCheck() == BST_CHECKED;
@@ -194,7 +194,7 @@ CSetupDlg::OnButtonRefLog( void )
 {
 	CFolderPickerDialog	dlg;
 
-	dlg.m_ofn.lpstrInitialDir = m_strLogPath.GetBuffer();
+	dlg.m_ofn.lpstrInitialDir = m_strLogPath.GetString();
 	dlg.m_ofn.lpstrTitle      = _T("Select a log folder");
 	dlg.m_ofn.lpstrFilter     = _T("Any File\0*.*\0\0");
 

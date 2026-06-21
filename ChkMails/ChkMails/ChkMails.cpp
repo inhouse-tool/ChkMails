@@ -18,7 +18,7 @@ BOOL
 CChkMailsApp::DeleteProfileValue( CString strSection, CString strName )
 {
 	CString	strKey;
-	strKey.Format( _T("Software\\%s\\%s\\%s"), m_pszRegistryKey, m_pszAppName, strSection.GetBuffer() );
+	strKey.Format( _T("Software\\%s\\%s\\%s"), m_pszRegistryKey, m_pszAppName, strSection.GetString() );
 
 	HKEY	hKey = NULL;
 	DWORD	dwResult = RegOpenKeyEx( HKEY_CURRENT_USER, strKey, 0, KEY_WRITE, &hKey );
@@ -38,7 +38,7 @@ CChkMailsApp::WriteProfileCode( LPCTSTR lpszSection, LPCTSTR lpszEntry, LPCTSTR 
 	DWORD	cbRecord = 0;
 
 	CStringA strCode = (CStringA)lpszCode;
-	BYTE*	pszRecord = (BYTE*)strCode.GetBuffer();
+	BYTE*	pszRecord = (BYTE*)strCode.GetString();
 	DWORD	dwError = EnDecrypt( pszRecord, pbRecord, cbRecord, true );
 
 	WriteProfileBinary( lpszSection, lpszEntry, pbRecord, (UINT)cbRecord );

@@ -253,7 +253,7 @@ CWhitePage::OnEditPaste( void )
 				if	( strIn[i] >= 0x80 )
 					strIn.SetAt( i, ' ' );
 
-			WCHAR*	pchIn = strIn.GetBuffer();
+			WCHAR*	pchIn = (WCHAR*)strIn.GetString();
 			int	cchOut =
 			::WideCharToMultiByte( CP_ACP, 0, pchIn, -1, NULL,        0, NULL, NULL );
 			CHAR*	pchOut = new CHAR[cchOut];
@@ -281,7 +281,7 @@ CWhitePage::OnEditPaste( void )
 bool
 CWhitePage::TakeSender( CStringA strHeader )
 {
-	char*	pchPair = (char*)AfxGetMainWnd()->SendMessage( WM_GET_SENDER, 0, (LPARAM)strHeader.GetBuffer() );
+	char*	pchPair = (char*)AfxGetMainWnd()->SendMessage( WM_GET_SENDER, 0, (LPARAM)strHeader.GetString() );
 	if	( !pchPair )
 		return	false;
 
