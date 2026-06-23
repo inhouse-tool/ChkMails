@@ -49,7 +49,6 @@ protected:
 
 		int	m_nPort;
 		CString	m_strHost;
-		bool	m_bReceiving;
 		int	m_iTLS;
 
 	    CredHandle	m_hCred;

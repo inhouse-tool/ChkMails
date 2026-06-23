@@ -24,7 +24,6 @@ CParaSocket::CParaSocket( void )
 	m_nState     = SOCK_STATE_IDLE;
 
 	m_nPort      = 0;
-	m_bReceiving = false;
 
 	m_iTLS        = 0;
 	SecInvalidateHandle( &m_hCred );
@@ -385,9 +384,8 @@ CParaSocket::OnReceiveTLS( void )
 
 	// Consume encrypted data.
 
+	bool	bDone = true;
 	while	( m_cbEncrypted ){
-
-		bool	bDone = true;
 
 		// Prepare the buffers to decrypt the encrypted data.
 
@@ -417,10 +415,6 @@ CParaSocket::OnReceiveTLS( void )
 				EnqueueTLS( (BYTE*)asbIn[i].pvBuffer, asbIn[i].cbBuffer );
 
 			(void)ConsumeTLS( &descIn );
-			
-			m_nState = SOCK_STATE_RECEIVED;
-			NotifyState();
-			break;
 		}
 
 		// Session closed: Abandon encrypted data.
@@ -491,6 +485,11 @@ CParaSocket::OnReceiveTLS( void )
 			FinishTLS( status );
 			break;
 		}
+	}
+
+	if	( bDone ){
+		m_nState = SOCK_STATE_RECEIVED;
+		NotifyState();
 	}
 }
 
