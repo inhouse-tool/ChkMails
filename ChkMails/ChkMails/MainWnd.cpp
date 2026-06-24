@@ -1334,6 +1334,11 @@ CMainWnd::GetDate( CStringA strHeader, CAttr& attr )
 					break;
 				}
 			}
+
+			CStringA strLower = MakeLowerA( strDate );
+			x = strLower.Find( "added by postmaster" );
+			if	( x >= 0 )
+				FilterError( IDS_RF_TIMEZONE, attr );
 		}
 	}
 }
@@ -1499,15 +1504,18 @@ CMainWnd::CheckMID( CStringA strHeader, CAttr& attr )
 		do{
 			if	( x < 0 )
 				break;
+
 			CStringA strRight = strMessageId.Mid( x+1 );
 			CStringA strLeft  = strMessageId.Left( x );
 			if	( strLeft.IsEmpty() ){
 				x = -1;
 				break;
 			}
+
 			x = strRight.Find( '.' );
 			if	( x < 0 )
 				break;
+
 			for	( int i = 0; i < strRight.GetLength(); i++ ){
 				char	ch = strRight[i];
 				if	( ch >= 'A' && ch <= 'Z' ){
@@ -1521,8 +1529,24 @@ CMainWnd::CheckMID( CStringA strHeader, CAttr& attr )
 				else
 					bIP = false;
 			}
-			// We abandoned check of the left side ( in strLeft above )
-			// as we observed some senders do not conform to RFC 5322...
+
+			// See RFC 5322:
+			// id-left = dot-atom-text / obs-id-left
+			// dot-atom-text = 1*atext *("." 1*atext)
+
+			CStringA strAtext =	"ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+						"abcdefghijklmnopqrstuvwxyz"
+						"0123456789"
+						"!#$%&'*+-/=?^_`{|}~";
+			for	( int i = 0; i < strLeft.GetLength(); i++ ){
+				char	ch = strLeft[i];
+				if	( ch == '.' )
+					continue;
+				x = strAtext.Find( ch );
+				if	( x < 0 )
+					break;
+			}
+
 		}while	( 0 );
 		if	( x < 0 || bIP )
 			FilterError( IDS_RF_MESSAGEID, attr );
@@ -3098,6 +3122,7 @@ CMainWnd::CheckHeaderFields( CStringA strIn, CAttr& attr )
 			"Feedback-ID",					// Gmail specific
 			"From",
 			"Generate-Delivery-Report",
+			"gmsai",					// Gmail specific
 			"In-Reply-To",
 			"Incomplete-Copy",
 			"Importance",
@@ -3130,6 +3155,7 @@ CMainWnd::CheckHeaderFields( CStringA strIn, CAttr& attr )
 			"Precedence",					// RFC 2076 ( discouraged )
 			"Prevent-NonDelivery-Report",
 			"Priority",
+			"ReachoutTracker",				// Gmail specific
 			"Received",
 			"References",
 			"Reply-By",
@@ -4857,7 +4883,7 @@ CMainWnd::ConnectPOP( void )
 #undef	atoi
 #endif//_UNICODE
 
-#define	DBGOUTPUT
+//#define	DBGOUTPUT
 
 void
 CMainWnd::RespondPOP( CStringA strMessage )
