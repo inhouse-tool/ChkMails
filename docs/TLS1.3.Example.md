@@ -156,7 +156,7 @@ Ethernet フレーム, IP パケット, TCP パケットとしてのデコード
 
 そして 1回クライアント側からの TCP [ACK] が挟まった後,
 その次のパケットでようやく全体を送り切ったようで,
-次のようなデコードが現れました.
+Wireshark に次のようなデコードが現れました.
 
 ```
     TLSv1.3 Record Layer: Application Data Protocol: Post Office Protocol 🔒
@@ -167,7 +167,7 @@ Ethernet フレーム, IP パケット, TCP パケットとしてのデコード
         [Application Data Protocol: Post Office Protocol]
 ```
 
-`TLSv1.3 Record Layer` に載った `Application Data` で, `Post Office Protocol`🔒 だと言ってます.
+`TLSv1.3 Record Layer` に載った `Application Data` で, `Post Office Protocol`🔒 だとデコードされています.
 <sub>( 2026年6月現在 )</sub>
 
 Post Office Protocol? もう?
@@ -323,7 +323,7 @@ POP3 サーバーが接続後に最初に送ってくる
 
 とたどり,<br>
 特に 2. と 3. の間が 1[µs] も空いていないという速攻ぶりで TCP 層を切られてしまうので,
-[TLS 層を締めくくるセレモニー](https://www.google.com/search?q=TLS+1.3+Close+Notify+とは)なんか挟んでいる暇がありません.
+[TLS 層を締めくくるセレモニー](https://www.google.com/search?q=TLS+1.3+Close+Notify+とは)なんか挟んでいる暇がありませんでした.
 
 せいぜいハンドルリークが出ないように, 切られた後,
 [`DeleteSecurityContext()`](https://learn.microsoft.com/ja-jp/windows/win32/api/sspi/nf-sspi-deletesecuritycontext),
