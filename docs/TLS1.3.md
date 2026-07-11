@@ -206,12 +206,12 @@ TLS1.3 では,
 
 ここでいう「受信」とは,
 TLS の接続直後の儀式が終わって,
-いよいよアプリケーションデータをやり取りしようというフェースに入った後の受信
+いよいよアプリケーションデータをやり取りしようというフェーズに入った後の受信
 ( [`select()`](https://learn.microsoft.com/ja-jp/windows/win32/api/winsock2/nf-winsock2-select) や
 [`WSAAsyncSelect()`](https://learn.microsoft.com/ja-jp/windows/win32/api/winsock2/nf-winsock2-wsaasyncselect)
 で待ち受けたネットワークイベントの `FD_READ` が来たとき, あるいは
 [`CAsyncSocket::OnReceive()`](https://learn.microsoft.com/ja-jp/cpp/mfc/reference/casyncsocket-class#onreceive)
-が呼び出されたとき. 応答と同じなのでフェーズ管理が必要 )
+が呼び出されたとき. [応答](#応答)と同じなのでフェーズ管理が必要 )
 ですが,
 ここにも TLS1.3 独自の対応が必要です.
 
