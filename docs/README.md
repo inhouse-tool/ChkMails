@@ -69,6 +69,29 @@ Visual Studio 2022&reg; での C++ なので,
 OS としての基本を見失ってないか？ Windows&reg;.
 </sup>
 
+【2026年7月追記】
+<br>
+なんかウザくなってきたので[回避方法](https://www.google.com/search?q=KB5039212+MoTW+回避方法)を探すと,
+[ファイルのコピー元のホストを「イントラネット」に登録する](https://jpwinsup.github.io/blog/2025/12/18/UserInterfaceAndApps/motw-on-network-share/)という方法があったので試してみましたが,
+なぜか `.eml` には効果がありませんでした.
+もうちょっと調べてみると `.eml` ファイル担当の
+[Property Handler である `inetcomm.dll` のせい](https://www.google.com/search?q=.eml+の更新日時が書き換わるのは+property+handler+のせい)であることが判ったので,
+下記のようにレジストリーから同 handler を一掃したところ, ようやく現象が解消しました.
+<br>
+<sup>
+次の Windows&reg; Update で再発したりしないかワクワクしながら見守ろうと思います.
+</sup>
+
+```
+Windows Registry Editor Version 5.00
+
+[-HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\PropertySystem\PropertyHandlers\.eml]
+[-HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\PropertySystem\PropertyHandlers\.nws]
+
+[-HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\PropertySystem\PropertyHandlers\.eml]
+[-HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\PropertySystem\PropertyHandlers\.nws]
+```
+
 
 ### 3. 誤った assertion failure
 
