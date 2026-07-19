@@ -17,7 +17,7 @@
 まずはこちらから
 [Client Hello](https://www.google.com/search?q=TLS+1.3+%22Client+Hello%22+って%3f)
 を送信することになります.
-その担当関数は [`CParaSocket::OnConnectTLS1()`](CParaSocket.md#onconnecttls1) です.
+その担当関数は [`CParaSocket::StartTLS()`](CParaSocket.md#starttls) です.
 
 TLS1.3 の場合,
 [Client Hello](https://www.google.com/search?q=TLS+1.3+%22Client+Hello%22+って%3f)
@@ -83,7 +83,7 @@ TLS1.2 との大きな違いは,「バージョンに対する心の広さ」で
 
 [Client Hello](https://www.google.com/search?q=TLS+1.3+%22Client+Hello%22+って%3f)
 を送り終わったら,
-その応答の対応は [`CParaSocket::OnConnectTLS2()`](CParaSocket.md#onconnecttls2) に委ねます.
+その応答の対応は [`CParaSocket::OnConnectTLS()`](CParaSocket.md#onconnecttls) に委ねます.
 
 
 ## 応答
@@ -223,7 +223,7 @@ TLS1.3 の
 [Finished](https://www.google.com/search?q=TLS+1.3+%22Finished%22+って%3f)
 なのでしょう.
 
-上記メッセージを送り返すまでが [`CParaSocket::OnConnectTLS2()`](CParaSocket.md#onconnecttls2) の担当で,
+上記メッセージを送り返すまでが [`CParaSocket::OnConnectTLS()`](CParaSocket.md#onconnecttls) の担当で,
 これでいわゆる「[ハンドシェイク](https://www.google.com/search?q=TLS+ハンドシェイク)」は完了です.
 
 次からの受信担当は [`CParaSocket::OnReceiveTLS()`](CParaSocket.md#onreceivetls) に移ります.

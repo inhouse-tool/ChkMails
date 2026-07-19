@@ -14,6 +14,7 @@ DCカード		dnp-cdms.jp
 DHL		dhl.com
 DHL		dhl-news.com
 DHL		dhl.??
+docomo		docomo.ne.jp
 ETC		etc-meisai.jp
 FamilyMart	family.co.jp
 IBKR		interactivebrokers.co.jp
@@ -27,8 +28,12 @@ JAバンク		janetbank.jp
 JAバンク		otp-auth.net
 JAバンク		webcenter.anser.or.jp
 JCB		jcb.co.jp
+JRE POINT	jrepoint.jp
 LINE		line.me
+Louis Vuitton	louisvuitton.com
 MasterCard	mastercard
+MaxTV		!
+MyDocomo	docomo.ne.jp
 NHK		nhk-charactershop-tokyo.com
 NHK		*nhk*.jp
 nintendo	nintendo
@@ -47,6 +52,7 @@ SMBC		vpass.ne.jp
 Sony		sony.jp
 Sony Bank	sonybank.net
 TEPCO		tepco.co.jp
+TikTok		tiktok.com
 TOKYOGAS	tokyo-gas.co.jp
 TS CUBIC	tscubic.com
 Trip.com	trip.com
@@ -100,6 +106,7 @@ webull		webull
 イープラス	eplus.co.jp
 エポス		epos.jp
 エムアイカード	micard.co.jp
+エルメス		hermes.com
 オリコ		orico.co.jp
 クレディセゾン	saisoncard.co.jp
 クレディセゾン	saisonid.com
@@ -108,6 +115,8 @@ webull		webull
 セゾンカード	saisoncard.co.jp
 セゾンカード	saisonid.com
 ソニー銀行	sonybank.net
+ドコモ		docomo.ne.jp
+パテック		patek.com
 バンドルカード	vandle.jp
 バンドルカード	zendesk.com
 ビューカード	viewcard.co.jp
@@ -124,12 +133,14 @@ webull		webull
 ヤマト運輸	kuronekoyamato.co.jp
 ヨドバシ		yodobashi.com
 ライフカード	lifecard.co.jp
+ロレックス	rolex.com
 三井住友		smbc.co.jp
 三井住友		vpass.ne.jp
 三井銀行		smbc.co.jp
 三菱UFJ		mufg.jp
 三菱ＭＵＦＧ	!
 佐川急便		sagawa-exp.co.jp
+出前館		demae-can.com
 北洋銀行		hokuyobank.co.jp
 国勢調査		!
 国民健康保険事務センター	!
@@ -147,6 +158,9 @@ webull		webull
 横浜バンクカード	boy.co.jp
 横浜バンクカード	vpass.ne.jp
 横浜銀行		boy.co.jp
+無印良品		muji.co.jp
+無印良品		muji.com
+無印良品		muji.net
 第一生命保険	daiichihd.com
 第一生命保険	daiichilife.com
 警察		!
