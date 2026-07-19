@@ -11,6 +11,9 @@
 #define SECURITY_WIN32
 #include <security.h>
 
+// for CERT_CONTEXT
+#include <wincrypt.h>
+
 #define	SOCK_STATE_IDLE		0
 #define	SOCK_STATE_CONNECTED	1
 #define	SOCK_STATE_RECEIVED	2
@@ -40,43 +43,50 @@ protected:
 		int	m_nState;
 
 	virtual	void	OnAccept(  int nErrorCode );
-	virtual	void	OnClose(   int nErrorCode );
 	virtual	void	OnConnect( int nErrorCode );
 	virtual	void	OnReceive( int nErrorCode );
 	virtual	void	OnSend(    int nErrorCode );
+	virtual	void	OnClose(   int nErrorCode );
 
 		void	NotifyState( void );
 
 		int	m_nPort;
 		CString	m_strHost;
 		int	m_iTLS;
+		bool	m_bTLS1_3;
 
 	    CredHandle	m_hCred;
 	    CtxtHandle	m_hContext;
 	SecPkgContext_StreamSizes
 			m_cbsContext;
+	PCCERT_CONTEXT*	m_ppCert;
+		int	m_npCert;
 
 		BYTE*	m_pbDecrypted;
 		DWORD	m_cbDecrypted;
 		BYTE*	m_pbEncrypted;
 		DWORD	m_cbEncrypted;
+		DWORD	m_ixEncrypted;
+		BYTE*	m_pbSendBlock;
 		DWORD	m_cbPacketMax;
+		DWORD	m_cbBufferMax;
 
-		bool	OnConnectTLS1( void );
-		bool	OnConnectTLS2( void );
+		bool	StartTLS( void );
+		bool	OnConnectTLS( void );
 		void	OnReceiveTLS( void );
-
 		int	ReceiveTLS( BYTE* pbData, DWORD cbData );
 		int	SendTLS(    BYTE* pbData, DWORD cbData );
 		void	CloseTLS( void );
 		void	FinishTLS( SECURITY_STATUS status );
 
-		bool	ConsumeTLS( SecBufferDesc* pDesc );
+		void	ConsumeTLS( SecBufferDesc* pDesc );
 		int	SeekBufTLS( SecBufferDesc* pDesc, DWORD dwType );
 
 		bool	SendBackTLS( void* pbData, DWORD cbData );
 		void	EnqueueTLS( BYTE* pbData, DWORD cbData );
-		BYTE*	DequeueTLS( DWORD cbData );
+		void	DequeueTLS( BYTE* pbData, DWORD cbData );
+
+		void	GetCertForTLS( void );
 
 		DWORD	GetWinVer( void );
 };

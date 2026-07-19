@@ -26,22 +26,36 @@ CParaSocket::CParaSocket( void )
 	m_nPort      = 0;
 
 	m_iTLS        = 0;
+	m_bTLS1_3     = false;
 	SecInvalidateHandle( &m_hCred );
 	SecInvalidateHandle( &m_hContext );
+	m_ppCert      = NULL;
+	m_npCert      = 0;
 	m_cbsContext  = { 0 };
-	m_cbDecrypted = 0;
 	m_pbDecrypted = NULL;
+	m_cbDecrypted = 0;
 	m_pbEncrypted = NULL;
 	m_cbEncrypted = 0;
+	m_ixEncrypted = 0;
+	m_pbSendBlock = NULL;
 	m_cbPacketMax = 0;
+	m_cbBufferMax = 0;
 }
 
 CParaSocket::~CParaSocket( void )
 {
-	if	( m_pbDecrypted )
+	if	( m_pbDecrypted ){
 		delete[] m_pbDecrypted;
-	if	( m_pbEncrypted )
+		m_pbDecrypted = NULL;
+	}
+	if	( m_pbEncrypted ){
 		delete[] m_pbEncrypted;
+		m_pbEncrypted = NULL;
+	}
+	if	( m_pbSendBlock ){
+		delete[] m_pbSendBlock;
+		m_pbSendBlock = NULL;
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -67,8 +81,10 @@ CParaSocket::Connect( LPCTSTR lpszHostAddress, UINT nHostPort )
 		m_iTLS = 0;
 
 	if	( m_iTLS ){
-		m_cbPacketMax = 16384+256;	// according to observed SecPkgContext_StreamSizes
-		m_pbEncrypted = new BYTE[m_cbPacketMax];
+		m_cbPacketMax = 5 + 16384 + 44;	// according to observed SecPkgContext_StreamSizes ( header + message + trailer )
+		m_cbBufferMax = 65536;
+		m_pbEncrypted = new BYTE[m_cbBufferMax];
+		m_pbSendBlock = new BYTE[m_cbPacketMax];
 		m_cbEncrypted = 0;
 	}
 
@@ -78,14 +94,21 @@ CParaSocket::Connect( LPCTSTR lpszHostAddress, UINT nHostPort )
 void
 CParaSocket::Close( void )
 {
+	// In TLS, Close does not wait 'Close Notify'.
+
 	if	( m_iTLS ){
 		if	( m_nState != SOCK_STATE_IDLE )
 			CloseTLS();
 
+		delete[] m_pbSendBlock;
+		m_pbSendBlock = NULL;
 		delete[] m_pbEncrypted;
-		m_cbPacketMax = 0;
 		m_pbEncrypted = NULL;
+		delete[] m_pbDecrypted;
+		m_pbDecrypted = NULL;
 		m_cbEncrypted = 0;
+		m_ixEncrypted = 0;
+		m_cbPacketMax = 0;
 	}
 
 	CAsyncSocket::Close();
@@ -94,6 +117,8 @@ CParaSocket::Close( void )
 int
 CParaSocket::Send( void* pbData, int cbData, int nFlags )
 {
+	// In TLS, Send ignores flags ( as MSG_DONTROUTE, MSG_OOB ).
+
 	if	( m_iTLS )
 		return	SendTLS( (BYTE*)pbData, cbData );
 	else
@@ -103,6 +128,8 @@ CParaSocket::Send( void* pbData, int cbData, int nFlags )
 int
 CParaSocket::Receive( void* pbData, int cbData, int nFlags )
 {
+	// In TLS, Receive ignores flags ( as MSG_PEEK, MSG_OOB ).
+
 	if	( m_iTLS )
 		return	ReceiveTLS( (BYTE*)pbData, cbData );
 	else
@@ -112,6 +139,8 @@ CParaSocket::Receive( void* pbData, int cbData, int nFlags )
 BOOL
 CParaSocket::IOCtl( long lCommand, DWORD* lpArgument )
 {
+	// In TLS, FIONREAD returns decrypted size, not encrypted size.
+
 	if	( m_iTLS && ( lCommand == FIONREAD ) ){
 		*lpArgument = m_cbDecrypted;
 		return	TRUE;
@@ -139,13 +168,6 @@ CParaSocket::OnAccept( int nErrorCode )
 }
 
 void
-CParaSocket::OnClose( int nErrorCode )
-{
-	m_nState = nErrorCode? SOCK_STATE_FAILED: SOCK_STATE_IDLE;
-	NotifyState();
-}
-
-void
 CParaSocket::OnConnect( int nErrorCode )
 {
 	m_nState = nErrorCode? SOCK_STATE_FAILED: SOCK_STATE_CONNECTED;
@@ -153,7 +175,7 @@ CParaSocket::OnConnect( int nErrorCode )
 	if	( nErrorCode )
 		NotifyState();
 	else if	( m_iTLS == 1 )
-		OnConnectTLS1();
+		StartTLS();
 	else
 		NotifyState();
 }
@@ -166,7 +188,7 @@ CParaSocket::OnReceive( int nErrorCode )
 	if	( nErrorCode )
 		NotifyState();
 	else if	( m_iTLS == 2 )
-		OnConnectTLS2();
+		OnConnectTLS();
 	else if	( m_iTLS >= 3 )
 		OnReceiveTLS();
 	else
@@ -178,6 +200,17 @@ CParaSocket::OnSend( int nErrorCode )
 {
 	m_nState = nErrorCode? SOCK_STATE_FAILED: SOCK_STATE_SENT;
 	NotifyState();
+}
+
+void
+CParaSocket::OnClose( int nErrorCode )
+{
+	m_nState = nErrorCode? SOCK_STATE_FAILED: SOCK_STATE_IDLE;
+
+	if	( m_iTLS )
+		FinishTLS( SEC_E_OK );
+	else
+		NotifyState();
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -192,17 +225,22 @@ CParaSocket::NotifyState( void )
 
 #pragma comment( lib, "Secur32.lib" )
 
-#define	FLAGS_CRED	(SCH_USE_STRONG_CRYPTO | SCH_CRED_AUTO_CRED_VALIDATION | SCH_CRED_NO_DEFAULT_CREDS)
+#define	FLAGS_CRED	(SCH_CRED_AUTO_CRED_VALIDATION | SCH_CRED_NO_DEFAULT_CREDS)
 #define	FLAGS_ISC	(ISC_REQ_ALLOCATE_MEMORY | ISC_REQ_CONFIDENTIALITY | ISC_REQ_REPLAY_DETECT | ISC_REQ_SEQUENCE_DETECT | ISC_REQ_STREAM)
 
 bool
-CParaSocket::OnConnectTLS1( void )
+CParaSocket::StartTLS( void )
 {
-	// Clear count of the encrypted data.
+	// Clear counts of the processed data.
 
 	m_cbEncrypted = 0;
+	m_cbDecrypted = 0;
 
-	// Choice either SCH_CREDENTIALS ( TLS 1.3 ) or SCHANNEL_CRED ( TLS 1.2 ).
+	// Get Client Certifications for TLS.
+
+	GetCertForTLS();
+
+	// Acquire TLS with a certification.
 
 	void*	pAuthData = NULL;
 	SCH_CREDENTIALS	cred13 = { 0 };
@@ -211,11 +249,19 @@ CParaSocket::OnConnectTLS1( void )
 	if	( GetWinVer() >= 11 ){
 		cred13.dwVersion = SCH_CREDENTIALS_VERSION;
 		cred13.dwFlags = FLAGS_CRED;
+		if	( m_ppCert ){
+			cred13.cCreds = m_npCert;
+			cred13.paCred = m_ppCert;
+		}
 		pAuthData = &cred13;
 	}
 	else{
 		cred12.dwVersion = SCHANNEL_CRED_VERSION;
-		cred12.dwFlags = FLAGS_CRED;
+		cred12.dwFlags = FLAGS_CRED | SCH_USE_STRONG_CRYPTO;
+		if	( m_ppCert ){
+			cred12.cCreds = m_npCert;
+			cred12.paCred = m_ppCert;
+		}
 		pAuthData = &cred12;
 	}
 
@@ -223,15 +269,11 @@ CParaSocket::OnConnectTLS1( void )
 
 	SECURITY_STATUS	status =
 	AcquireCredentialsHandle( NULL, UNISP_NAME, SECPKG_CRED_OUTBOUND, NULL,
-						pAuthData, NULL, NULL, &m_hCred, NULL );		
-	if	( status != SEC_E_OK ){
-		SetLastError( status );
-		return	false;
-	}
+						pAuthData, NULL, NULL, &m_hCred, NULL );
 
 	bool	bDone = false;
+	if	( status == SEC_E_OK ){
 
-	do{
 		// Prepare the buffer for the outgoing message.
 		// See https://learn.microsoft.com/en-us/windows/win32/secauthn/stream-contexts
 
@@ -250,7 +292,12 @@ CParaSocket::OnConnectTLS1( void )
 
 		if	( status == SEC_I_CONTINUE_NEEDED )
 			bDone = SendBackTLS( asbOut[0].pvBuffer, asbOut[0].cbBuffer );
-	}while	( 0 );
+
+		// OK: Why didn't you send 'Client Hello'?
+
+		else if	( status == SEC_E_OK )
+			bDone = true;
+	}
 
 	// Done: Go ahead to the next stage to wait 'Server hello'.
 
@@ -266,13 +313,13 @@ CParaSocket::OnConnectTLS1( void )
 }
 
 bool
-CParaSocket::OnConnectTLS2( void )
+CParaSocket::OnConnectTLS( void )
 {
 	bool	bDone = true;
 
 	// Receive 'Server Hello'.
 
-	int	cbReceived = CAsyncSocket::Receive( m_pbEncrypted +m_cbEncrypted, m_cbPacketMax -m_cbEncrypted );
+	int	cbReceived = CAsyncSocket::Receive( m_pbEncrypted +m_ixEncrypted +m_cbEncrypted, m_cbPacketMax -m_cbEncrypted );
 	if	( cbReceived <= 0 ){
 		if	( cbReceived < 0 )
 			FinishTLS( cbReceived );
@@ -285,7 +332,7 @@ CParaSocket::OnConnectTLS2( void )
 
 	SecBuffer	asbIn[4] = { 0 };
 	asbIn[0].BufferType = SECBUFFER_TOKEN;
-	asbIn[0].pvBuffer   = m_pbEncrypted;
+	asbIn[0].pvBuffer   = m_pbEncrypted + m_ixEncrypted;
 	asbIn[0].cbBuffer   = m_cbEncrypted;
 	asbIn[1].BufferType = SECBUFFER_EMPTY;
 	asbIn[2].BufferType = SECBUFFER_EMPTY;
@@ -338,9 +385,13 @@ CParaSocket::OnConnectTLS2( void )
 			DWORD	cbPacket = m_cbsContext.cbHeader + m_cbsContext.cbMaximumMessage + m_cbsContext.cbTrailer;
 			if	( cbPacket > m_cbPacketMax ){
 				m_cbPacketMax = cbPacket;
-				delete[]	m_pbEncrypted;
-				m_pbEncrypted = new BYTE[m_cbPacketMax];
+				delete[] m_pbSendBlock;
+				m_pbSendBlock = new BYTE[m_cbPacketMax];
 			}
+
+			SecPkgContext_ConnectionInfo	info = { 0 };
+			QueryContextAttributes( &m_hContext, SECPKG_ATTR_CONNECTION_INFO, &info );
+			m_bTLS1_3 = ( info.dwProtocol & SP_PROT_TLS1_3 );
 
 			m_iTLS = 3;
 			m_nState = SOCK_STATE_CONNECTED;
@@ -373,7 +424,8 @@ CParaSocket::OnReceiveTLS( void )
 
 	// Receive encrypted data.
 
-	int	cbReceived = CAsyncSocket::Receive( m_pbEncrypted + m_cbEncrypted, m_cbPacketMax - m_cbEncrypted, 0 );
+	int	cbReceived = CAsyncSocket::Receive( m_pbEncrypted + m_ixEncrypted + m_cbEncrypted,
+							m_cbBufferMax - (m_ixEncrypted + m_cbEncrypted), 0 );
 	if	( cbReceived <= 0 ){
 		if	( cbReceived < 0 )
 			FinishTLS( cbReceived );
@@ -392,7 +444,7 @@ CParaSocket::OnReceiveTLS( void )
 		SecBuffer asbIn[4] = { 0 };
 
 		asbIn[0].BufferType = SECBUFFER_DATA;
-		asbIn[0].pvBuffer   = m_pbEncrypted;
+		asbIn[0].pvBuffer   = m_pbEncrypted + m_ixEncrypted;
 		asbIn[0].cbBuffer   = m_cbEncrypted;
 		asbIn[1].BufferType = SECBUFFER_EMPTY;
 		asbIn[2].BufferType = SECBUFFER_EMPTY;
@@ -414,13 +466,14 @@ CParaSocket::OnReceiveTLS( void )
 			if	( i >= 0 && asbIn[i].cbBuffer > 0 )
 				EnqueueTLS( (BYTE*)asbIn[i].pvBuffer, asbIn[i].cbBuffer );
 
-			(void)ConsumeTLS( &descIn );
+			ConsumeTLS( &descIn );
 		}
 
 		// Session closed: Abandon encrypted data.
 
 		else if	( status == SEC_I_CONTEXT_EXPIRED ){
 			m_cbEncrypted = 0;
+			FinishTLS( SEC_E_OK );
 			break;
 		}
 
@@ -429,9 +482,11 @@ CParaSocket::OnReceiveTLS( void )
 		else if	( status == SEC_E_INCOMPLETE_MESSAGE )
 			break;
 
-		// Another context required: Apply the returned Extra as a token for a new context. ( TLS 1.3 )
+		// Post-handshake context required: Apply the returned Extra as a token for a new context. ( TLS 1.3 )
 
-		else if	( status == SEC_I_RENEGOTIATE ){
+		else if	( m_bTLS1_3 && (
+			  status == SEC_I_RENEGOTIATE ||
+			  status == SEC_I_CONTINUE_NEEDED ) ){
 			void*	pbExtra = NULL;
 			DWORD	cbExtra = 0;
 
@@ -470,6 +525,8 @@ CParaSocket::OnReceiveTLS( void )
 				ConsumeTLS( &descIn );
 				bDone = SendBackTLS( asbOut[0].pvBuffer, asbOut[0].cbBuffer );
 			}
+			else if	( status == SEC_E_INCOMPLETE_MESSAGE )
+				break;
 			else
 				bDone = false;
 		}
@@ -498,16 +555,10 @@ CParaSocket::ReceiveTLS( BYTE* pbData, DWORD cbData )
 {
 	int	cbRecv = 0;
 
-	if	( cbData != 0 )
+	if	( (int)cbData > 0 )
 		if	( m_cbDecrypted ){
-			int	cbToGet = min( cbData, m_cbDecrypted );
-			BYTE*	pbGet = DequeueTLS( cbToGet );
-			CopyMemory( pbData, pbGet, cbToGet );
-			delete[] pbGet;
-
-			pbData += cbToGet;
-			cbData -= cbToGet;
-			cbRecv += cbToGet;
+			cbRecv = min( cbData, m_cbDecrypted );
+			DequeueTLS( pbData, cbRecv );
 		}
 
 	return	cbRecv;
@@ -522,19 +573,18 @@ CParaSocket::SendTLS( BYTE* pbData, DWORD cbData )
 		int	cbToPut = min( cbData, m_cbsContext.cbMaximumMessage );
 
 		if	( m_cbPacketMax ){
-			char*	pbSend = new char[m_cbPacketMax];
 
 			// Prepare the buffers to encrypt the message.
 
 			SecBuffer asbOut[3];
 			asbOut[0].BufferType = SECBUFFER_TOKEN;
-			asbOut[0].pvBuffer   = pbSend;
+			asbOut[0].pvBuffer   = m_pbSendBlock;
 			asbOut[0].cbBuffer   = m_cbsContext.cbHeader;
 			asbOut[1].BufferType = SECBUFFER_DATA;
-			asbOut[1].pvBuffer   = pbSend +m_cbsContext.cbHeader;
+			asbOut[1].pvBuffer   = m_pbSendBlock +m_cbsContext.cbHeader;
 			asbOut[1].cbBuffer   = cbToPut;
 			asbOut[2].BufferType = SECBUFFER_STREAM_TRAILER;
-			asbOut[2].pvBuffer   = pbSend +m_cbsContext.cbHeader +cbToPut;
+			asbOut[2].pvBuffer   = m_pbSendBlock +m_cbsContext.cbHeader +cbToPut;
 			asbOut[2].cbBuffer   = m_cbsContext.cbTrailer;
 			SecBufferDesc	descOut = { SECBUFFER_VERSION, _countof( asbOut ), asbOut };
 
@@ -550,9 +600,15 @@ CParaSocket::SendTLS( BYTE* pbData, DWORD cbData )
 				int	cbDone = 0;
 				int	cbSent = -1;
 				while	( cbDone != cbTotal ){
-					cbSent = CAsyncSocket::Send( pbSend+cbDone, cbTotal-cbDone, 0 );
-					if	( cbSent == SOCKET_ERROR )
-						break;
+					cbSent = CAsyncSocket::Send( m_pbSendBlock+cbDone, cbTotal-cbDone, 0 );
+					if	( cbSent == SOCKET_ERROR ){
+						if	( GetLastError() == WSAEWOULDBLOCK ){
+							Sleep( 20 );
+							continue;
+						}
+						else
+							break;
+					}
 					else
 						cbDone += cbSent;
 				}
@@ -562,11 +618,14 @@ CParaSocket::SendTLS( BYTE* pbData, DWORD cbData )
 				}
 			}
 
-			delete[] pbSend;
+			// Sent after CloseNotify: Not error, not sent.
+
+			else if	( status == SEC_I_CONTEXT_EXPIRED )
+				break;
 
 			// Failed: Clean up.
 
-			if	( status != SEC_E_OK ){
+			else{
 				FinishTLS( status );
 				return	SOCKET_ERROR;
 			}
@@ -614,7 +673,7 @@ CParaSocket::CloseTLS( void )
 
 	// Clean up anyway.
 
-	FinishTLS( status );
+	FinishTLS( SEC_E_OK );
 }
 
 void
@@ -627,6 +686,13 @@ CParaSocket::FinishTLS( SECURITY_STATUS status )
 	if	( SecIsValidHandle( &m_hCred ) ){
 		FreeCredentialsHandle( &m_hCred );
 		SecInvalidateHandle( &m_hCred );
+	}
+	if	( m_npCert ){
+		for	( int i = 0; i < m_npCert; i++ )
+			CertFreeCertificateContext( m_ppCert[i] );
+		delete[] m_ppCert;
+		m_ppCert = NULL;
+		m_npCert = 0;
 	}
 
 	if	( status != SEC_E_OK ){
@@ -641,7 +707,7 @@ CParaSocket::SendBackTLS( void* pbData, DWORD cbData )
 {
 	bool	bDone = true;
 
-	if	( pbData ){
+	if	( pbData && cbData ){
 		BYTE*	pbSend = (BYTE*)pbData;
 
 		while	( cbData > 0 ){
@@ -661,24 +727,36 @@ CParaSocket::SendBackTLS( void* pbData, DWORD cbData )
 	return	bDone;
 }
 
-bool
+void
 CParaSocket::ConsumeTLS( SecBufferDesc* pDesc )
 {
-	bool		bDone = true;
 	SecBuffer*	pBuffers = pDesc->pBuffers;
 
-	int	cbExtra = 0;
 	int	i = SeekBufTLS( pDesc, SECBUFFER_EXTRA );
-	if	( i >= 0 )
-		cbExtra = pBuffers[i].cbBuffer;
 
-	{
+	// Some extra remains: Keep it.
+
+	if	( i >= 0 ){
+		BYTE*	pbExtra = (BYTE*)pBuffers[i].pvBuffer;
+		int	cbExtra =        pBuffers[i].cbBuffer;
 		int	cbConsumed = m_cbEncrypted - cbExtra;
-		MoveMemory( m_pbEncrypted, m_pbEncrypted + cbConsumed, cbExtra );
-		m_cbEncrypted = cbExtra;
+		m_cbEncrypted  = cbExtra;
+		m_ixEncrypted += cbConsumed;
+
+		// Too close to the tail: Copy to the top.
+
+		if	( m_ixEncrypted + m_cbPacketMax > m_cbBufferMax ){			
+			MoveMemory( m_pbEncrypted, pbExtra, cbExtra );
+			m_ixEncrypted = 0;
+		}
 	}
 
-	return	bDone;
+	// No extra remains: Reset the buffer.
+
+	else{
+		m_cbEncrypted = 0;
+		m_ixEncrypted = 0;
+	}
 }
 
 int
@@ -708,25 +786,81 @@ CParaSocket::EnqueueTLS( BYTE* pbData, DWORD cbData )
 	m_cbDecrypted = cbNew;
 }
 
-BYTE*
-CParaSocket::DequeueTLS( DWORD cbData )
+void
+CParaSocket::DequeueTLS( BYTE* pbData, DWORD cbData )
 {
 	int	cbNew = m_cbDecrypted -cbData;
 	BYTE*	pbNew = cbNew? new BYTE[cbNew]: NULL;
 
-	BYTE*	pbData = new BYTE[cbData];
+	if	( !m_pbDecrypted )
+		return;
+
 	CopyMemory( pbData, m_pbDecrypted, cbData );
 	if	( pbNew )
-		CopyMemory( pbNew,  m_pbDecrypted +cbData, cbNew );
+		CopyMemory( pbNew, m_pbDecrypted +cbData, cbNew );
 
 	delete[] m_pbDecrypted;
 	m_pbDecrypted = pbNew;
 	m_cbDecrypted = cbNew;
+}
 
-	return	pbData;
+#pragma comment( lib, "Crypt32.lib" )
 
-// Consider using a ring buffer
-// if you think that physical memory copying is expensive.
+void
+CParaSocket::GetCertForTLS( void )
+{
+	m_npCert = 0;
+
+	FILETIME	ftNow;
+	GetSystemTimeAsFileTime( &ftNow );
+
+	HCERTSTORE	hMyStore = CertOpenStore( CERT_STORE_PROV_SYSTEM, 0, NULL, CERT_SYSTEM_STORE_CURRENT_USER, L"My" );
+	if	( hMyStore ){
+		LPSTR	pchOID[] = { szOID_PKIX_KP_CLIENT_AUTH };
+		CERT_ENHKEY_USAGE	eku = { 0 };
+		eku.cUsageIdentifier = 1;
+		eku.rgpszUsageIdentifier = pchOID;
+
+		int	nCert = 0;
+		for	( int iTurn = 0; iTurn < 2; iTurn++ ){
+			PCCERT_CONTEXT	pCtx = NULL;
+			int	iCert = 0;
+			for	( ;; ){
+
+				// Find a certificate.
+
+				pCtx = CertFindCertificateInStore( hMyStore,
+									X509_ASN_ENCODING | PKCS_7_ASN_ENCODING,
+									CERT_FIND_EXT_ONLY_ENHKEY_USAGE_FLAG,
+									CERT_FIND_ENHKEY_USAGE,
+									&eku, pCtx );
+				if	( !pCtx )
+					break;
+
+				// Does it have Certification key?
+
+				DWORD	dwSize = 0;
+				if	( !CertGetCertificateContextProperty( pCtx, CERT_KEY_PROV_INFO_PROP_ID, NULL, &dwSize ) )
+					continue;
+
+				// Is it valid now?
+
+				if	( CompareFileTime( &ftNow, &pCtx->pCertInfo->NotBefore ) < 0 )
+					continue;
+				else if	( CompareFileTime( &ftNow, &pCtx->pCertInfo->NotAfter  ) > 0 )
+					continue;
+
+				if	( iTurn == 0 )
+					m_npCert++;
+				else
+					m_ppCert[iCert++] = CertDuplicateCertificateContext( pCtx );
+			}
+			if	( iTurn == 0 )
+				if	( m_npCert )
+					m_ppCert = new PCCERT_CONTEXT[m_npCert];
+		}
+		CertCloseStore( hMyStore, 0 );
+	}
 }
 
 DWORD
