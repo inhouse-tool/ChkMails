@@ -1839,8 +1839,15 @@ CMainWnd::Get1stReceivedA( CStringA strHeader )
 	x = xIn;
 	do{
 		x = strHeader.Find( "\r\n", x );
+		if	( x < 0 ){
+			break;
+		}
 		x += 2;
-		if	( strHeader[x] > ' ' ){
+		if	( strHeader[x] > ' ' ){		// Next header field:
+			xOut = x;
+			break;
+		}
+		else if	( strHeader[x] == '\r' ){	// Forged 'Received:' at the bottom of a mail header:
 			xOut = x;
 			break;
 		}
@@ -3055,88 +3062,87 @@ CMainWnd::CheckHeaderFields( CStringA strIn, CAttr& attr )
 			"ARC-Authentication-Results",			// RFC 8617 ( experimental )
 			"ARC-Message-Signature",			// RFC 8617 ( experimental )
 			"ARC-Seal",					// RFC 8617 ( experimental )
-			"Archived-At",
+			"Archived-At",					// RFC 5064
 			"Authentication-Results",
 			"Auto-Forwarded",
 			"Autoforwarded",
 			"Auto-Submitted",
 			"Autosubmitted",
-			"BIMI-Indicator",
-			"BIMI-Location",
-			"BIMI-Selector",
+			"BIMI-Indicator",				// IETF ( draft )
+			"BIMI-Location",				// IETF ( draft )
+			"BIMI-Selector",				// IETF ( draft )
 			"Cc",
 			"Comments",
 			"Content-Alternative",
-			"Content-Base",
+		//	"Content-Base",					// RFC 2557 ( removed )
 			"Content-Class",				// MS specific
-			"Content-Description",
-			"Content-Disposition",
-			"Content-Duration",
-			"Content-features",
-			"Content-ID",
+			"Content-Description",				// RFC 2045
+			"Content-Disposition",				// RFC 2183
+			"Content-Duration",				// RFC 3803
+			"Content-features",				// RFC 2912
+			"Content-ID",					// RFC 2392
 			"Content-Identifier",
-			"Content-Language",
+			"Content-Language",				// RFC 3282
 			"Content-Location",
-			"Content-MD5",
-			"Content-Return",
+			"Content-MD5",					// RFC 1864
+		//	"Content-Return",				// obsolete
 			"Content-Transfer-Encoding",
 			"Content-Type",
 			"Conversion",
 			"Conversion-With-Loss",
 			"Date",
 			"Deferred-Delivery",
+			"Delivered-To",					// RFC 9228
 			"Delivery-Date",
 			"Discarded-X400-IPMS-Extensions",
 			"Discarded-X400-MTS-Extensions",
-			"Disclose-Recipients",
-			"Disposition-Notification-Options",
-			"Disposition-Notification-To",
-			"DKIM-Signature",
+		//	"Disclose-Recipients",				// RFC 4021 ( for X.400 )
+			"Disposition-Notification-Options",		// RFC 8098
+			"Disposition-Notification-To",			// RFC 8098
+			"DKIM-Signature",				// RFC 6376
 			"DL-Expansion-History",
-			"DomainKey-Signature",
-		//	"Downgraded-Cc",				// obsolete
-		//	"Downgraded-Disposition-Notification-To",	// obsolete
-			"Downgraded-Final-Recipient",
-		//	"Downgraded-From",				// obsolete
-			"Downgraded-In-Reply-To",
-		//	"Downgraded-Mail-From",				// obsolete
-			"Downgraded-Message-Id",
-			"Downgraded-Original-Recipient",
-		//	"Downgraded-Rcpt-To",				// obsolete
-			"Downgraded-References",
-		//	"Downgraded-Reply-To",				// obsolete
-		//	"Downgraded-Resent-Cc",				// obsolete
-		//	"Downgraded-Resent-From",			// obsolete
-		//	"Downgraded-Resent-Reply-To",			// obsolete
-		//	"Downgraded-Resent-Sender",			// obsolete
-		//	"Downgraded-Resent-To",				// obsolete
-		//	"Downgraded-Return-Path",			// obsolete
-		//	"Downgraded-Sender",				// obsolete
-		//	"Downgraded-To",				// obsolete
+			"DomainKey-Signature",				// RFC 4870
+		//	"Downgraded-Cc",				// RFC 6857 ( obsolete )
+		//	"Downgraded-Disposition-Notification-To",	// RFC 6857 ( obsolete )
+			"Downgraded-Final-Recipient",			// RFC 6857
+		//	"Downgraded-From",				// RFC 6857 ( obsolete )
+			"Downgraded-In-Reply-To",			// RFC 6857
+		//	"Downgraded-Mail-From",				// RFC 6857 ( obsolete )
+			"Downgraded-Message-Id",			// RFC 6857
+			"Downgraded-Original-Recipient",		// RFC 6857
+		//	"Downgraded-Rcpt-To",				// RFC 6857 ( obsolete )
+			"Downgraded-References",			// RFC 6857
+		//	"Downgraded-In-Reply-To",			// RFC 6857 ( obsolete )
+		//	"Downgraded-Resent-Cc",				// RFC 6857 ( obsolete )
+		//	"Downgraded-Resent-From",			// RFC 6857 ( obsolete )
+		//	"Downgraded-Resent-Reply-To",			// RFC 6857 ( obsolete )
+		//	"Downgraded-Resent-Sender",			// RFC 6857 ( obsolete )
+		//	"Downgraded-Resent-To",				// RFC 6857 ( obsolete )
+		//	"Downgraded-Return-Path",			// RFC 6857 ( obsolete )
+		//	"Downgraded-Sender",				// RFC 6857 ( obsolete )
+		//	"Downgraded-To",				// RFC 6857 ( obsolete )
 			"Encoding",
 		//	"Encrypted",					// obsolete
-			"Envelope-From",
 			"Errors-To",					// RFC 2076 ( discouraged )
 			"Expires",
-			"Expiry-Date",
+		//	"Expiry-Date",					// RFC 2156 ( obsolete )
 			"Feedback-ID",					// Gmail specific
 			"From",
 			"Generate-Delivery-Report",
-			"gmsai",					// Gmail specific
+			"gmsai",					// Gmail specific ( Google Mail Server Application Indicator )
 			"In-Reply-To",
 			"Incomplete-Copy",
 			"Importance",
-			"Keywords",
-			"Language",
+			"Keywords",					// RFC 5322
 			"Latest-Delivery-Time",
-			"List-Archive",
-			"List-Help",
-			"List-ID",
-			"List-Owner",
-			"List-Post",
-			"List-Subscribe",
-			"List-Unsubscribe",
-			"List-Unsubscribe-Post",
+			"List-Archive",					// RFC 2369
+			"List-Help",					// RFC 2369
+			"List-ID",					// RFC 2919
+			"List-Owner",					// RFC 2369
+			"List-Post",					// RFC 2369
+			"List-Subscribe",				// RFC 2369
+			"List-Unsubscribe",				// RFC 2369
+			"List-Unsubscribe-Post",			// RFC 8058
 			"Message-Context",
 			"Message-ID",
 			"Message-Id",					// @bma.mpse.jp
@@ -3144,11 +3150,11 @@ CMainWnd::CheckHeaderFields( CStringA strIn, CAttr& attr )
 			"MIME-Version",
 		//	"MMHS-Exempted-Address", etc.			// RFC 6477
 			"MT-Priority",					// RFC 6758
-			"Organization",
+			"Organization",					// RFC 7681 ( informational )
 			"Original-Encoded-Information-Types",
-			"Original-From",
+			"Original-From",				// RFC 5703
 			"Original-Message-ID",
-			"Original-Recipient",
+			"Original-Recipient",				// RFC 3464
 			"Original-Subject",
 			"Originator-Return-Address",
 			"PICS-Label",
@@ -3157,7 +3163,8 @@ CMainWnd::CheckHeaderFields( CStringA strIn, CAttr& attr )
 			"Priority",
 			"ReachoutTracker",				// Gmail specific
 			"Received",
-			"References",
+			"Received-SPF",					// RFC 7208
+			"References",					// RFC 5322
 			"Reply-By",
 			"Reply-To",
 			"Require-Recipient-Valid-Since",		// RFC 7293
@@ -3165,31 +3172,31 @@ CMainWnd::CheckHeaderFields( CStringA strIn, CAttr& attr )
 			"Resent-Date",
 			"Resent-From",
 			"Resent-Message-ID",
-			"Resent-Reply-To",
+		//	"Resent-Reply-To",				// RFC 5322 ( obsolete )
 			"Resent-Sender",
 			"Resent-To",
 			"Return-Path",
 			"Sender",
 			"Sensitivity",
-			"Solicitation",
+			"Solicitation",					// RFC 3865
 			"Subject",
 			"Supersedes",
 			"Thread-Index",					// MS specific
 			"Thread-Topic",					// MS specific
-			"TLS-Report-Domain",
-			"TLS-Report-Submitter",
-			"TLS-Required",
+			"TLS-Report-Domain",				// RFC 8460
+			"TLS-Report-Submitter",				// RFC 8460
+			"TLS-Required",					// RFC 8689
 			"To",
 			"User-Agent",
 			"VBR-Info",					// RFC 5518
-			"X400-Content-Identifier",
-			"X400-Content-Return",
-			"X400-Content-Type",
-			"X400-MTS-Identifier",
-			"X400-Originator",
-			"X400-Received",
-			"X400-Recipients",
-			"X400-Trace",
+		//	"X400-Content-Identifier",			// RFC 4021 ( for X.400 )
+		//	"X400-Content-Return",				// RFC 4021 ( for X.400 )
+		//	"X400-Content-Type",				// RFC 4021 ( for X.400 )
+		//	"X400-MTS-Identifier",				// RFC 4021 ( for X.400 )
+		//	"X400-Originator",				// RFC 4021 ( for X.400 )
+		//	"X400-Received",				// RFC 4021 ( for X.400 )
+		//	"X400-Recipients",				// RFC 4021 ( for X.400 )
+		//	"X400-Trace",					// RFC 4021 ( for X.400 )
 			NULL };
 	int	x = 0;
 	for	( ;; ){
@@ -4991,11 +4998,12 @@ CMainWnd::RespondPOP( CStringA strMessage )
 			}
 			break;
 		case	8:	// Sent QUIT: to close and to connect the next user
-			ClosePOP( 0 );
-			SetTimer( TID_CLOSE, 0, NULL );
+			SetTimer( TID_CLOSE, 100, NULL );	// Wait server to close the session ( timeout 100ms ).
 			m_iPhase++;
 			break;
 		case	9:
+			ClosePOP( 0 );				// Close the session if it remains ( timeout ).
+
 			// All users done: Show the result.
 
 			if	( ++m_iUser >= m_aAccount.GetCount() ){
