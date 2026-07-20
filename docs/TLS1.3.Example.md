@@ -2,13 +2,53 @@
 
 動きますよ. ホントに動くんです.
 
-ホントに動いた証拠として,
-動いている最中のやり取りを [Wireshark](https://www.wireshark.org/) でキャプチャーしておいた記録と,<br>
-どの記録がどの局面でキャプチャーされたものなのかの説明も添えてお送りいたします.
+動いているのは当 class [`CParaSocket`](CParaSocket.md) と言うよりは,
+当 class が動作を発注している先である
+[SSPI 関数](https://learn.microsoft.com/ja-jp/windows/win32/secauthn/authentication-functions)
+のみなさんのおかげなのですが,
+その [Schannel SSP の概要説明](https://learn.microsoft.com/ja-jp/windows-server/security/tls/tls-ssl-schannel-ssp-overview)に,
+「1.0、1.1、1.2、および 1.3」と TLS バージョンの対応が謳われています.
+なので 当 class も TLS1.3 がイケるわけです,
+[SSPI 関数](https://learn.microsoft.com/ja-jp/windows/win32/secauthn/authentication-functions)
+がイケる範囲で.
+
+なので当 class は, いわゆる [1-RTT](https://www.google.com/search?q=1-RTT+とは) に対応していますが,
+[0-RTT](https://www.google.com/search?q=0-RTT+とは) には対応していません.
+この仕事の発注先である
+[Schannel SSP](https://learn.microsoft.com/ja-jp/windows-server/security/tls/tls-ssl-schannel-ssp-overview)
+が対応していないからです.
 <br>
-<sup>
+<sup> (
+その点を [Bing 在住の AI である Copilot さん](https://copilot.microsoft.com/)に確認してみたところ,
+「仕様的にも構造的にも 0-RTT はムリ。」と請け合ってくれたので間違いないでしょう.
+) </sup>
+
+また, 当 class は TLS1.3 の
+[ポストハンドシェイク制御メッセージ](https://www.google.com/search?q=TLS+1.3+ポストハンドシェイク制御メッセージ)である
+
+* NewSessionTicket
+* KeyUpdate
+* CertificateRequest ( Certificate / CertificateVerify )
+
+に対応しています.
+<br>
+<sup> (
+当初, [アプリ](https://github.com/inhouse-tool/ChkMails)に必要だった
+NewSessionTicket だけ対応していたのですが,
+[Copilot さん](https://copilot.microsoft.com/)が「あとちょっとでイケるのに他のは？」とか言ってきたので,
+つい.
+) </sup>
+
+以下,
+ホントに動いた証拠として,
+POP3 のやり取りを [Wireshark](https://www.wireshark.org/) 
+でキャプチャーしておいた記録を,
+ここに掲げておくものです.
+ついでにどの記録がどの局面でキャプチャーされたものなのかの説明も添えておきました.
+<br>
+<sup> (
 そうでもしておかないと, どれがなにやらだれがどこやら, わかんなくなっちゃうんですよ…….
-</sup>
+) </sup>
 
 
 ## 接続
