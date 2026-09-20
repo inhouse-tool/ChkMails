@@ -2838,7 +2838,6 @@ CMainWnd::EscapeFromJIS( CStringA strIn, CAttr& attr )
 		{ "\x1b$B",		true,	false	},	// JIS X 0208-1983 / JIS X 0208:1990
 		{ "\x1b(B",		false,	false	},	// ASCII
 		{ "\x1b(J",		false,	false	},	// JIS X 0201-1976 Latin
-		{ "\x1b$(D",		true,	false	},	// JIS X 0212-1990
 		{ "\x1b(I",		false,	true	},	// JIS X 0201-1976 Kana
 		{ NULL,			false,	false	}
 	};
@@ -3547,20 +3546,34 @@ CMainWnd::IsFieldRegisterd( CString strField, CAttr& attr )
 		int	x = strName.Find( '\t' );
 		CString	strRegisteredWord   = strName.Left( x );
 		CString	strRegisteredDomain = strName.Mid( x+1 );
-		NormalizeAlias( strRegisteredWord );
 
-		int	iWord = strField.Find( strRegisteredWord );
-		if	( iWord < 0 ){
-			if	( strRegisteredWord.GetLength() > 4 ){
-				CString	strFieldL = strField;
-				strFieldL.MakeLower();
-				strRegisteredWord.MakeLower();
-				iWord = strFieldL.Find( strRegisteredWord );
-				if	( iWord < 0 )
+		// Quoted: Check if identical.
+
+		if	( strRegisteredWord[0] == '"' &&
+			  strRegisteredWord[strRegisteredWord.GetLength()-1] == '"' ){
+			strRegisteredWord.Delete( 0, 1 );
+			strRegisteredWord.Delete( strRegisteredWord.GetLength()-1, 1 );
+			if	( strRegisteredWord != strField )
+				continue;
+		}
+
+		// Normal: Check if included.
+
+		else{
+			NormalizeAlias( strRegisteredWord );
+			int	iWord = strField.Find( strRegisteredWord );
+			if	( iWord < 0 ){
+				if	( strRegisteredWord.GetLength() > 4 ){
+					CString	strFieldL = strField;
+					strFieldL.MakeLower();
+					strRegisteredWord.MakeLower();
+					iWord = strFieldL.Find( strRegisteredWord );
+					if	( iWord < 0 )
+						continue;
+				}
+				else
 					continue;
 			}
-			else
-				continue;
 		}
 
 		nHit |= 0x01;
