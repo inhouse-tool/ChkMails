@@ -1,4 +1,4 @@
-# ChkMails<br><sup><sup>Version 1.1.16.920</sup></sup>
+# ChkMails<br><sup><sup>Version 1.1.17.1103</sup></sup>
 
 メールが届いているかチェックしてお知らせする常駐アプリです.
 
@@ -6,7 +6,7 @@
 
 要らないメールかどうかもチェックします.
 要らないと判定したメールは自動的に削除します.
-要するに, スパムメール対策<sup>*</sup>なんですが,
+要するに, スパムメール対策<sup> * </sup>なんですが,
 要らないメールは「仕分け」するのではなく「削除」し,
 要るメールが残らない限り何事もなかったかのように黙っています.
 結果的に,
@@ -354,14 +354,21 @@ DMARC と DKIM と SPF の 3つが pass しています.
 
 1. 'Received:' from unrelated domain<br>
 メール送信時の認証手順に小細工を施して, `Received:` に信用度の高い無関係のドメインを騙っている.
-<br><sup>( 業界では[HELO spoofing](https://www.google.com/search?q=helo+spoofing)とか呼ばれています. )</sup>
+<br><sup>( 業界では[HELO spoofing](https://www.google.com/search?q="helo+spoofing"+とは)とか呼ばれています. )</sup>
 
 1. DMARC 'From:' unrelated domain<br>
 DMRAC 未対応な無関係のドメインを `From:` に騙って, `dmarc=fail` を回避している.
 <br><sup>( 勝手に騙られたドメインの[IPレピュテーション](https://www.google.com/search?q=IPレピュテーション)もガタ落ちというものです. )</sup>
 
-デフォルトで上記 2つとも ON にしてあります.<br>
-人間が目視確認しようとしても目がつらいばかりですが,
+1. DKIM Signature by Sender<br>
+送信者が自分で `DKIM Signature` を施している.
+<br><sup>( 本来, メールを中継した第三者が付与すべき signature を送信者が自作自演しています. 認証が pass するように調整したということです. )</sup>
+
+デフォルトで上記 1. と 2. は ON にしてあります. 3. も ON に設定して問題ありません.
+<br><sup>(
+まだ 3. の機能が備わる前, インストール後の初期値として OFF を選定してしまったのを引きずっているだけです.
+)</sup><br>
+これらは人間が目視確認しようとしても目がつらいばかりですが,
 コンピューターから見ると判りやすい痕跡がメールヘッダーに残ります.
 わざわざ「私はスパムです。」と言ってくれているようなもんです.
 見逃す手はないでしょう.
