@@ -571,13 +571,7 @@ Content-Transfer-Encoding: 7bit
 | [Recipient](../../#recipient) | カスタマイズ ( 受信者を全て指名の上, [`ml.smile-etc.jp`](#authentication-results-が全て-pass-している代行業者メールの例) を除外 ) |
 | [Sender](../../#sender) | カスタマイズ ( 全て☑ の上, 本文中 `5` 回以上の検出で摘発 ) |
 | [Time Zone](../../#time-zone) | カスタマイズ ( +0800 に☑ ) |
-| [Whitelist](../../#whitelist) | カスタマイズ ( order-update@amazon.co.jp と shipment-tracking@amazon.co.jp を救済<sup> * </sup> ) |
-
-<sub>
-*
-なぜか amazon 発行の進捗報告に U+202E RIGHT-TO-LEFT OVERRIDE が混入するようになってしまっていたので, やむなくホワイトリスト入りさせて救済.
-</sub>
-
+| [Whitelist](../../#whitelist) | カスタマイズ ( order-update@amazon.co.jp と shipment-tracking@amazon.co.jp を救済 )<br><sup>なぜか amazon 発行の進捗報告に U+202E RIGHT-TO-LEFT OVERRIDE が混入するようになってしまっていたので, やむなくホワイトリスト入りさせて救済.</sup> |
 
 > [!IMPORTANT]
 あくまで当方の交流範囲に基づいての設定なので, 万人が丸パクリできるものではありません.
