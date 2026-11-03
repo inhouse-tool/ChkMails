@@ -39,7 +39,7 @@ CAuthPage::OnInitDialog( void )
 		else
 			GetDlgItem( IDC_STATIC_AUTH_SENDERID+i )->EnableWindow( FALSE );
 
-	for	( int i = 0; i < 2; i++ )
+	for	( int i = 0; i < 3; i++ )
 		if	( m_dwFlags & ( 1 << i ) )
 			((CButton*)GetDlgItem( IDC_CHECK_AUTH_RECEIVED+i ))->SetCheck( BST_CHECKED );
 
@@ -53,7 +53,7 @@ CAuthPage::OnOK( void )
 	m_nAuth = pCombo->GetCurSel();
 
 	m_dwFlags = 0xffff;
-	for	( int i = 0; i < 2; i++ )
+	for	( int i = 0; i < 3; i++ )
 		if	( ((CButton*)GetDlgItem( IDC_CHECK_AUTH_RECEIVED+i ))->
 				GetCheck() != BST_CHECKED )
 			m_dwFlags &= ~( 1 << i );

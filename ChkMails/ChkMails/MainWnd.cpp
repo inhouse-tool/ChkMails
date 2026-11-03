@@ -505,7 +505,7 @@ CMainWnd::OnMenuFilter( void )
 		bUpdate = true;
 	}
 	if	( sheet.m_pageAuth  .m_dwFlags          != m_dwAuth ){
-		m_dwAuth        = sheet.m_pageAuth        .m_dwFlags;
+		m_dwAuth        = sheet.m_pageAuth        .m_dwFlags	| 0xfff8;//TMP: Adjust default for the next version
 		bUpdate = true;
 	}
 	if	( sheet.m_pageCode  .m_dwFlags          != m_dwCode ){
@@ -846,7 +846,7 @@ CMainWnd::LoadFilters( void )
 	CChkMailsApp*	pApp = (CChkMailsApp*)AfxGetApp();
 
 	m_nAuth         = pApp->GetProfileInt(    _T("Filters"), _T("AuthFail"),   2 );
-	m_dwAuth        = pApp->GetProfileInt(    _T("Filters"), _T("AuthFlag"),   0x0003 );
+	m_dwAuth        = pApp->GetProfileInt(    _T("Filters"), _T("AuthFlag"),   0xffff );
 	m_dwAuthCache   = pApp->GetProfileInt(    _T("Filters"), _T("AuthBits"),   0x0000 );
 	m_dwCode        = pApp->GetProfileInt(    _T("Filters"), _T("Code"),       0xffff );
 	m_strCodeFont   = pApp->GetProfileString( _T("Filters"), _T("CodeFont"),   _T("") );
@@ -1676,6 +1676,32 @@ CMainWnd::CheckReceived( CStringA strHeader, CAttr& attr )
 			FilterError( IDS_RF_AUTH_DMARC, attr );
 
 	}while	( false );
+
+	// Check if 'DKIM-Signature:' is placed under 'From:' and 'To;' and sent from another host.
+	// ( i.e. DKIM Signature Injection )
+
+	do{
+		if	( !IsFiltered( IDS_RF_AUTH_DKIM ) )
+			break;
+
+		strHeader.MakeLower();
+		x = strHeader.Find( "dkim-signature:" );
+		int	xTo = strHeader.Find( "from:" );
+		if	( x > xTo ){
+			x = strHeader.Find( "d=", x );
+			if	( x < 0 )
+				break;
+			int	x2 = strHeader.Find( ";", x );
+			if	( x2 < 0 )
+				break;
+			x += 2;
+			CStringA strSigner = strHeader.Mid( x, x2-x );
+			strSigner = DomainOfA( strSigner );
+			strSendDomain.MakeLower();
+			if	( strSigner != strSendDomain )
+				FilterError( IDS_RF_AUTH_DKIM, attr );
+		}
+	}while	( false );
 }
 
 void
@@ -1706,6 +1732,11 @@ CMainWnd::GetTime( CStringA strDate, CAttr& attr )
 
 	int	x;
 	long	lBias = 0;
+
+	if	( strDate.Right( 1 ) == ")" ){
+		x = strDate.ReverseFind( '(' );
+		strDate.Delete( x, strDate.GetLength()-x );
+	}
 	{
 		CStringA strZone;
 		x = strDate.ReverseFind( '+' );
@@ -2513,7 +2544,7 @@ CMainWnd::StringFromPart( CStringA strIn, CAttr& attr )
 			continue;
 		}
 		else{
-			for	( --x; ; x-- )
+			for	( --x; x >= 0; x-- )
 				if	( strIn[x] != '\r' &&
 					  strIn[x] != '\n' )
 					break;
@@ -3070,6 +3101,7 @@ CMainWnd::CheckHeaderFields( CStringA strIn, CAttr& attr )
 			"BIMI-Indicator",				// IETF ( draft )
 			"BIMI-Location",				// IETF ( draft )
 			"BIMI-Selector",				// IETF ( draft )
+			"Bounces-to",					// Amazon specific
 			"Cc",
 			"Comments",
 			"Content-Alternative",
